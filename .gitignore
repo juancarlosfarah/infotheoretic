@@ -10,3 +10,52 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+# Python
+# ======
+*.pyc
+*.egg-info
+
+# Temporary Files
+# ===============
+*~
+*.orig
+\#*
+.\#*
+.DS_Store
+stage1
+*.BACKUP.*
+*.BASE.*
+*.LOCAL.*
+*.REMOTE.*
+
+# LaTeX Files
+# ===========
+*.out
+*.aux
+*.log
+*.synctex.gz
+*.pdf
+*.toc
+*.blg
+*.bbl
+
+# IDEA files
+# ==========
+*.idea
+*.iml
+
+# Virtual Environment
+# ===================
+venv
+
+# Build Folders
+# =============
+build
+dist
+out
+target
+
+# Libraries
+# =========
+lib
