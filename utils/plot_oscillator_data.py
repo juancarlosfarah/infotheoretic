@@ -2,8 +2,7 @@ __author__ = 'juancarlosfarah'
 
 import pymongo
 import matplotlib.pyplot as plt
-import numpy as np
-from scipy.interpolate import spline
+
 
 def connect(database):
     host = "localhost"
@@ -12,7 +11,7 @@ def connect(database):
     return mc.get_database(database)
 
 
-def plot(threshold):
+def plot_one(threshold):
     db = connect("individual_project")
 
     cursor = db.oscillator_simulation.find({"threshold": threshold})
@@ -43,6 +42,7 @@ def plot(threshold):
     plt.show(fig)
 
     return
+
 
 def plot():
     db = connect("individual_project")
