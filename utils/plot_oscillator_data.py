@@ -62,9 +62,6 @@ def plot():
         "0.6": "green"
     }
 
-    fig1 = plt.figure()
-    fig2 = plt.figure()
-
     for key in cursors:
         beta[key] = []
         global_sync[key] = []
@@ -74,6 +71,7 @@ def plot():
             global_sync[key].append(doc['global_sync'])
             integrated_information[key].append(doc['integrated_information_e'])
 
+    fig1 = plt.figure()
     handles = []
     labels = []
     for key in cursors:
@@ -88,6 +86,7 @@ def plot():
     plt.legend(handles, labels, title="Threshold")
     plt.show(fig1)
 
+    fig2 = plt.figure()
     handles = []
     labels = []
     for key in cursors:
