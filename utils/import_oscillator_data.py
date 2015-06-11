@@ -45,18 +45,23 @@ class OscillatorDataImporter:
             avg_syncs = []
             beta = output.data.b
             sync_discrete = []
+            syncs = np.zeros((num_oscillators, duration))
 
             # Create ObjectId
             _id = ObjectId()
 
+            t_step = 0
             for sync_t in sync:
 
                 # Record average synchrony to calculate global synchrony.
                 avg_sync_t = np.average(sync_t)
                 avg_syncs.append(avg_sync_t)
 
-                # Transform diagonal.
+                # Get diagonal and store for later calculations.
                 diagonal = sync_t.diagonal().copy()
+                syncs[:, t_step] = diagonal.T
+
+                # Transform diagonal.
                 diagonal[diagonal < threshold] = 0
                 diagonal[diagonal >= threshold] = 1
 
@@ -66,13 +71,28 @@ class OscillatorDataImporter:
                     "data": diagonal.tolist()
                 }
                 sync_discrete.append(sync_obj)
+                t_step += 1
 
+            # Compute variance for lambda.
+            sync_vars = []
+            for i in range(num_oscillators):
+                sync_vars.append(np.var(syncs[i]))
+
+            # Compute variance for chi.
+            chi_vars = []
+            for i in range(duration):
+                chi_vars.append(np.var(syncs[:, i]))
+
+            lamda = np.average(sync_vars)
+            chi = np.average(chi_vars)
             avg_sync = np.average(avg_syncs)
 
             obj = {
                 "_id": _id,
                 "global_sync": avg_sync,
                 "beta": beta,
+                "lambda": lamda,
+                "chi": chi,
                 "num_oscillators": num_oscillators,
                 "duration": duration,
                 "threshold": threshold
@@ -89,4 +109,11 @@ class OscillatorDataImporter:
 if __name__ == '__main__':
     data_folder = "/Users/juancarlosfarah/Git/data/Data"
     default_db = "individual_project"
-    pass
+
+    # odi = OscillatorDataImporter()
+    # odi.connect(default_db)
+    # odi.load_folder(data_folder, 0.9)
+    # odi.load_folder(data_folder, 0.8)
+    # odi.load_folder(data_folder, 0.7)
+    # odi.load_folder(data_folder, 0.6)
+    # odi.load_folder(data_folder, 0.5)
