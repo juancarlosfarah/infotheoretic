@@ -48,27 +48,38 @@ def plot():
     db = connect("individual_project")
 
     cursors = {
+        "0.9": db.oscillator_simulation.find({"threshold": 0.9}),
         "0.8": db.oscillator_simulation.find({"threshold": 0.8}),
         "0.7": db.oscillator_simulation.find({"threshold": 0.7}),
-        "0.6": db.oscillator_simulation.find({"threshold": 0.6})
+        "0.6": db.oscillator_simulation.find({"threshold": 0.6}),
+        "0.5": db.oscillator_simulation.find({"threshold": 0.5})
     }
 
     beta = dict()
     global_sync = dict()
     integrated_information = dict()
+    chi = dict()
+    lamda = dict()
+
     colors = {
+        "0.9": "orange",
         "0.8": "red",
         "0.7": "blue",
-        "0.6": "green"
+        "0.6": "green",
+        "0.5": "purple"
     }
 
     for key in cursors:
         beta[key] = []
         global_sync[key] = []
+        chi[key] = []
+        lamda[key] = []
         integrated_information[key] = []
         for doc in cursors[key]:
             beta[key].append(doc['beta'])
             global_sync[key].append(doc['global_sync'])
+            lamda[key].append(doc['lambda'])
+            chi[key].append(doc['chi'])
             integrated_information[key].append(doc['integrated_information_e'])
 
     fig1 = plt.figure()
@@ -100,6 +111,66 @@ def plot():
                                    label=key))
     plt.legend(handles, labels, title="Threshold")
     plt.show(fig2)
+
+    fig3 = plt.figure()
+    handles = []
+    labels = []
+    for key in cursors:
+        labels.append(key)
+        plt.xlabel("Beta")
+        plt.ylabel("Chi")
+        plt.title("Chi over Beta")
+        handles.append(plt.scatter(beta[key],
+                                   chi[key],
+                                   color=colors[key],
+                                   label=key))
+    plt.legend(handles, labels, title="Threshold")
+    plt.show(fig3)
+
+    fig4 = plt.figure()
+    handles = []
+    labels = []
+    for key in cursors:
+        labels.append(key)
+        plt.xlabel("Beta")
+        plt.ylabel("Lambda")
+        plt.title("Lambda over Beta")
+        handles.append(plt.scatter(beta[key],
+                                   lamda[key],
+                                   color=colors[key],
+                                   label=key))
+    plt.legend(handles, labels, title="Threshold")
+    plt.show(fig4)
+
+    fig5 = plt.figure()
+    handles = []
+    labels = []
+    for key in cursors:
+        labels.append(key)
+        plt.xlabel("Chi")
+        plt.ylabel("Integrated Information Empirical")
+        plt.title("Integrated Information Empirical over Chi")
+        handles.append(plt.scatter(chi[key],
+                                   integrated_information[key],
+                                   color=colors[key],
+                                   label=key))
+    plt.legend(handles, labels, title="Threshold")
+    plt.show(fig5)
+
+    fig6 = plt.figure()
+    handles = []
+    labels = []
+    for key in cursors:
+        labels.append(key)
+        plt.xlabel("Lambda")
+        plt.ylabel("Integrated Information Empirical")
+        plt.title("Integrated Information Empirical over Lambda")
+        handles.append(plt.scatter(lamda[key],
+                                   integrated_information[key],
+                                   color=colors[key],
+                                   label=key))
+    plt.legend(handles, labels, title="Threshold")
+    plt.show(fig6)
 
     return
 
