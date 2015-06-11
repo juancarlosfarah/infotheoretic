@@ -5,7 +5,6 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.util.JSON;
 import infodynamics.measures.discrete.MutualInformationCalculatorDiscrete;
 import infodynamics.utils.MatrixUtils;
 import infodynamics.utils.RandomGenerator;
@@ -15,7 +14,6 @@ import org.bson.types.ObjectId;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Sorts.ascending;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -130,17 +128,12 @@ public class Main {
 
         System.out.println("First Effective Information Test:");
 
-        int[] var0 = {0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 0};
-        int[] var1 = {0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1};
-
         RandomGenerator rg = new RandomGenerator();
         int[] var0a = rg.generateRandomInts(1000000, 2);
         var0a[0] = 0;
         int[] var1a = new int[1000000];
         var1a[0] = 0;
-        for (int i = 1; i < 1000000; i++) {
-            var1a[i] = var0a[i - 1];
-        }
+        System.arraycopy(var0a, 0, var1a, 1, 999999);
 
         int[][] states0 = {var0a, var1a};
 
@@ -214,11 +207,7 @@ public class Main {
         Document ne = new Document("$exists", false);
         Document query = new Document("integrated_information_e", ne);
 
-        MongoCursor<Document> c = simulation.find(query).iterator();
-
-        while (c.hasNext()) {
-
-            Document doc = c.next();
+        for (Document doc : simulation.find(query)) {
 
             // Get ObjectId for simulation.
             ObjectId _id = doc.getObjectId("_id");
@@ -227,30 +216,30 @@ public class Main {
             MongoCursor<Document> cursor = data.find(eq("simulation_id", _id))
                     .sort(ascending("_id"))
                     .iterator();
-
             int num_oscillators = doc.getInteger("num_oscillators");
             int duration = doc.getInteger("duration");
-
             int[][] obs = new int[num_oscillators][duration];
 
+            // Transform data for use with Phi_E Calculator.
             int column = 0;
-            while (cursor.hasNext()){
+            while (cursor.hasNext()) {
                 Document d = cursor.next();
-                ArrayList<Integer> array = (ArrayList)(d.get("data"));
+                ArrayList<Integer> array = (ArrayList) (d.get("data"));
                 int[] vector = Ints.toArray(array);
                 MatrixUtils.insertVectorIntoMatrix(vector, obs, column);
                 column++;
             }
 
+            // Compute Phi_E and Minimium Information Bipartition.
             iicd = new IntegratedInformationCalculatorDiscrete(2, tau);
             iicd.addObservations(obs);
             iicd.computePossiblePartitions();
             double ii = iicd.compute();
             ArrayList<List<Integer>> mib = new ArrayList<List<Integer>>();
-
             mib.add(Ints.asList(iicd.minimumInformationPartition[0]));
             mib.add(Ints.asList(iicd.minimumInformationPartition[1]));
 
+            // Store results in MongoDB.
             Document update = new Document();
             update.put("integrated_information_e", ii);
             update.put("min_information_bipartition", mib);
