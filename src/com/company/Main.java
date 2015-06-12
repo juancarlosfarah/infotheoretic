@@ -20,16 +20,6 @@ import java.util.List;
 
 public class Main {
 
-    public static MongoDatabase connect(String host,
-                                        int port,
-                                        String database) {
-
-        MongoClient mongoClient = new MongoClient(host , port);
-
-        return mongoClient.getDatabase(database);
-    }
-
-
     public static void testMutualInformation() {
 
         int[] var0 = { 0, 1, 1, 0 };
@@ -198,7 +188,11 @@ public class Main {
         System.out.println(Arrays.deepToString(iicd.minimumInformationPartition));
 
         // Test with data from Kuramoto Oscillator simulations.
-        MongoDatabase db = connect("localhost", 27017, "individual_project");
+        String host = "localhost";
+        int port = 27017;
+        String database = "individual_project";
+        MongoClient mongoClient = new MongoClient(host , port);
+        MongoDatabase db = mongoClient.getDatabase(database);
         MongoCollection<Document> simulation;
         MongoCollection<Document> data;
         simulation = db.getCollection("oscillator_simulation");
@@ -206,6 +200,9 @@ public class Main {
 
         Document ne = new Document("$exists", false);
         Document query = new Document("integrated_information_e", ne);
+
+        // Counter to keep track of number of updated documents.
+        int count = 0;
 
         for (Document doc : simulation.find(query)) {
 
@@ -246,7 +243,15 @@ public class Main {
             update.put("tau", tau);
             Document setDoc = new Document("$set", update);
             simulation.updateOne(eq("_id", _id), setDoc);
+
+            // Show counter.
+            count++;
+            System.out.println("Finished processing simulation " + count + ".");
+
         }
+
+        // Disconnect from DB.
+        mongoClient.close();
 
     }
 }
