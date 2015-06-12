@@ -12,7 +12,7 @@ public class EffectiveInformationCalculatorDiscrete {
     int[][] data;
     int base;
     int tau;
-
+    double system;
 
     public EffectiveInformationCalculatorDiscrete(int base, int tau) {
         this.base = base;
@@ -23,11 +23,9 @@ public class EffectiveInformationCalculatorDiscrete {
         data = states;
     }
 
-    public double computeForBipartition(int[] p1) {
-        double rvalue = 0.0;
+    public double computeForSystem() {
 
         try {
-
             MutualInformationCalculatorDiscrete micd;
 
             // Calculate MI for whole system.
@@ -37,7 +35,21 @@ public class EffectiveInformationCalculatorDiscrete {
             micd = new MutualInformationCalculatorDiscrete(sysBase, 0);
             micd.initialise();
             micd.addObservations(sysPaired[0], sysPaired[1]);
-            double system = micd.computeAverageLocalOfObservations();
+            system = micd.computeAverageLocalOfObservations();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return system;
+    }
+
+    public double computeForBipartition(int[] p1) {
+        double rvalue = 0.0;
+
+        try {
+
+            MutualInformationCalculatorDiscrete micd;
 
             double sum = 0;
 
@@ -49,7 +61,8 @@ public class EffectiveInformationCalculatorDiscrete {
             micd = new MutualInformationCalculatorDiscrete(p1Base, 0);
             micd.initialise();
             micd.addObservations(p1Paired[0], p1Paired[1]);
-            sum += micd.computeAverageLocalOfObservations();
+            double p1Ei = micd.computeAverageLocalOfObservations();
+            sum += p1Ei;
 
             // Calculate MI for the second partition.
             int[][] part2 = MatrixUtils.selectAllRowsExcept(data, p1);
@@ -59,7 +72,8 @@ public class EffectiveInformationCalculatorDiscrete {
             micd = new MutualInformationCalculatorDiscrete(p2Base, 0);
             micd.initialise();
             micd.addObservations(p2Paired[0], p2Paired[1]);
-            sum += micd.computeAverageLocalOfObservations();
+            double p2Ei = micd.computeAverageLocalOfObservations();
+            sum += p2Ei;
 
             // Subtract sum of MI of partitions from the MI of system.
             rvalue = system - sum;

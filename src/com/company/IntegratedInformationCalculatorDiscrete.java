@@ -54,12 +54,17 @@ public class IntegratedInformationCalculatorDiscrete {
         EffectiveInformationCalculatorDiscrete eicd;
         eicd = new EffectiveInformationCalculatorDiscrete(base, tau);
         eicd.addObservations(data);
+        eicd.computeForSystem();
 
         for (int[] partition : partitions) {
-            // TODO: Confirm with Pedro what to do if Normalisation Factor is 0.
+
             double k = computeNormalizationFactor(partition);
             double ei = eicd.computeForBipartition(partition);
-            double mipScore = ei / k;
+
+            // If k = 0, it means that one of the partitions has an entropy
+            // of 0, which means that it doesn't tell us anything about the
+            // rest of the system. Return 0 otherwise return normalised EI.
+            double mipScore = (k == 0) ? 0 : ei / k;
 
             if (mipScore < minimumInformationPartitionValue) {
                 minimumInformationPartition[0] = partition;
@@ -100,10 +105,7 @@ public class IntegratedInformationCalculatorDiscrete {
         ecd.addObservations(part2);
         double entropy2 = ecd.computeAverageLocalOfObservations();
 
-        double rvalue = Math.min(entropy1, entropy2);
-
-        // TODO: Confirm with Pedro what to do if Normalisation Factor is 0.
-        return rvalue == 0 ? 1 : rvalue;
+        return Math.min(entropy1, entropy2);
 
     }
 
