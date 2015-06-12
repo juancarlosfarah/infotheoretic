@@ -3,7 +3,7 @@ __author__ = 'juancarlosfarah'
 import pymongo
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.interpolate import interp1d
+import scipy.interpolate as spi
 
 
 def connect(database):
@@ -235,14 +235,18 @@ def plot_curves():
         # Split list of tuples into two list of x values any y values.
         x, y = zip(*points)
 
-        curve = interp1d(x, y, kind='linear')
+        # Plot original points.
+        plt.plot(x, y, 'ro', color=colors[key], label=key)
+
         x_new = np.linspace(min(x), max(x), 200)
+        spline = spi.InterpolatedUnivariateSpline(x, y)
+        spline.set_smoothing_factor(0.15)
 
         handles.append(plt.plot(x_new,
-                                curve(x_new),
+                                spline(x_new),
                                 color=colors[key],
                                 label=key))
-    plt.ylim(0, 1)
+    plt.ylim(-0.5, 1)
     plt.legend(handles, labels, title="Threshold")
     plt.show(fig2)
 
@@ -266,14 +270,18 @@ def plot_curves():
         # Split list of tuples into two list of x values any y values.
         x, y = zip(*points)
 
-        curve = interp1d(x, y, kind='linear')
+        # Plot original points.
+        plt.plot(x, y, 'ro', color=colors[key], label=key)
+
         x_new = np.linspace(min(x), max(x), 200)
+        spline = spi.InterpolatedUnivariateSpline(x, y)
+        spline.set_smoothing_factor(1.1)
 
         handles.append(plt.plot(x_new,
-                                curve(x_new),
+                                spline(x_new),
                                 color=colors[key],
                                 label=key))
-    plt.ylim(0, 1)
+    plt.ylim(-0.5, 1)
     plt.legend(handles, labels, title="Threshold")
     plt.show(fig3)
 
@@ -297,14 +305,18 @@ def plot_curves():
         # Split list of tuples into two list of x values any y values.
         x, y = zip(*points)
 
-        curve = interp1d(x, y, kind='linear')
+        # Plot original points.
+        plt.plot(x, y, 'ro', color=colors[key], label=key)
+
         x_new = np.linspace(min(x), max(x), 200)
+        spline = spi.InterpolatedUnivariateSpline(x, y)
+        spline.set_smoothing_factor(1.1)
 
         handles.append(plt.plot(x_new,
-                                curve(x_new),
+                                spline(x_new),
                                 color=colors[key],
                                 label=key))
-    plt.ylim(0, 1)
+    plt.ylim(-0.5, 1)
     plt.legend(handles, labels, title="Threshold")
     plt.show(fig4)
 
@@ -328,14 +340,18 @@ def plot_curves():
         # Split list of tuples into two list of x values any y values.
         x, y = zip(*points)
 
-        curve = interp1d(x, y, kind='linear')
+        # Plot original points.
+        plt.plot(x, y, 'ro', color=colors[key], label=key)
+
         x_new = np.linspace(min(x), max(x), 200)
+        spline = spi.InterpolatedUnivariateSpline(x, y)
+        spline.set_smoothing_factor(0.2)
 
         handles.append(plt.plot(x_new,
-                                curve(x_new),
+                                spline(x_new),
                                 color=colors[key],
                                 label=key))
-    plt.ylim(0, 1)
+    plt.ylim(-0.5, 1)
     plt.legend(handles, labels, title="Threshold")
     plt.show(fig5)
 
