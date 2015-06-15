@@ -60,6 +60,7 @@ def plot():
     beta = dict()
     global_sync = dict()
     integrated_information = dict()
+    coalition_entropy = dict()
     chi = dict()
     lamda = dict()
 
@@ -77,12 +78,14 @@ def plot():
         chi[key] = []
         lamda[key] = []
         integrated_information[key] = []
+        coalition_entropy[key] = []
         for doc in cursors[key]:
             beta[key].append(doc['beta'])
             global_sync[key].append(doc['global_sync'])
             lamda[key].append(doc['lambda'])
             chi[key].append(doc['chi'])
             integrated_information[key].append(doc['integrated_information_e'])
+            coalition_entropy[key].append(doc['coalition_entropy'])
 
     fig1 = plt.figure()
     handles = []
@@ -173,6 +176,21 @@ def plot():
                                    label=key))
     plt.legend(handles, labels, title="Threshold")
     plt.show(fig6)
+
+    fig7 = plt.figure()
+    handles = []
+    labels = []
+    for key in cursors:
+        labels.append(key)
+        plt.xlabel("Beta")
+        plt.ylabel("Coalition Entropy")
+        plt.title("Coalition Entropy over Beta")
+        handles.append(plt.scatter(beta[key],
+                                   coalition_entropy[key],
+                                   color=colors[key],
+                                   label=key))
+    plt.legend(handles, labels, title="Threshold")
+    plt.show(fig7)
 
     return
 
