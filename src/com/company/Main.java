@@ -100,7 +100,7 @@ public class Main {
 
     }
 
-    public static void main(String[] args) {
+    public static void testIntegratedInformation() {
 
         System.out.println("Running tests...");
         testMutualInformation();
@@ -187,6 +187,35 @@ public class Main {
         System.out.println(iicd.compute());
         System.out.println(Arrays.deepToString(iicd.minimumInformationPartition));
 
+    }
+
+    public static void testCoalitionEntropy() {
+
+        System.out.println("\n");
+        System.out.println("Coalition Entropy Test:");
+
+        CoalitionEntropyCalculatorDiscrete cecd;
+        cecd = new CoalitionEntropyCalculatorDiscrete(2);
+
+        int[] var1 = {1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1};
+        int[] var2 = {1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 0};
+        int[] var3 = {1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1};
+        int[] var4 = {1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1};
+
+        int[][] states = {var1, var2, var3, var4};
+
+        cecd.addObservations(states);
+
+        System.out.println(cecd);
+        System.out.println(cecd.compute());
+    }
+
+    public static void computeIntegratedInformation() {
+
+        // Use tau = 1;
+        int tau = 1;
+        IntegratedInformationCalculatorDiscrete iicd;
+
         // Test with data from Kuramoto Oscillator simulations.
         String host = "localhost";
         int port = 27017;
@@ -252,6 +281,79 @@ public class Main {
 
         // Disconnect from DB.
         mongoClient.close();
+
+    }
+
+    public static void computeCoalitionEntropy() {
+
+        int base = 2;
+        CoalitionEntropyCalculatorDiscrete cecd;
+
+        // Test with data from Kuramoto Oscillator simulations.
+        String host = "localhost";
+        int port = 27017;
+        String database = "individual_project";
+        MongoClient mongoClient = new MongoClient(host , port);
+        MongoDatabase db = mongoClient.getDatabase(database);
+        MongoCollection<Document> simulation;
+        MongoCollection<Document> data;
+        simulation = db.getCollection("oscillator_simulation");
+        data = db.getCollection("oscillator_data");
+
+        Document ne = new Document("$exists", false);
+        Document query = new Document("coalition_entropy", ne);
+
+        // Counter to keep track of number of updated documents.
+        int count = 0;
+
+        for (Document doc : simulation.find(query)) {
+
+            // Get ObjectId for simulation.
+            ObjectId _id = doc.getObjectId("_id");
+
+            // Get data for this simulation.
+            MongoCursor<Document> cursor = data.find(eq("simulation_id", _id))
+                                               .sort(ascending("_id"))
+                                               .iterator();
+            int num_oscillators = doc.getInteger("num_oscillators");
+            int duration = doc.getInteger("duration");
+            int[][] obs = new int[num_oscillators][duration];
+
+            // Transform data for use with Phi_E Calculator.
+            int column = 0;
+            while (cursor.hasNext()) {
+                Document d = cursor.next();
+                ArrayList<Integer> array = (ArrayList) (d.get("data"));
+                int[] vector = Ints.toArray(array);
+                MatrixUtils.insertVectorIntoMatrix(vector, obs, column);
+                column++;
+            }
+
+            // Compute coalition entropy.
+            cecd = new CoalitionEntropyCalculatorDiscrete(base);
+            cecd.addObservations(obs);
+            double ce = cecd.compute();
+
+            // Store results in MongoDB.
+            Document update = new Document();
+            update.put("coalition_entropy", ce);
+            Document setDoc = new Document("$set", update);
+            simulation.updateOne(eq("_id", _id), setDoc);
+
+            // Show counter.
+            count++;
+            System.out.println("Finished processing simulation " + count + ".");
+
+        }
+
+        // Disconnect from DB.
+        mongoClient.close();
+    }
+
+
+    public static void main(String[] args) {
+
+        computeCoalitionEntropy();
 
     }
 }
