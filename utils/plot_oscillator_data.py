@@ -192,6 +192,21 @@ def plot():
     plt.legend(handles, labels, title="Threshold")
     plt.show(fig7)
 
+    fig8 = plt.figure()
+    handles = []
+    labels = []
+    for key in cursors:
+        labels.append(key)
+        plt.xlabel("Coalition Entropy")
+        plt.ylabel("Integrated Information Empirical")
+        plt.title("Integrated Information Empirical over Coalition Entropy")
+        handles.append(plt.scatter(coalition_entropy[key],
+                                   integrated_information[key],
+                                   color=colors[key],
+                                   label=key))
+    plt.legend(handles, labels, title="Threshold")
+    plt.show(fig8)
+
     return
 
 
