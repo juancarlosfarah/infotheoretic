@@ -46,7 +46,7 @@ def plot_one(threshold):
     return
 
 
-def plot():
+def plot(phi="integrated_information_e"):
     db = connect("individual_project")
 
     cursors = {
@@ -60,6 +60,7 @@ def plot():
     beta = dict()
     global_sync = dict()
     integrated_information = dict()
+    phi_e_tilde = dict()
     coalition_entropy = dict()
     chi = dict()
     lamda = dict()
@@ -79,13 +80,15 @@ def plot():
         lamda[key] = []
         integrated_information[key] = []
         coalition_entropy[key] = []
+        phi_e_tilde[key] = []
         for doc in cursors[key]:
             beta[key].append(doc['beta'])
             global_sync[key].append(doc['global_sync'])
             lamda[key].append(doc['lambda'])
             chi[key].append(doc['chi'])
-            integrated_information[key].append(doc['integrated_information_e'])
+            integrated_information[key].append(doc[phi])
             coalition_entropy[key].append(doc['coalition_entropy'])
+            phi_e_tilde[key].append(doc['integrated_information_e_tilde'])
 
     fig1 = plt.figure()
     handles = []
@@ -206,6 +209,21 @@ def plot():
                                    label=key))
     plt.legend(handles, labels, title="Threshold")
     plt.show(fig8)
+
+    fig9 = plt.figure()
+    handles = []
+    labels = []
+    for key in cursors:
+        labels.append(key)
+        plt.xlabel("Integrated Information Empirical Tilde")
+        plt.ylabel("Integrated Information Empirical")
+        plt.title("Phi_E vs Phi_E Tilde ")
+        handles.append(plt.scatter(phi_e_tilde[key],
+                                   integrated_information[key],
+                                   color=colors[key],
+                                   label=key))
+    plt.legend(handles, labels, title="Threshold")
+    plt.show(fig9)
 
     return
 
@@ -390,5 +408,6 @@ def plot_curves():
 
 
 if __name__ == "__main__":
-    plot()
+    plot(phi='integrated_information_e')
+    plot(phi='integrated_information_e_tilde')
     # plot_curves()
