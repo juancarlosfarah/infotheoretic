@@ -350,10 +350,84 @@ public class Main {
         mongoClient.close();
     }
 
+    public static void computeIntegratedInformationEmpiricalTilde() {
+
+        // Use tau = 1;
+        int tau = 1;
+        IntegratedInformationEmpiricalTildeCalculatorDiscrete iicd;
+
+        // Test with data from Kuramoto Oscillator simulations.
+        String host = "localhost";
+        int port = 27017;
+        String database = "individual_project";
+        MongoClient mongoClient = new MongoClient(host , port);
+        MongoDatabase db = mongoClient.getDatabase(database);
+        MongoCollection<Document> simulation;
+        MongoCollection<Document> data;
+        simulation = db.getCollection("oscillator_simulation");
+        data = db.getCollection("oscillator_data");
+
+        Document ne = new Document("$exists", false);
+        Document query = new Document("integrated_information_e_tilde", ne);
+
+        // Counter to keep track of number of updated documents.
+        int count = 0;
+
+        for (Document doc : simulation.find(query)) {
+
+            // Get ObjectId for simulation.
+            ObjectId _id = doc.getObjectId("_id");
+
+            // Get data for this simulation.
+            MongoCursor<Document> cursor = data.find(eq("simulation_id", _id))
+                    .sort(ascending("_id"))
+                    .iterator();
+            int num_oscillators = doc.getInteger("num_oscillators");
+            int duration = doc.getInteger("duration");
+            int[][] obs = new int[num_oscillators][duration];
+
+            // Transform data for use with Phi_E Calculator.
+            int column = 0;
+            while (cursor.hasNext()) {
+                Document d = cursor.next();
+                ArrayList<Integer> array = (ArrayList) (d.get("data"));
+                int[] vector = Ints.toArray(array);
+                MatrixUtils.insertVectorIntoMatrix(vector, obs, column);
+                column++;
+            }
+
+            // Compute Phi_E and Minimium Information Bipartition.
+            iicd = new IntegratedInformationEmpiricalTildeCalculatorDiscrete(2,
+                    tau);
+            iicd.addObservations(obs);
+            iicd.computePossiblePartitions();
+            double ii = iicd.compute();
+            ArrayList<List<Integer>> mib = new ArrayList<List<Integer>>();
+            mib.add(Ints.asList(iicd.minimumInformationPartition[0]));
+            mib.add(Ints.asList(iicd.minimumInformationPartition[1]));
+
+            // Store results in MongoDB.
+            Document update = new Document();
+            update.put("integrated_information_e_tilde", ii);
+            update.put("min_information_bipartition_tilde", mib);
+            Document setDoc = new Document("$set", update);
+            simulation.updateOne(eq("_id", _id), setDoc);
+
+            // Show counter.
+            count++;
+            System.out.println("Finished processing simulation " + count + ".");
+
+        }
+
+        // Disconnect from DB.
+        mongoClient.close();
+
+    }
+
 
     public static void main(String[] args) {
 
-        computeCoalitionEntropy();
+        computeIntegratedInformationEmpiricalTilde();
 
     }
 }
