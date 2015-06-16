@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * Created by juancarlosfarah on 22/05/15.
  */
-public class IntegratedInformationCalculatorDiscrete {
+public class IntegratedInformationEmpiricalCalculatorDiscrete {
 
     private int base;
     private int tau;
@@ -22,7 +22,7 @@ public class IntegratedInformationCalculatorDiscrete {
     private double minimumInformationPartitionValue;
 
 
-    public IntegratedInformationCalculatorDiscrete(int base, int tau) {
+    public IntegratedInformationEmpiricalCalculatorDiscrete(int base, int tau) {
         this.base = base;
         this.tau = tau;
         partitions = new HashSet<int[]>();

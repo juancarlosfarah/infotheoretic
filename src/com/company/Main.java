@@ -162,8 +162,8 @@ public class Main {
         System.out.println("\n");
         System.out.println("First Integrated Information Test:");
 
-        IntegratedInformationCalculatorDiscrete iicd;
-        iicd = new IntegratedInformationCalculatorDiscrete(2, tau);
+        IntegratedInformationEmpiricalCalculatorDiscrete iicd;
+        iicd = new IntegratedInformationEmpiricalCalculatorDiscrete(2, tau);
         iicd.addObservations(states1);
         iicd.computePossiblePartitions();
 
@@ -181,7 +181,7 @@ public class Main {
 
         int[][] states2 = rg.generateRandomInts(8, 10000, 2);
 
-        iicd = new IntegratedInformationCalculatorDiscrete(2, tau);
+        iicd = new IntegratedInformationEmpiricalCalculatorDiscrete(2, tau);
         iicd.addObservations(states2);
         iicd.computePossiblePartitions();
         System.out.println(iicd.compute());
@@ -214,7 +214,7 @@ public class Main {
 
         // Use tau = 1;
         int tau = 1;
-        IntegratedInformationCalculatorDiscrete iicd;
+        IntegratedInformationEmpiricalCalculatorDiscrete iicd;
 
         // Test with data from Kuramoto Oscillator simulations.
         String host = "localhost";
@@ -257,7 +257,7 @@ public class Main {
             }
 
             // Compute Phi_E and Minimium Information Bipartition.
-            iicd = new IntegratedInformationCalculatorDiscrete(2, tau);
+            iicd = new IntegratedInformationEmpiricalCalculatorDiscrete(2, tau);
             iicd.addObservations(obs);
             iicd.computePossiblePartitions();
             double ii = iicd.compute();
