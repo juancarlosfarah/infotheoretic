@@ -46,7 +46,10 @@ def plot_one(threshold):
     return
 
 
-def plot(phi="integrated_information_e", save=False):
+def plot(phi="integrated_information_e",
+         save=False,
+         path="$HOME",
+         ext="svg"):
     db = connect("individual_project")
 
     cursors = {
@@ -105,7 +108,7 @@ def plot(phi="integrated_information_e", save=False):
     plt.legend(handles, labels, title="Threshold")
 
     if save:
-        fig.savefig("/Users/juancarlosfarah/Git/infotheoretic/docs/1.png")
+        fig.savefig(path + "1." + ext)
     else:
         plt.show(fig)
 
@@ -124,7 +127,7 @@ def plot(phi="integrated_information_e", save=False):
     plt.legend(handles, labels, title="Threshold")
 
     if save:
-        fig.savefig("/Users/juancarlosfarah/Git/infotheoretic/docs/2.png")
+        fig.savefig(path + "2." + ext)
     else:
         plt.show(fig)
 
@@ -143,7 +146,7 @@ def plot(phi="integrated_information_e", save=False):
     plt.legend(handles, labels, title="Threshold")
 
     if save:
-        fig.savefig("/Users/juancarlosfarah/Git/infotheoretic/docs/3.png")
+        fig.savefig(path + "3." + ext)
     else:
         plt.show(fig)
 
@@ -162,7 +165,7 @@ def plot(phi="integrated_information_e", save=False):
     plt.legend(handles, labels, title="Threshold")
 
     if save:
-        fig.savefig("/Users/juancarlosfarah/Git/infotheoretic/docs/4.png")
+        fig.savefig(path + "4." + ext)
     else:
         plt.show(fig)
 
@@ -181,7 +184,7 @@ def plot(phi="integrated_information_e", save=False):
     plt.legend(handles, labels, title="Threshold")
 
     if save:
-        fig.savefig("/Users/juancarlosfarah/Git/infotheoretic/docs/5.png")
+        fig.savefig(path + "5." + ext)
     else:
         plt.show(fig)
 
@@ -200,7 +203,7 @@ def plot(phi="integrated_information_e", save=False):
     plt.legend(handles, labels, title="Threshold")
 
     if save:
-        fig.savefig("/Users/juancarlosfarah/Git/infotheoretic/docs/6.png")
+        fig.savefig(path + "6." + ext)
     else:
         plt.show(fig)
 
@@ -219,7 +222,7 @@ def plot(phi="integrated_information_e", save=False):
     plt.legend(handles, labels, title="Threshold")
 
     if save:
-        fig.savefig("/Users/juancarlosfarah/Git/infotheoretic/docs/7.png")
+        fig.savefig(path + "7." + ext)
     else:
         plt.show(fig)
 
@@ -238,7 +241,7 @@ def plot(phi="integrated_information_e", save=False):
     plt.legend(handles, labels, title="Threshold")
 
     if save:
-        fig.savefig("/Users/juancarlosfarah/Git/infotheoretic/docs/8.png")
+        fig.savefig(path + "8." + ext)
     else:
         plt.show(fig)
 
@@ -258,9 +261,11 @@ def plot(phi="integrated_information_e", save=False):
     plt.legend(handles, labels, title="Threshold")
 
     if save:
-        fig.savefig("/Users/juancarlosfarah/Git/infotheoretic/docs/9.png")
+        fig.savefig(path + "9." + ext)
     else:
         plt.show(fig)
+
+    plt.close()
 
     return
 
@@ -445,6 +450,12 @@ def plot_curves():
 
 
 if __name__ == "__main__":
-    plot(phi='integrated_information_e', save=False)
-    plot(phi='integrated_information_e_tilde', save=False)
+    plot(phi="integrated_information_e",
+         save=True,
+         path="/Users/juancarlosfarah/Git/infotheoretic/docs/phi_e/",
+         ext="svg")
+    plot(phi='integrated_information_e_tilde',
+         save=True,
+         path="/Users/juancarlosfarah/Git/infotheoretic/docs/phi_e_tilde/",
+         ext="svg")
     # plot_curves()
