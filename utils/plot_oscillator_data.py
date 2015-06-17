@@ -46,7 +46,7 @@ def plot_one(threshold):
     return
 
 
-def plot(phi="integrated_information_e"):
+def plot(phi="integrated_information_e", save=False):
     db = connect("individual_project")
 
     cursors = {
@@ -90,7 +90,7 @@ def plot(phi="integrated_information_e"):
             coalition_entropy[key].append(doc['coalition_entropy'])
             phi_e_tilde[key].append(doc['integrated_information_e_tilde'])
 
-    fig1 = plt.figure()
+    fig = plt.figure()
     handles = []
     labels = []
     for key in cursors:
@@ -103,9 +103,13 @@ def plot(phi="integrated_information_e"):
                                    color=colors[key],
                                    label=key))
     plt.legend(handles, labels, title="Threshold")
-    plt.show(fig1)
 
-    fig2 = plt.figure()
+    if save:
+        fig.savefig("/Users/juancarlosfarah/Git/infotheoretic/docs/1.png")
+    else:
+        plt.show(fig)
+
+    fig = plt.figure()
     handles = []
     labels = []
     for key in cursors:
@@ -118,9 +122,13 @@ def plot(phi="integrated_information_e"):
                                    color=colors[key],
                                    label=key))
     plt.legend(handles, labels, title="Threshold")
-    plt.show(fig2)
 
-    fig3 = plt.figure()
+    if save:
+        fig.savefig("/Users/juancarlosfarah/Git/infotheoretic/docs/2.png")
+    else:
+        plt.show(fig)
+
+    fig = plt.figure()
     handles = []
     labels = []
     for key in cursors:
@@ -133,9 +141,13 @@ def plot(phi="integrated_information_e"):
                                    color=colors[key],
                                    label=key))
     plt.legend(handles, labels, title="Threshold")
-    plt.show(fig3)
 
-    fig4 = plt.figure()
+    if save:
+        fig.savefig("/Users/juancarlosfarah/Git/infotheoretic/docs/3.png")
+    else:
+        plt.show(fig)
+
+    fig = plt.figure()
     handles = []
     labels = []
     for key in cursors:
@@ -148,9 +160,13 @@ def plot(phi="integrated_information_e"):
                                    color=colors[key],
                                    label=key))
     plt.legend(handles, labels, title="Threshold")
-    plt.show(fig4)
 
-    fig5 = plt.figure()
+    if save:
+        fig.savefig("/Users/juancarlosfarah/Git/infotheoretic/docs/4.png")
+    else:
+        plt.show(fig)
+
+    fig = plt.figure()
     handles = []
     labels = []
     for key in cursors:
@@ -163,9 +179,13 @@ def plot(phi="integrated_information_e"):
                                    color=colors[key],
                                    label=key))
     plt.legend(handles, labels, title="Threshold")
-    plt.show(fig5)
 
-    fig6 = plt.figure()
+    if save:
+        fig.savefig("/Users/juancarlosfarah/Git/infotheoretic/docs/5.png")
+    else:
+        plt.show(fig)
+
+    fig = plt.figure()
     handles = []
     labels = []
     for key in cursors:
@@ -178,9 +198,13 @@ def plot(phi="integrated_information_e"):
                                    color=colors[key],
                                    label=key))
     plt.legend(handles, labels, title="Threshold")
-    plt.show(fig6)
 
-    fig7 = plt.figure()
+    if save:
+        fig.savefig("/Users/juancarlosfarah/Git/infotheoretic/docs/6.png")
+    else:
+        plt.show(fig)
+
+    fig = plt.figure()
     handles = []
     labels = []
     for key in cursors:
@@ -193,9 +217,13 @@ def plot(phi="integrated_information_e"):
                                    color=colors[key],
                                    label=key))
     plt.legend(handles, labels, title="Threshold")
-    plt.show(fig7)
 
-    fig8 = plt.figure()
+    if save:
+        fig.savefig("/Users/juancarlosfarah/Git/infotheoretic/docs/7.png")
+    else:
+        plt.show(fig)
+
+    fig = plt.figure()
     handles = []
     labels = []
     for key in cursors:
@@ -208,22 +236,31 @@ def plot(phi="integrated_information_e"):
                                    color=colors[key],
                                    label=key))
     plt.legend(handles, labels, title="Threshold")
-    plt.show(fig8)
 
-    fig9 = plt.figure()
+    if save:
+        fig.savefig("/Users/juancarlosfarah/Git/infotheoretic/docs/8.png")
+    else:
+        plt.show(fig)
+
+    fig = plt.figure()
     handles = []
     labels = []
     for key in cursors:
         labels.append(key)
         plt.xlabel("Integrated Information Empirical Tilde")
         plt.ylabel("Integrated Information Empirical")
-        plt.title("Phi_E vs Phi_E Tilde ")
+        plt.title("Integrated Information Empirical vs "
+                  "Integrated Information Empirical Tilde")
         handles.append(plt.scatter(phi_e_tilde[key],
                                    integrated_information[key],
                                    color=colors[key],
                                    label=key))
     plt.legend(handles, labels, title="Threshold")
-    plt.show(fig9)
+
+    if save:
+        fig.savefig("/Users/juancarlosfarah/Git/infotheoretic/docs/9.png")
+    else:
+        plt.show(fig)
 
     return
 
@@ -408,6 +445,6 @@ def plot_curves():
 
 
 if __name__ == "__main__":
-    plot(phi='integrated_information_e')
-    plot(phi='integrated_information_e_tilde')
+    plot(phi='integrated_information_e', save=False)
+    plot(phi='integrated_information_e_tilde', save=False)
     # plot_curves()
