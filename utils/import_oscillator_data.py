@@ -4,15 +4,20 @@ import oct2py
 import os
 import pymongo
 import numpy as np
+import random
+import sys
 from bson.objectid import ObjectId
 
 
 class OscillatorDataImporter:
 
-    def __init__(self, database=None):
+    def __init__(self,
+                 database=None,
+                 is_surrogate=False,
+                 is_shuffled=False):
         self.db = database
-
-        pass
+        self.is_surrogate = is_surrogate
+        self.is_shuffled = is_shuffled
 
     def connect(self, database):
         """
@@ -35,6 +40,8 @@ class OscillatorDataImporter:
         # Files are by default Octave files.
         # Initialise Oct2Py object.
         oc = oct2py.Oct2Py()
+        file_count = 0
+        num_files = len(files)
 
         for f in files:
             path = folder + "/" + f
@@ -50,6 +57,11 @@ class OscillatorDataImporter:
             # Create ObjectId
             _id = ObjectId()
 
+            # Shuffle if surrogate data.
+            if self.is_surrogate:
+                if self.is_shuffled:
+                    random.shuffle(sync)
+
             t_step = 0
             for sync_t in sync:
 
@@ -64,11 +76,12 @@ class OscillatorDataImporter:
                 # Transform diagonal.
                 diagonal[diagonal < threshold] = 0
                 diagonal[diagonal >= threshold] = 1
+                data = diagonal.tolist()
 
                 # Store information in object.
                 sync_obj = {
                     "simulation_id": _id,
-                    "data": diagonal.tolist()
+                    "data": data
                 }
                 sync_discrete.append(sync_obj)
                 t_step += 1
@@ -89,13 +102,16 @@ class OscillatorDataImporter:
 
             obj = {
                 "_id": _id,
+                "source": f,
                 "global_sync": avg_sync,
                 "beta": beta,
                 "lambda": lamda,
                 "chi": chi,
                 "num_oscillators": num_oscillators,
                 "duration": duration,
-                "threshold": threshold
+                "threshold": threshold,
+                "is_surrogate": self.is_surrogate,
+                "is_shuffled": self.is_shuffled
             }
 
             # Storing in MongoDB if database has been defined.
@@ -104,13 +120,27 @@ class OscillatorDataImporter:
                 db.oscillator_simulation.insert_one(obj)
                 db.oscillator_data.insert(sync_discrete)
 
+            # Progress bar.
+            file_count += 1
+            progress = (file_count / float(num_files - 1)) * 100
+            sys.stdout.write("Processing Oscillator Data: %d%% \r" % progress)
+            sys.stdout.flush()
+
         return
 
 if __name__ == '__main__':
     data_folder = "/Users/juancarlosfarah/Git/data/Data"
-    default_db = "individual_project"
+    default_db = "infotheoretic"
 
     # odi = OscillatorDataImporter()
+    # odi.connect(default_db)
+    # odi.load_folder(data_folder, 0.9)
+    # odi.load_folder(data_folder, 0.8)
+    # odi.load_folder(data_folder, 0.7)
+    # odi.load_folder(data_folder, 0.6)
+    # odi.load_folder(data_folder, 0.5)
+
+    # odi = OscillatorDataImporter(is_surrogate=True, is_shuffled=True)
     # odi.connect(default_db)
     # odi.load_folder(data_folder, 0.9)
     # odi.load_folder(data_folder, 0.8)
