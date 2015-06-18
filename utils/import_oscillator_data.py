@@ -4,7 +4,6 @@ import oct2py
 import os
 import pymongo
 import numpy as np
-import random
 import sys
 from bson.objectid import ObjectId
 
@@ -16,8 +15,8 @@ class OscillatorDataImporter:
                  is_surrogate=False,
                  is_shuffled=False):
         self.db = database
-        self.is_surrogate = is_surrogate
         self.is_shuffled = is_shuffled
+        self.is_surrogate = is_surrogate or is_shuffled
 
     def connect(self, database):
         """
@@ -56,11 +55,6 @@ class OscillatorDataImporter:
 
             # Create ObjectId
             _id = ObjectId()
-
-            # Shuffle if surrogate data.
-            if self.is_surrogate:
-                if self.is_shuffled:
-                    random.shuffle(sync)
 
             t_step = 0
             for sync_t in sync:
@@ -114,11 +108,15 @@ class OscillatorDataImporter:
                 "is_shuffled": self.is_shuffled
             }
 
+            # Shuffle if surrogate data.
+            if self.is_shuffled:
+                np.random.shuffle(sync_discrete)
+
             # Storing in MongoDB if database has been defined.
             db = self.db
             if db is not None:
                 db.oscillator_simulation.insert_one(obj)
-                db.oscillator_data.insert(sync_discrete)
+                db.oscillator_data.insert(sync_discrete, {'ordered': True})
 
             # Progress bar.
             file_count += 1
@@ -140,7 +138,7 @@ if __name__ == '__main__':
     # odi.load_folder(data_folder, 0.6)
     # odi.load_folder(data_folder, 0.5)
 
-    # odi = OscillatorDataImporter(is_surrogate=True, is_shuffled=True)
+    # odi = OscillatorDataImporter(is_shuffled=True)
     # odi.connect(default_db)
     # odi.load_folder(data_folder, 0.9)
     # odi.load_folder(data_folder, 0.8)
