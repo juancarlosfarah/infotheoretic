@@ -15,7 +15,7 @@ def connect(database):
 
 
 def plot_one(threshold):
-    db = connect("individual_project")
+    db = connect("infotheoretic")
 
     cursor = db.oscillator_simulation.find({"threshold": threshold})
 
@@ -52,15 +52,16 @@ def plot(phi="integrated_information_e",
          path="$HOME",
          ext="svg",
          query=None):
-    db = connect("individual_project")
+
+    db = connect("infotheoretic")
 
     duration = "Various"
 
-    if "duration" in query:
-        duration = query['duration']
-
     if not query:
         query = dict()
+
+    if "duration" in query:
+        duration = query['duration']
 
     q1 = deepcopy(query)
     q1['threshold'] = 0.9
@@ -305,7 +306,7 @@ def plot(phi="integrated_information_e",
 
 
 def plot_curves():
-    db = connect("individual_project")
+    db = connect("infotheoretic")
 
     cursors = {
         "0.9": db.oscillator_simulation.find({"threshold": 0.9}),
@@ -483,19 +484,277 @@ def plot_curves():
     plt.show(fig5)
 
 
-if __name__ == "__main__":
-    q = {
-        "duration": 5000
+def plot_surrogate_correlation(phi="integrated_information_e",
+                               save=False,
+                               path="$HOME",
+                               ext="svg",
+                               query=None):
+
+    db = connect("infotheoretic")
+
+    duration = "Various"
+
+    if not query:
+        query = dict()
+
+    if "duration" in query:
+        duration = query['duration']
+
+    q1a = deepcopy(query)
+    q1b = deepcopy(query)
+    q1a['threshold'] = 0.9
+    q1a['is_surrogate'] = False
+    q1b['threshold'] = 0.9
+    q1b['is_surrogate'] = True
+
+    q2a = deepcopy(query)
+    q2b = deepcopy(query)
+    q2a['threshold'] = 0.8
+    q2a['is_surrogate'] = False
+    q2b['threshold'] = 0.8
+    q2b['is_surrogate'] = True
+
+    q3a = deepcopy(query)
+    q3b = deepcopy(query)
+    q3a['threshold'] = 0.7
+    q3a['is_surrogate'] = False
+    q3b['threshold'] = 0.7
+    q3b['is_surrogate'] = True
+
+    q4a = deepcopy(query)
+    q4b = deepcopy(query)
+    q4a['threshold'] = 0.6
+    q4a['is_surrogate'] = False
+    q4b['threshold'] = 0.6
+    q4b['is_surrogate'] = True
+
+    q5a = deepcopy(query)
+    q5b = deepcopy(query)
+    q5a['threshold'] = 0.5
+    q5a['is_surrogate'] = False
+    q5b['threshold'] = 0.5
+    q5b['is_surrogate'] = True
+
+    cursors_a = {
+        "0.9": db.oscillator_simulation.find(q1a).sort('source', direction=1),
+        "0.8": db.oscillator_simulation.find(q2a).sort('source', direction=1),
+        "0.7": db.oscillator_simulation.find(q3a).sort('source', direction=1),
+        "0.6": db.oscillator_simulation.find(q4a).sort('source', direction=1),
+        "0.5": db.oscillator_simulation.find(q5a).sort('source', direction=1)
     }
 
-    plot(phi="integrated_information_e",
-         save=True,
-         path="/Users/juancarlosfarah/Git/infotheoretic/docs/phi_e/",
-         ext="svg",
-         query=q)
-    plot(phi='integrated_information_e_tilde',
-         save=True,
-         path="/Users/juancarlosfarah/Git/infotheoretic/docs/phi_e_tilde/",
-         ext="svg",
-         query=q)
+    cursors_b = {
+        "0.9": db.oscillator_simulation.find(q1b).sort('source', direction=1),
+        "0.8": db.oscillator_simulation.find(q2b).sort('source', direction=1),
+        "0.7": db.oscillator_simulation.find(q3b).sort('source', direction=1),
+        "0.6": db.oscillator_simulation.find(q4b).sort('source', direction=1),
+        "0.5": db.oscillator_simulation.find(q5b).sort('source', direction=1)
+    }
+
+    beta = {'original': dict(), 'surrogate': dict()}
+    global_sync = {'original': dict(), 'surrogate': dict()}
+    integrated_information = {'original': dict(), 'surrogate': dict()}
+    phi_e_tilde = {'original': dict(), 'surrogate': dict()}
+    coalition_entropy = {'original': dict(), 'surrogate': dict()}
+    chi = {'original': dict(), 'surrogate': dict()}
+    lamda = {'original': dict(), 'surrogate': dict()}
+
+    colors = {
+        "0.9": "orange",
+        "0.8": "red",
+        "0.7": "blue",
+        "0.6": "green",
+        "0.5": "purple"
+    }
+
+    for key in cursors_a:
+        beta['original'][key] = []
+        global_sync['original'][key] = []
+        chi['original'][key] = []
+        lamda['original'][key] = []
+        integrated_information['original'][key] = []
+        coalition_entropy['original'][key] = []
+        phi_e_tilde['original'][key] = []
+        for doc in cursors_a[key]:
+            beta['original'][key].append(doc['beta'])
+            global_sync['original'][key].append(doc['global_sync'])
+            lamda['original'][key].append(doc['lambda'])
+            chi['original'][key].append(doc['chi'])
+            integrated_information['original'][key].append(doc[phi])
+            coalition_entropy['original'][key].append(doc['coalition_entropy'])
+            phi_e_tilde['original'][key].append(doc['integrated_information_e_tilde'])
+
+    for key in cursors_b:
+        beta['surrogate'][key] = []
+        global_sync['surrogate'][key] = []
+        chi['surrogate'][key] = []
+        lamda['surrogate'][key] = []
+        integrated_information['surrogate'][key] = []
+        coalition_entropy['surrogate'][key] = []
+        phi_e_tilde['surrogate'][key] = []
+        for doc in cursors_b[key]:
+            beta['surrogate'][key].append(doc['beta'])
+            global_sync['surrogate'][key].append(doc['global_sync'])
+            lamda['surrogate'][key].append(doc['lambda'])
+            chi['surrogate'][key].append(doc['chi'])
+            integrated_information['surrogate'][key].append(doc[phi])
+            coalition_entropy['surrogate'][key].append(doc['coalition_entropy'])
+            phi_e_tilde['surrogate'][key].append(doc['integrated_information_e_tilde'])
+
+    fig = plt.figure()
+    handles = []
+    labels = []
+    for key in colors:
+        labels.append(key)
+        plt.xlabel("Coalition Entropy")
+        plt.ylabel("Coalition Entropy Surrogate")
+        plt.title("Coalition Entropy Surrogate Data Analysis\n"
+                  "Duration = " + str(duration) + ", Tau = 1")
+        handles.append(plt.scatter(coalition_entropy['original'][key],
+                                   coalition_entropy['surrogate'][key],
+                                   color=colors[key],
+                                   label=key))
+    plt.legend(handles, labels, title="Threshold")
+
+    if save:
+        fig.savefig(path + "coalition_entropy_surrogate_analysis." + ext)
+    else:
+        plt.show(fig)
+
+    fig = plt.figure()
+    handles = []
+    labels = []
+    for key in colors:
+        labels.append(key)
+        plt.xlabel("Integrated Information")
+        plt.ylabel("Integrated Information Surrogate")
+        plt.title("Integrated Information Surrogate Data Analysis\n"
+                  "Duration = " + str(duration) + ", Tau = 1")
+        handles.append(plt.scatter(integrated_information['original'][key],
+                                   integrated_information['surrogate'][key],
+                                   color=colors[key],
+                                   label=key))
+    plt.legend(handles, labels, title="Threshold")
+
+    if save:
+        fig.savefig(path + "integrated_information_surrogate_analysis." + ext)
+    else:
+        plt.show(fig)
+
+    fig = plt.figure()
+    handles = []
+    labels = []
+    for key in colors:
+        labels.append(key)
+        plt.xlabel("Chi")
+        plt.ylabel("Chi Surrogate")
+        plt.title("Chi Surrogate Data Analysis\n"
+                  "Duration = " + str(duration) + ", Tau = 1")
+        handles.append(plt.scatter(chi['original'][key],
+                                   chi['surrogate'][key],
+                                   color=colors[key],
+                                   label=key))
+    plt.legend(handles, labels, title="Threshold")
+
+    if save:
+        fig.savefig(path + "chi_surrogate_analysis." + ext)
+    else:
+        plt.show(fig)
+
+    fig = plt.figure()
+    handles = []
+    labels = []
+    for key in colors:
+        labels.append(key)
+        plt.xlabel("Lambda")
+        plt.ylabel("Lambda Surrogate")
+        plt.title("Lambda Surrogate Data Analysis\n"
+                  "Duration = " + str(duration) + ", Tau = 1")
+        handles.append(plt.scatter(lamda['original'][key],
+                                   lamda['surrogate'][key],
+                                   color=colors[key],
+                                   label=key))
+    plt.legend(handles, labels, title="Threshold")
+
+    if save:
+        fig.savefig(path + "lambda_surrogate_analysis." + ext)
+    else:
+        plt.show(fig)
+
+    fig = plt.figure()
+    handles = []
+    labels = []
+    for key in colors:
+        labels.append(key)
+        plt.xlabel("Global Synchrony")
+        plt.ylabel("Global Synchrony Surrogate")
+        plt.title("Global Synchrony Surrogate Data Analysis\n"
+                  "Duration = " + str(duration) + ", Tau = 1")
+        handles.append(plt.scatter(global_sync['original'][key],
+                                   global_sync['surrogate'][key],
+                                   color=colors[key],
+                                   label=key))
+    plt.legend(handles, labels, title="Threshold")
+
+    if save:
+        fig.savefig(path + "global_sync_surrogate_analysis." + ext)
+    else:
+        plt.show(fig)
+
+    fig = plt.figure()
+    handles = []
+    labels = []
+    for key in colors:
+        labels.append(key)
+        plt.xlabel("Integrated Information Empirical Tilde")
+        plt.ylabel("Integrated Information Empirical Tilde Surrogate")
+        plt.title("Integrated Information Empirical "
+                  "Tilde Surrogate Data Analysis\n"
+                  "Duration = " + str(duration) + ", Tau = 1")
+        handles.append(plt.scatter(phi_e_tilde['original'][key],
+                                   phi_e_tilde['surrogate'][key],
+                                   color=colors[key],
+                                   label=key))
+    plt.legend(handles, labels, title="Threshold")
+
+    if save:
+        fig.savefig(path + "phi_e_tilde_surrogate_analysis." + ext)
+    else:
+        plt.show(fig)
+
+    fig = plt.figure()
+    handles = []
+    labels = []
+    for key in colors:
+        labels.append(key)
+        plt.xlabel("Beta")
+        plt.ylabel("Beta Surrogate")
+        plt.title("Beta Surrogate Data Analysis\n"
+                  "Duration = " + str(duration) + ", Tau = 1")
+        handles.append(plt.scatter(beta['original'][key],
+                                   beta['surrogate'][key],
+                                   color=colors[key],
+                                   label=key))
+    plt.legend(handles, labels, title="Threshold")
+
+    if save:
+        fig.savefig(path + "beta_surrogate_analysis." + ext)
+    else:
+        plt.show(fig)
+
+
+if __name__ == "__main__":
+    q = {
+        'duration': 5000,
+        'is_surrogate': True
+    }
+    # plot_surrogate_correlation(phi="integrated_information_e",
+    #                            save=False,
+    #                            path="/Users/juancarlosfarah/Git/infotheoretic/docs/surrogate/",
+    #                            ext="png")
+    # plot(phi='integrated_information_e',
+    #      save=False,
+    #      path="/Users/juancarlosfarah/Git/infotheoretic/docs/phi_e_tilde/",
+    #      ext="svg",
+    #      query=q)
     # plot_curves()
