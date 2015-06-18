@@ -219,7 +219,7 @@ public class Main {
         // Test with data from Kuramoto Oscillator simulations.
         String host = "localhost";
         int port = 27017;
-        String database = "individual_project";
+        String database = "infotheoretic";
         MongoClient mongoClient = new MongoClient(host , port);
         MongoDatabase db = mongoClient.getDatabase(database);
         MongoCollection<Document> simulation;
@@ -292,7 +292,7 @@ public class Main {
         // Test with data from Kuramoto Oscillator simulations.
         String host = "localhost";
         int port = 27017;
-        String database = "individual_project";
+        String database = "infotheoretic";
         MongoClient mongoClient = new MongoClient(host , port);
         MongoDatabase db = mongoClient.getDatabase(database);
         MongoCollection<Document> simulation;
@@ -359,7 +359,7 @@ public class Main {
         // Test with data from Kuramoto Oscillator simulations.
         String host = "localhost";
         int port = 27017;
-        String database = "individual_project";
+        String database = "infotheoretic";
         MongoClient mongoClient = new MongoClient(host , port);
         MongoDatabase db = mongoClient.getDatabase(database);
         MongoCollection<Document> simulation;
