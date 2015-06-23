@@ -13,10 +13,13 @@ class OscillatorDataImporter:
     def __init__(self,
                  database=None,
                  is_surrogate=False,
-                 is_shuffled=False):
+                 is_shuffled=False,
+                 is_sorted=False):
         self.db = database
         self.is_shuffled = is_shuffled
-        self.is_surrogate = is_surrogate or is_shuffled
+        self.is_sorted = is_sorted
+        self.is_surrogate = is_surrogate or is_shuffled or is_sorted
+        self.base = 2
 
     def connect(self, database):
         """
@@ -72,12 +75,7 @@ class OscillatorDataImporter:
                 diagonal[diagonal >= threshold] = 1
                 data = diagonal.tolist()
 
-                # Store information in object.
-                sync_obj = {
-                    "simulation_id": _id,
-                    "data": data
-                }
-                sync_discrete.append(sync_obj)
+                sync_discrete.append(data)
                 t_step += 1
 
             # Compute variance for lambda.
@@ -105,18 +103,38 @@ class OscillatorDataImporter:
                 "duration": duration,
                 "threshold": threshold,
                 "is_surrogate": self.is_surrogate,
-                "is_shuffled": self.is_shuffled
+                "is_shuffled": self.is_shuffled,
+                "is_sorted": self.is_sorted
             }
 
-            # Shuffle if surrogate data.
+            # Shuffle if indicated.
             if self.is_shuffled:
                 np.random.shuffle(sync_discrete)
+
+            # Sort if indicated.
+            if self.is_sorted:
+                sync_reduced = self.reduce(sync_discrete)
+                zipped = zip(sync_reduced, sync_discrete)
+                zipped.sort(key=lambda k: k[0])
+                sync_discrete = [v[1] for v in zipped]
 
             # Storing in MongoDB if database has been defined.
             db = self.db
             if db is not None:
+
+                # Create object container.
+                sync_objs = []
+                for data_point in sync_discrete:
+                    # Store information in object.
+                    sync_obj = {
+                        "simulation_id": _id,
+                        "data": data_point
+                    }
+                    sync_objs.append(sync_obj)
+
+                # Insert to database.
                 db.oscillator_simulation.insert_one(obj)
-                db.oscillator_data.insert(sync_discrete, {'ordered': True})
+                db.oscillator_data.insert(sync_objs, {'ordered': True})
 
             # Progress bar.
             file_count += 1
@@ -125,6 +143,51 @@ class OscillatorDataImporter:
             sys.stdout.flush()
 
         return
+
+    def reduce(self, data):
+        rows = len(data)
+        columns = len(data[0])
+        combined_values = []
+        for r in range(rows):
+            combined_row_value = 0
+            multiplier = 1
+            for c in range(columns - 1, -1, -1):
+                # Add in the contribution from each row.
+                combined_row_value += data[r][c] * multiplier
+                multiplier *= self.base
+            combined_values.append(combined_row_value)
+
+        return combined_values
+
+
+def test_reduce():
+    odi = OscillatorDataImporter()
+    d0 = np.array([[0, 0, 0, 0, 0, 1, 1, 0],
+                   [1, 1, 1, 0, 0, 1, 1, 0],
+                   [1, 1, 1, 0, 0, 1, 1, 0],
+                   [0, 0, 1, 0, 1, 1, 1, 0],
+                   [1, 1, 1, 0, 1, 0, 1, 1],
+                   [0, 0, 1, 0, 1, 1, 1, 0]])
+
+    d1 = [[0, 0, 0, 0, 0, 1, 1, 0],
+          [1, 1, 1, 0, 0, 1, 1, 0],
+          [1, 1, 1, 0, 0, 1, 1, 0],
+          [0, 0, 1, 0, 1, 1, 1, 0],
+          [1, 1, 1, 0, 1, 0, 1, 1],
+          [0, 0, 1, 0, 1, 1, 1, 0]]
+
+    # Should print out [26, 26, 31, 0, 7, 61, 63, 2]
+    print odi.reduce(d0.T)
+
+    d1 = np.array(d1).T
+    d1 = d1.tolist()
+    d1_reduced = odi.reduce(d1)
+    zipped = zip(d1_reduced, d1)
+    zipped.sort(key=lambda k: k[0])
+    d1 = [v[1] for v in zipped]
+    print np.array(d1)
+    print d1_reduced
+    print d1
 
 if __name__ == '__main__':
     data_folder = "/Users/juancarlosfarah/Git/data/Data"
@@ -138,10 +201,10 @@ if __name__ == '__main__':
     # odi.load_folder(data_folder, 0.6)
     # odi.load_folder(data_folder, 0.5)
 
-    # odi = OscillatorDataImporter(is_shuffled=True)
-    # odi.connect(default_db)
-    # odi.load_folder(data_folder, 0.9)
-    # odi.load_folder(data_folder, 0.8)
-    # odi.load_folder(data_folder, 0.7)
-    # odi.load_folder(data_folder, 0.6)
-    # odi.load_folder(data_folder, 0.5)
+    odi = OscillatorDataImporter(is_sorted=True)
+    odi.connect(default_db)
+    odi.load_folder(data_folder, 0.9)
+    odi.load_folder(data_folder, 0.8)
+    odi.load_folder(data_folder, 0.7)
+    odi.load_folder(data_folder, 0.6)
+    odi.load_folder(data_folder, 0.5)
