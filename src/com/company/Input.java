@@ -32,19 +32,19 @@ public class Input {
         try {
             int[][] t = MatrixUtils.transpose(original);
             this.reduced = MatrixUtils.computeCombinedValues(t, base);
-
-            int count = 0;
-            for (int i = 0; i < reduced.length; i++) {
-                Integer key = reduced[i];
-                Integer value = map.get(key);
-                if (value == null) {
-                    map.put(key, count);
-                    reduced[i] = count;
-                    count++;
-                } else {
-                    reduced[i] = value;
-                }
-            }
+//
+//            int count = 0;
+//            for (int i = 0; i < reduced.length; i++) {
+//                Integer key = reduced[i];
+//                Integer value = map.get(key);
+//                if (value == null) {
+//                    map.put(key, count);
+//                    reduced[i] = count;
+//                    count++;
+//                } else {
+//                    reduced[i] = value;
+//                }
+//            }
 
             // Reduced base will equal the original base
             // to the power of the number of variables.
