@@ -71,7 +71,7 @@ public class Main {
     public static void testMutualInformationTimeSeriesPairs() {
         int[] var0 = { 0, 0, 0, 0, 0, 1, 1, 0};
         int[] var1 = { 1, 1, 1, 0, 0, 1, 1, 0};
-        int[] var2 = { 1, 1, 1, 0, 0, 1, 0, 0};
+        int[] var2 = { 1, 1, 1, 0, 0, 1, 1, 0};
         int[] var3 = { 0, 0, 1, 0, 1, 1, 1, 0};
         int[] var4 = { 1, 1, 1, 0, 1, 0, 1, 1};
         int[] var5 = { 0, 0, 1, 0, 1, 1, 1, 0};
@@ -210,7 +210,7 @@ public class Main {
         System.out.println(cecd.compute());
     }
 
-    public static void computeIntegratedInformation() {
+    public static void computeIntegratedInformation(boolean override) {
 
         // Use tau = 1;
         int tau = 1;
@@ -227,7 +227,7 @@ public class Main {
         simulation = db.getCollection("oscillator_simulation");
         data = db.getCollection("oscillator_data");
 
-        Document ne = new Document("$exists", false);
+        Document ne = new Document("$exists", override);
         Document query = new Document("integrated_information_e", ne);
 
         // Counter to keep track of number of updated documents.
@@ -267,8 +267,8 @@ public class Main {
 
             // Store results in MongoDB.
             Document update = new Document();
-            update.put("integrated_information_e", ii);
-            update.put("min_information_bipartition", mib);
+            update.put("phi_e", ii);
+            update.put("mib", mib);
             update.put("tau", tau);
             Document setDoc = new Document("$set", update);
             simulation.updateOne(eq("_id", _id), setDoc);
@@ -284,7 +284,7 @@ public class Main {
 
     }
 
-    public static void computeCoalitionEntropy() {
+    public static void computeCoalitionEntropy(boolean override) {
 
         int base = 2;
         CoalitionEntropyCalculatorDiscrete cecd;
@@ -300,7 +300,7 @@ public class Main {
         simulation = db.getCollection("oscillator_simulation");
         data = db.getCollection("oscillator_data");
 
-        Document ne = new Document("$exists", false);
+        Document ne = new Document("$exists", override);
         Document query = new Document("coalition_entropy", ne);
 
         // Counter to keep track of number of updated documents.
@@ -350,7 +350,8 @@ public class Main {
         mongoClient.close();
     }
 
-    public static void computeIntegratedInformationEmpiricalTilde() {
+    public static void computeIntegratedInformationEmpiricalTilde
+            (boolean override) {
 
         // Use tau = 1;
         int tau = 1;
@@ -367,7 +368,7 @@ public class Main {
         simulation = db.getCollection("oscillator_simulation");
         data = db.getCollection("oscillator_data");
 
-        Document ne = new Document("$exists", false);
+        Document ne = new Document("$exists", override);
         Document query = new Document("integrated_information_e_tilde", ne);
 
         // Counter to keep track of number of updated documents.
@@ -408,8 +409,8 @@ public class Main {
 
             // Store results in MongoDB.
             Document update = new Document();
-            update.put("integrated_information_e_tilde", ii);
-            update.put("min_information_bipartition_tilde", mib);
+            update.put("phi_e_tilde", ii);
+            update.put("mib_tilde", mib);
             Document setDoc = new Document("$set", update);
             simulation.updateOne(eq("_id", _id), setDoc);
 
@@ -426,10 +427,9 @@ public class Main {
 
 
     public static void main(String[] args) {
-
-        computeCoalitionEntropy();
-        computeIntegratedInformation();
-        computeIntegratedInformationEmpiricalTilde();
-
+        testIntegratedInformation();
+        computeCoalitionEntropy(false);
+        computeIntegratedInformation(false);
+        computeIntegratedInformationEmpiricalTilde(false);
     }
 }
