@@ -227,8 +227,9 @@ public class Main {
         simulation = db.getCollection("oscillator_simulation");
         data = db.getCollection("oscillator_data");
 
+        Document query = new Document();
         Document ne = new Document("$exists", override);
-        Document query = new Document("integrated_information_e", ne);
+        query.put("phi_e", ne);
 
         // Counter to keep track of number of updated documents.
         int count = 0;
@@ -300,8 +301,9 @@ public class Main {
         simulation = db.getCollection("oscillator_simulation");
         data = db.getCollection("oscillator_data");
 
+        Document query = new Document();
         Document ne = new Document("$exists", override);
-        Document query = new Document("coalition_entropy", ne);
+        query.put("coalition_entropy", ne);
 
         // Counter to keep track of number of updated documents.
         int count = 0;
@@ -368,8 +370,9 @@ public class Main {
         simulation = db.getCollection("oscillator_simulation");
         data = db.getCollection("oscillator_data");
 
+        Document query = new Document();
         Document ne = new Document("$exists", override);
-        Document query = new Document("integrated_information_e_tilde", ne);
+        query.put("phi_e_tilde", ne);
 
         // Counter to keep track of number of updated documents.
         int count = 0;
@@ -432,4 +435,5 @@ public class Main {
         computeIntegratedInformation(false);
         computeIntegratedInformationEmpiricalTilde(false);
     }
+
 }
