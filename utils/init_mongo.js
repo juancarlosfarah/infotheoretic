@@ -11,10 +11,9 @@ function createIndexes() {
 
 // Remove Simulation Data
 // =======================
-function removeSimulationData(key) {
-    var q = {};
-    q[key] = true;
-    var c = db.oscillator_simulation.find(q);
+function removeSimulationData(query) {
+
+    var c = db.oscillator_simulation.find(query);
 
     while (c.hasNext()) {
         var doc = c.next();
