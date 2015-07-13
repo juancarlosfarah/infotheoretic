@@ -869,9 +869,218 @@ def plot_sorted_correlation(phi="integrated_information_e",
         plt.show(fig)
 
 
+def plot_mi_analysis(save=False,
+                     path="$HOME",
+                     ext="svg",
+                     query=None,
+                     duration=5000,
+                     num_oscillators=8):
+
+    db = connect("infotheoretic")
+
+    if not query:
+        query = dict()
+
+    if "duration" in query:
+        duration = query['duration']
+    else:
+        query['duration'] = duration
+
+    if "num_oscillators" in query:
+        num_oscillators = query['num_oscillators']
+    else:
+        query['num_oscillators'] = num_oscillators
+
+    cursors = dict()
+    colors = dict()
+    types = ['sorted', 'shuffled', 'normal']
+    available_colors = ["orange", "red", "blue", "green", "purple",
+                        "yellow", "brown", "pink", "magenta", "black"]
+    count = 0
+
+    for t in types:
+        q = deepcopy(query)
+        if t == 'sorted':
+            q['is_sorted'] = True
+        if t == 'shuffled':
+            q['is_shuffled'] = True
+        if t == 'normal':
+            q['is_surrogate'] = False
+
+        cursors[t] = db.oscillator_simulation.find(q).sort('source', direction=1)
+        colors[t] = available_colors[count]
+        count += 1
+
+    beta = dict()
+    mi = dict()
+    hc = dict()
+
+    for key in cursors:
+        beta[key] = []
+        mi[key] = []
+        hc[key] = []
+
+        for doc in cursors[key]:
+            beta[key].append(doc['beta'])
+            mi[key].append(doc['mi'])
+            hc[key].append(doc['coalition_entropy'])
+
+    fig = plt.figure()
+    handles = []
+    labels = []
+    for key in colors:
+        labels.append(key)
+
+        plt.xlabel("Beta")
+        plt.ylabel("Mutual Information")
+        plt.title("Mutual Information vs Beta\n"
+                  "Duration = " + str(duration) + ", Tau = 1")
+        handles.append(plt.scatter(beta[key],
+                                   mi[key],
+                                   color=colors[key],
+                                   label=key))
+    plt.legend(handles, labels, title="Type")
+
+    if save:
+        fig.savefig(path + "mi_vs_beta." + ext)
+    else:
+        plt.show(fig)
+
+    fig = plt.figure()
+    handles = []
+    labels = []
+    for key in colors:
+        labels.append(key)
+
+        plt.xlabel("Coalition Entropy")
+        plt.ylabel("Mutual Information")
+        plt.title("Mutual Information vs Coalition Entropy\n"
+                  "Duration = " + str(duration) + ", Tau = 1")
+        handles.append(plt.scatter(hc[key],
+                                   mi[key],
+                                   color=colors[key],
+                                   label=key))
+    plt.legend(handles, labels, title="Type")
+
+    if save:
+        fig.savefig(path + "mi_vs_hc." + ext)
+    else:
+        plt.show(fig)
+
+
+def plot_mi_results(save=False,
+                    path="$HOME",
+                    ext="svg",
+                    query=None,
+                    duration=5000,
+                    num_oscillators=8):
+
+    db = connect("infotheoretic")
+
+    if not query:
+        query = dict()
+
+    if "duration" in query:
+        duration = query['duration']
+    else:
+        query['duration'] = duration
+
+    if "num_oscillators" in query:
+        num_oscillators = query['num_oscillators']
+    else:
+        query['num_oscillators'] = num_oscillators
+
+    colors = dict()
+    types = ['shuffled', 'normal']
+    available_colors = ["orange", "red", "blue", "green", "purple",
+                        "yellow", "brown", "pink", "magenta", "black"]
+    count = 0
+
+    for t in types:
+        colors[t] = available_colors[count]
+        count += 1
+
+    cursor = db.oscillator_simulation.find(q)
+
+    beta = []
+    hc = []
+    mi = []
+    mi_shuffled = []
+
+    for doc in cursor:
+        beta.append(doc['beta'])
+        mi.append(doc['mi'])
+        hc.append(doc['coalition_entropy'])
+        mi_shuffled.append(doc['shuffled']['mi'])
+
+    fig = plt.figure()
+    handles = []
+    labels = ["Normal", "Shuffled"]
+
+    plt.xlabel("Beta")
+    plt.ylabel("Mutual Information")
+    plt.title("Mutual Information vs Beta\n"
+              "Duration = " + str(duration) + ", Tau = 1")
+    handles.append(plt.scatter(beta,
+                               mi,
+                               color=colors['normal'],
+                               label="Normal"))
+
+    handles.append(plt.scatter(beta,
+                               mi_shuffled,
+                               color=colors['shuffled'],
+                               label="Shuffled"))
+
+    plt.legend(handles, labels, title="Type")
+
+    if save:
+        fig.savefig(path + "mi_vs_beta." + ext)
+    else:
+        plt.show(fig)
+
+    # Coalition Entropy
+    fig = plt.figure()
+    handles = []
+    labels = ["Normal", "Shuffled"]
+    plt.xlabel("Coalition Entropy")
+    plt.ylabel("Mutual Information")
+    plt.title("Mutual Information vs Coalition Entropy\n"
+              "Duration = " + str(duration) + ", Tau = 1")
+    handles.append(plt.scatter(hc,
+                               mi,
+                               color=colors['normal'],
+                               label="Normal"))
+    labels.append("Shuffled")
+    handles.append(plt.scatter(hc,
+                               mi_shuffled,
+                               color=colors['shuffled'],
+                               label="Shuffled"))
+
+    plt.legend(handles, labels, title="Type")
+
+    if save:
+        fig.savefig(path + "mi_vs_hc." + ext)
+    else:
+        plt.show(fig)
+
+    # Mutual Information normal vs shuffled.
+    fig = plt.figure()
+    plt.xlabel("Mutual Information")
+    plt.ylabel("Mutual Information Shuffled")
+    plt.title("Mutual Information\n"
+              "Duration = " + str(duration) + ", Tau = 1")
+    plt.scatter(mi, mi_shuffled)
+
+    if save:
+        fig.savefig(path + "mi_vs_mi_shuffled." + ext)
+    else:
+        plt.show(fig)
+
+
 if __name__ == "__main__":
     q = {
         'duration': 5000,
+        'num_oscillators': 8,
         'is_surrogate': False
     }
     all_thresholds = [0.9, 0.8, 0.7, 0.6, 0.5]
@@ -879,11 +1088,18 @@ if __name__ == "__main__":
     #                            save=False,
     #                            path="/Users/juancarlosfarah/Git/infotheoretic/docs/surrogate/",
     #                            ext="png")
-    plot(phi='phi_e',
-         save=False,
-         path="/Users/juancarlosfarah/Git/infotheoretic/docs/phi_e_tilde/",
-         ext="svg",
-         query=q,
-         thresholds=all_thresholds)
+    # plot(phi='phi_e',
+    #      save=False,
+    #      path="/Users/juancarlosfarah/Git/infotheoretic/docs/phi_e_tilde/",
+    #      ext="svg",
+    #      query=q,
+    #      thresholds=all_thresholds)
+
+    plot_mi_results(save=False,
+                    path="$HOME",
+                    ext="svg",
+                    query=q,
+                    duration=5000,
+                    num_oscillators=8)
 
     # plot_curves()
