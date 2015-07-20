@@ -1,11 +1,10 @@
 package com.company;
 
-import infodynamics.measures.discrete.EntropyCalculatorDiscrete;
-import infodynamics.measures.discrete.MutualInformationCalculatorDiscrete;
 import infodynamics.utils.MatrixUtils;
 
 /**
  * Created by juancarlosfarah on 22/05/15.
+ *
  */
 public class StochasticInteractionCalculatorDiscrete {
     int[][] data;
