@@ -5,7 +5,9 @@ import os
 import pymongo
 import numpy as np
 import sys
+import matrix_utils as mu
 from bson.objectid import ObjectId
+from threading import Thread
 
 
 class OscillatorDataImporter:
@@ -33,6 +35,7 @@ class OscillatorDataImporter:
         self.db = mc.get_database(database)
         return self.db
 
+    # noinspection PyUnresolvedReferences
     def load_folder(self, folder, threshold):
         if not os.path.isdir(folder):
             raise NameError(folder)
@@ -114,7 +117,7 @@ class OscillatorDataImporter:
 
                 # Sort if indicated.
                 if self.is_sorted:
-                    sync_reduced = self.reduce(sync_discrete)
+                    sync_reduced = mu.reduce(self.base, sync_discrete)
                     zipped = zip(sync_reduced, sync_discrete)
                     zipped.sort(key=lambda k: k[0])
                     sync_discrete = [v[1] for v in zipped]
@@ -145,94 +148,29 @@ class OscillatorDataImporter:
 
         return
 
-    def reduce(self, data):
-        rows = len(data)
-        columns = len(data[0])
-        combined_values = []
-        for r in range(rows):
-            combined_row_value = 0
-            multiplier = 1
-            for c in range(columns - 1, -1, -1):
-                # Add in the contribution from each row.
-                combined_row_value += data[r][c] * multiplier
-                multiplier *= self.base
-            combined_values.append(combined_row_value)
-
-        return combined_values
-
-
-def test_reduce():
-    odi = OscillatorDataImporter()
-    d0 = np.array([[0, 0, 0, 0, 0, 1, 1, 0],
-                   [1, 1, 1, 0, 0, 1, 1, 0],
-                   [1, 1, 1, 0, 0, 1, 1, 0],
-                   [0, 0, 1, 0, 1, 1, 1, 0],
-                   [1, 1, 1, 0, 1, 0, 1, 1],
-                   [0, 0, 1, 0, 1, 1, 1, 0]])
-
-    d1 = [[0, 0, 0, 0, 0, 1, 1, 0],
-          [1, 1, 1, 0, 0, 1, 1, 0],
-          [1, 1, 1, 0, 0, 1, 1, 0],
-          [0, 0, 1, 0, 1, 1, 1, 0],
-          [1, 1, 1, 0, 1, 0, 1, 1],
-          [0, 0, 1, 0, 1, 1, 1, 0]]
-
-    # Should print out [26, 26, 31, 0, 7, 61, 63, 2]
-    print odi.reduce(d0.T)
-
-    d1 = np.array(d1).T
-    d1 = d1.tolist()
-    d1_reduced = odi.reduce(d1)
-    zipped = zip(d1_reduced, d1)
-    zipped.sort(key=lambda k: k[0])
-    d1 = [v[1] for v in zipped]
-    print np.array(d1)
-    print d1_reduced
-    print d1
-
-
-def test_shuffle():
-    odi = OscillatorDataImporter()
-
-    d1 = [[0, 0, 0, 0, 0, 1, 1, 0],
-          [1, 1, 1, 0, 0, 1, 1, 0],
-          [1, 1, 1, 0, 0, 1, 1, 0],
-          [0, 0, 1, 0, 1, 1, 1, 0],
-          [1, 1, 1, 0, 1, 0, 1, 1],
-          [0, 0, 1, 0, 1, 1, 1, 0]]
-
-    # Should print out [26, 26, 31, 0, 7, 61, 63, 2]
-
-
-    d1 = np.array(d1).T
-    d1 = d1.tolist()
-    d1_reduced = odi.reduce(d1)
-    print d1_reduced
-
-    zipped = zip(d1_reduced, d1)
-    zipped.sort(key=lambda k: k[0])
-    d1_sorted = [v[1] for v in zipped]
-    print d1_sorted
-
-    d1_reduced = odi.reduce(d1_sorted)
-    print d1_reduced
-
-    np.random.shuffle(d1_sorted)
-    print d1_sorted
-    d1_reduced = odi.reduce(d1_sorted)
-    print d1_reduced
-
 if __name__ == '__main__':
-    data_folder = "/Users/juancarlosfarah/Git/data/Data"
+    data_folder = "/Users/juancarlosfarah/Git/data/Data/part4"
     default_db = "infotheoretic"
 
-    # odi = OscillatorDataImporter()
-    # odi.connect(default_db)
-    # odi.load_folder(data_folder, 0.9)
-    # odi.load_folder(data_folder, 0.8)
-    # odi.load_folder(data_folder, 0.7)
-    # odi.load_folder(data_folder, 0.6)
-    # odi.load_folder(data_folder, 0.5)
+    odi = OscillatorDataImporter()
+    odi.connect(default_db)
+
+    t1 = Thread(target=odi.load_folder, args=(data_folder, 0.9))
+    t2 = Thread(target=odi.load_folder, args=(data_folder, 0.8))
+    t3 = Thread(target=odi.load_folder, args=(data_folder, 0.7))
+    t4 = Thread(target=odi.load_folder, args=(data_folder, 0.6))
+    t5 = Thread(target=odi.load_folder, args=(data_folder, 0.5))
+    t1.start()
+    t2.start()
+    t3.start()
+    t4.start()
+    t5.start()
+
+    t1.join()
+    t2.join()
+    t3.join()
+    t4.join()
+    t5.join()
 
     # odi = OscillatorDataImporter(is_shuffled=True)
     # odi.connect(default_db)
