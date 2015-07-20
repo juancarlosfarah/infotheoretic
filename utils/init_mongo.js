@@ -7,6 +7,7 @@
 function createIndexes() {
     var db = db.getSiblingDB("infotheoretic");
     db.oscillator_data.ensureIndex({ "simulation_id": -1, "_id": 1 });
+    db.generator_data.ensureIndex({ "simulation_id": -1, "_id": 1 });
 }
 
 // Remove Simulation Data
@@ -36,3 +37,8 @@ function duplicate() {
         db.oscillator_data.insert(doc);
     }
 }
+
+// Count number of data points per simulation.
+// ===========================================
+db.generator_data.aggregate([ { "$group": { "_id": "$simulation_id",
+                                            "sum": { "$sum": 1 }}}]);
