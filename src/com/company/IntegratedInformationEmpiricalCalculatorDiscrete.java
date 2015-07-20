@@ -51,13 +51,6 @@ public class IntegratedInformationEmpiricalCalculatorDiscrete {
     public double compute() {
 
         double integratedInformation = 0.0;
-
-        // New EICD for original. (TODO: REMOVE)
-        EffectiveInformationCalculatorDiscrete eicdOrig;
-        eicdOrig = new EffectiveInformationCalculatorDiscrete(base, tau);
-        eicdOrig.addObservations(data);
-        data = MatrixUtils.shuffle(data);
-
         EffectiveInformationCalculatorDiscrete eicd;
         eicd = new EffectiveInformationCalculatorDiscrete(base, tau);
         eicd.addObservations(data);
@@ -65,16 +58,13 @@ public class IntegratedInformationEmpiricalCalculatorDiscrete {
 
         for (int[] partition : partitions) {
 
-            // TODO: Remove this.
-            double origEi = eicd.computeForBipartition(partition);
-
             double k = computeNormalizationFactor(partition);
             double ei = eicd.computeForBipartition(partition);
 
             // If k = 0, it means that one of the partitions has an entropy
             // of 0, which means that it doesn't tell us anything about the
             // rest of the system. Return 0 otherwise return normalised EI.
-            double mipScore = (k == 0) ? 0 : (origEi - ei) / k; // TODO: Undo.
+            double mipScore = (k == 0) ? 0 : ei / k;
 
             if (mipScore < minimumInformationPartitionValue) {
                 minimumInformationPartition[0] = partition;
