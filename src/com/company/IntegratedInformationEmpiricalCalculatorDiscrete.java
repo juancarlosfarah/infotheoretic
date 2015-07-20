@@ -1,6 +1,5 @@
 package com.company;
 
-import com.sun.tools.doclets.internal.toolkit.util.SourceToHTMLConverter;
 import infodynamics.measures.discrete.EntropyCalculatorDiscrete;
 import infodynamics.utils.MathsUtils;
 import infodynamics.utils.MatrixUtils;
@@ -11,6 +10,7 @@ import java.util.Set;
 
 /**
  * Created by juancarlosfarah on 22/05/15.
+ *
  */
 public class IntegratedInformationEmpiricalCalculatorDiscrete {
 
@@ -20,6 +20,7 @@ public class IntegratedInformationEmpiricalCalculatorDiscrete {
     public Set<int[]> partitions;
     public int[][] minimumInformationPartition;
     private double minimumInformationPartitionValue;
+    private double mutualInformation;
 
 
     public IntegratedInformationEmpiricalCalculatorDiscrete(int base, int tau) {
@@ -51,12 +52,21 @@ public class IntegratedInformationEmpiricalCalculatorDiscrete {
 
         double integratedInformation = 0.0;
 
+        // New EICD for original. (TODO: REMOVE)
+        EffectiveInformationCalculatorDiscrete eicdOrig;
+        eicdOrig = new EffectiveInformationCalculatorDiscrete(base, tau);
+        eicdOrig.addObservations(data);
+        data = MatrixUtils.shuffle(data);
+
         EffectiveInformationCalculatorDiscrete eicd;
         eicd = new EffectiveInformationCalculatorDiscrete(base, tau);
         eicd.addObservations(data);
-        eicd.computeForSystem();
+        mutualInformation = eicd.computeForSystem();
 
         for (int[] partition : partitions) {
+
+            // TODO: Remove this.
+            double origEi = eicd.computeForBipartition(partition);
 
             double k = computeNormalizationFactor(partition);
             double ei = eicd.computeForBipartition(partition);
@@ -64,7 +74,7 @@ public class IntegratedInformationEmpiricalCalculatorDiscrete {
             // If k = 0, it means that one of the partitions has an entropy
             // of 0, which means that it doesn't tell us anything about the
             // rest of the system. Return 0 otherwise return normalised EI.
-            double mipScore = (k == 0) ? 0 : ei / k;
+            double mipScore = (k == 0) ? 0 : (origEi - ei) / k; // TODO: Undo.
 
             if (mipScore < minimumInformationPartitionValue) {
                 minimumInformationPartition[0] = partition;
@@ -107,6 +117,10 @@ public class IntegratedInformationEmpiricalCalculatorDiscrete {
 
         return Math.min(entropy1, entropy2);
 
+    }
+
+    public double getMutualInformation() {
+        return mutualInformation;
     }
 
 }
