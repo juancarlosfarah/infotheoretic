@@ -3,10 +3,9 @@ package com.company;
 import infodynamics.measures.discrete.MutualInformationCalculatorDiscrete;
 import infodynamics.utils.MatrixUtils;
 
-import java.util.Arrays;
-
 /**
  * Created by juancarlosfarah on 22/05/15.
+ *
  */
 public class EffectiveInformationCalculatorDiscrete {
     int[][] data;
@@ -84,6 +83,4 @@ public class EffectiveInformationCalculatorDiscrete {
 
         return rvalue;
     }
-
-
 }
