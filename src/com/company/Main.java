@@ -2,6 +2,7 @@ package com.company;
 
 import com.google.common.primitives.Ints;
 import com.mongodb.MongoClient;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
@@ -22,6 +23,8 @@ public class Main {
 
     public static void testMutualInformation() {
 
+        System.out.println("Testing mutual information...");
+
         int[] var0 = { 0, 1, 1, 0 };
         int[] var1 = { 0, 1, 1, 0 };
         int[] var2 = { 0, 0, 1, 1 };
@@ -40,9 +43,14 @@ public class Main {
             e.printStackTrace();
         }
 
+        System.out.println("\n");
+
     }
 
     public static void testMutualInformationTimeSeries() {
+
+        System.out.println("Testing mutual information on time series...");
+
         int[] var0 = { 0, 0, 0, 0, 0, 1, 1, 0};
         int[] var1 = { 1, 1, 1, 0, 0, 1, 1, 0};
         int[] var2 = { 1, 1, 1, 0, 0, 1, 0, 0};
@@ -66,17 +74,36 @@ public class Main {
             e.printStackTrace();
         }
 
+        System.out.println("\n");
+
     }
 
     public static void testMutualInformationTimeSeriesPairs() {
-        int[] var0 = { 0, 0, 0, 0, 0, 1, 1, 0};
-        int[] var1 = { 1, 1, 1, 0, 0, 1, 1, 0};
-        int[] var2 = { 1, 1, 1, 0, 0, 1, 1, 0};
-        int[] var3 = { 0, 0, 1, 0, 1, 1, 1, 0};
-        int[] var4 = { 1, 1, 1, 0, 1, 0, 1, 1};
-        int[] var5 = { 0, 0, 1, 0, 1, 1, 1, 0};
 
-        int[][] states = { var0, var1, var2, var3, var4, var5 };
+        System.out.println("Testing MI on time series pairs...");
+
+        int[] var0 = { 0, 0, 0, 0, 0, 1, 1, 0, 0, 1 };
+        int[] var1 = { 1, 1, 1, 0, 0, 1, 1, 0, 0, 1 };
+        int[] var2 = { 1, 1, 1, 0, 0, 1, 1, 0, 0, 1 };
+        int[] var3 = { 0, 0, 1, 0, 1, 1, 1, 0, 0, 1 };
+        int[] var4 = { 1, 1, 1, 0, 1, 0, 1, 1, 0, 1 };
+        int[] var5 = { 0, 0, 1, 0, 1, 1, 1, 0, 0, 1 };
+
+        int iterations = 5;
+
+        int[][] states = new int[6][10 * iterations];
+
+        for (int i = 0; i < iterations; i++) {
+            int index = i * 10;
+            for (int j = 0; j < 10; j++) {
+                states[0][index + j] = var0[j];
+                states[1][index + j] = var1[j];
+                states[2][index + j] = var2[j];
+                states[3][index + j] = var3[j];
+                states[4][index + j] = var4[j];
+                states[5][index + j] = var5[j];
+            }
+        }
 
         Input input = new Input(states, 2);
 
@@ -98,46 +125,148 @@ public class Main {
             e.printStackTrace();
         }
 
+        // All states in three variables being visited.
+        int[] var6 = { 0, 0, 0, 1, 1, 1, 0, 1};
+        int[] var7 = { 0, 0, 1, 1, 0, 0, 1, 1};
+        int[] var8 = { 0, 1, 1, 0, 0, 1, 0, 1};
+
+        int it = 200;
+
+        int[][] states1 = new int[3][8 * it];
+
+        for (int i = 0; i < it; i++) {
+            int index = i * 8;
+            for (int j = 0; j < 8; j++) {
+                states1[0][index + j] = var6[j];
+                states1[1][index + j] = var7[j];
+                states1[2][index + j] = var8[j];
+            }
+        }
+
+        Input input1 = new Input(states1, 2);
+
+        int[][] paired1 = input1.pair(tau);
+        System.out.println(input1);
+
+        try {
+            MutualInformationCalculatorDiscrete micd = new
+                    MutualInformationCalculatorDiscrete(input1.getReducedBase(),
+                    0);
+
+            micd.initialise();
+            micd.addObservations(paired1[0], paired1[1]);
+            System.out.println(micd.computeAverageLocalOfObservations());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        int[] var09 = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        int[] var10 = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        int[] var11 = { 0, 1, 0, 1, 0, 1, 0, 1 };
+
+        int iter = 200;
+
+        int[][] states2 = new int[3][8 * iter];
+
+        for (int i = 0; i < iter; i++) {
+            int index = i * 8;
+            for (int j = 0; j < 8; j++) {
+                states2[0][index + j] = var09[j];
+                states2[1][index + j] = var10[j];
+                states2[2][index + j] = var11[j];
+            }
+        }
+
+        // Repeating states in three variable system.
+        Input input2 = new Input(states2, 2);
+
+        int[][] paired2 = input2.pair(tau);
+        System.out.println(input2);
+
+        try {
+            MutualInformationCalculatorDiscrete micd = new
+                    MutualInformationCalculatorDiscrete(input1.getReducedBase(),
+                    0);
+
+            micd.initialise();
+            micd.addObservations(paired2[0], paired2[1]);
+            System.out.println(micd.computeAverageLocalOfObservations());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("\n");
+
     }
 
     public static void testIntegratedInformation() {
 
-        System.out.println("Running tests...");
-        testMutualInformation();
-        System.out.println("\n");
-
-        testMutualInformationTimeSeries();
-        System.out.println("\n");
-
-        System.out.println("Testing MI on time series pairs...");
-        testMutualInformationTimeSeriesPairs();
-        System.out.println("\n");
-
         // Use tau = 1;
         int tau = 1;
 
+        // Example adapted from Wikipedia article on IIT.
+        // https://en.wikipedia.org/wiki/Integrated_information_theory
         System.out.println("First Effective Information Test:");
 
+        // Generate model.
         RandomGenerator rg = new RandomGenerator();
         int[] var0a = rg.generateRandomInts(1000000, 2);
         var0a[0] = 0;
         int[] var1a = new int[1000000];
         var1a[0] = 0;
         System.arraycopy(var0a, 0, var1a, 1, 999999);
-
         int[][] states0 = {var0a, var1a};
 
+        // Compute EI for original generative model.
         EffectiveInformationCalculatorDiscrete eicd;
         eicd = new EffectiveInformationCalculatorDiscrete(2, tau);
         eicd.addObservations(states0);
-
+        System.out.println("Computing EI for original generative model:");
+        double s = eicd.computeForSystem();
+        System.out.println("System:\t\t\t" + s);
         int[] p0 = {0};
         double o0 = eicd.computeForBipartition(p0);
-        System.out.println(o0);
-
+        System.out.println("Partition 1:\t" + o0);
         int[] p1 = {1};
         double o1 = eicd.computeForBipartition(p1);
-        System.out.println(o1);
+        System.out.println("Partition 2:\t" + o1);
+
+        // Compute II for original generative model.
+        System.out.println("Computing II for original generative model:");
+        IntegratedInformationEmpiricalCalculatorDiscrete iicd;
+        iicd = new IntegratedInformationEmpiricalCalculatorDiscrete(2, tau);
+        iicd.addObservations(states0);
+        iicd.computePossiblePartitions();
+        System.out.println(iicd.compute());
+        System.out.println(Arrays.deepToString(iicd.minimumInformationPartition));
+        System.out.println();
+
+        // Shuffle data.
+        int[][] states0s = MatrixUtils.shuffle(states0);
+        eicd = new EffectiveInformationCalculatorDiscrete(2, tau);
+        eicd.addObservations(states0s);
+
+        // Compute EI for shuffled generative model.
+        System.out.println("Computing EI for shuffled generative model:");
+        double ss = eicd.computeForSystem();
+        System.out.println("System:\t\t\t" + ss);
+        int[] p0s = {0};
+        double o0s = eicd.computeForBipartition(p0s);
+        System.out.println("Partition 1:\t" + o0s);
+        int[] p1s = {1};
+        double o1s = eicd.computeForBipartition(p1s);
+        System.out.println("Partition 2:\t" + o1s);
+
+        // Compute II for shuffled generative model.
+        System.out.println("Computing II for shuffled generative model:");
+        iicd = new IntegratedInformationEmpiricalCalculatorDiscrete(2, tau);
+        iicd.addObservations(states0s);
+        iicd.computePossiblePartitions();
+        System.out.println(iicd.compute());
+        System.out.println(Arrays.deepToString(iicd.minimumInformationPartition));
+
 
         System.out.println("\n");
         System.out.println("Second Effective Information Test:");
@@ -162,7 +291,6 @@ public class Main {
         System.out.println("\n");
         System.out.println("First Integrated Information Test:");
 
-        IntegratedInformationEmpiricalCalculatorDiscrete iicd;
         iicd = new IntegratedInformationEmpiricalCalculatorDiscrete(2, tau);
         iicd.addObservations(states1);
         iicd.computePossiblePartitions();
@@ -210,7 +338,9 @@ public class Main {
         System.out.println(cecd.compute());
     }
 
-    public static void computeIntegratedInformation(boolean override) {
+    public static void computeIntegratedInformation(boolean override,
+                                                    boolean shuffle,
+                                                    boolean save) {
 
         // Use tau = 1;
         int tau = 1;
@@ -241,11 +371,11 @@ public class Main {
 
             // Get data for this simulation.
             MongoCursor<Document> cursor = data.find(eq("simulation_id", _id))
-                    .sort(ascending("_id"))
-                    .iterator();
+                                               .sort(ascending("_id"))
+                                               .iterator();
             int num_oscillators = doc.getInteger("num_oscillators");
             int duration = doc.getInteger("duration");
-            int[][] obs = new int[num_oscillators][duration];
+            int[][] obs = new int[num_oscillators][duration * 10];
 
             // Transform data for use with Phi_E Calculator.
             int column = 0;
@@ -254,6 +384,11 @@ public class Main {
                 ArrayList<Integer> array = (ArrayList) (d.get("data"));
                 int[] vector = Ints.toArray(array);
                 MatrixUtils.insertVectorIntoMatrix(vector, obs, column);
+                for (int i = 1; i < 10; i++) {
+                    MatrixUtils.insertVectorIntoMatrix(vector,
+                                                       obs,
+                                                       column + i * duration);
+                }
                 column++;
             }
 
@@ -262,17 +397,29 @@ public class Main {
             iicd.addObservations(obs);
             iicd.computePossiblePartitions();
             double ii = iicd.compute();
+            double mi = iicd.getMutualInformation();
             ArrayList<List<Integer>> mib = new ArrayList<List<Integer>>();
             mib.add(Ints.asList(iicd.minimumInformationPartition[0]));
             mib.add(Ints.asList(iicd.minimumInformationPartition[1]));
 
             // Store results in MongoDB.
-            Document update = new Document();
-            update.put("phi_e", ii);
-            update.put("mib", mib);
-            update.put("tau", tau);
-            Document setDoc = new Document("$set", update);
-            simulation.updateOne(eq("_id", _id), setDoc);
+            if (save) {
+                Document setDoc = new Document();
+                Document update = new Document();
+                update.put("phi_e", ii);
+                update.put("mib", mib);
+                update.put("tau", tau);
+                update.put("mi", mi);
+
+                if (shuffle) {
+                    Document subDoc = new Document("shuffled", update);
+                    setDoc.put("$set", subDoc);
+                } else {
+                    setDoc.put("$set", update);
+                }
+
+                simulation.updateOne(eq("_id", _id), setDoc);
+            }
 
             // Show counter.
             count++;
@@ -321,7 +468,7 @@ public class Main {
             int duration = doc.getInteger("duration");
             int[][] obs = new int[num_oscillators][duration];
 
-            // Transform data for use with Phi_E Calculator.
+            // Transform data for use with H_c Calculator.
             int column = 0;
             while (cursor.hasNext()) {
                 Document d = cursor.next();
@@ -337,9 +484,11 @@ public class Main {
             double ce = cecd.compute();
 
             // Store results in MongoDB.
+            Document setDoc = new Document();
             Document update = new Document();
             update.put("coalition_entropy", ce);
-            Document setDoc = new Document("$set", update);
+            setDoc.put("$set", update);
+
             simulation.updateOne(eq("_id", _id), setDoc);
 
             // Show counter.
@@ -353,7 +502,7 @@ public class Main {
     }
 
     public static void computeIntegratedInformationEmpiricalTilde
-            (boolean override) {
+            (boolean override, boolean shuffle) {
 
         // Use tau = 1;
         int tau = 1;
@@ -384,8 +533,8 @@ public class Main {
 
             // Get data for this simulation.
             MongoCursor<Document> cursor = data.find(eq("simulation_id", _id))
-                    .sort(ascending("_id"))
-                    .iterator();
+                                               .sort(ascending("_id"))
+                                               .iterator();
             int num_oscillators = doc.getInteger("num_oscillators");
             int duration = doc.getInteger("duration");
             int[][] obs = new int[num_oscillators][duration];
@@ -411,10 +560,18 @@ public class Main {
             mib.add(Ints.asList(iicd.minimumInformationPartition[1]));
 
             // Store results in MongoDB.
+            Document setDoc = new Document();
             Document update = new Document();
             update.put("phi_e_tilde", ii);
             update.put("mib_tilde", mib);
-            Document setDoc = new Document("$set", update);
+
+            if (shuffle) {
+                Document subDoc = new Document("shuffled", update);
+                setDoc.put("$set", subDoc);
+            } else {
+                setDoc.put("$set", update);
+            }
+
             simulation.updateOne(eq("_id", _id), setDoc);
 
             // Show counter.
@@ -429,11 +586,196 @@ public class Main {
     }
 
 
+    public static MongoDatabase connect() {
+        String host = "localhost";
+        int port = 27017;
+        String database = "infotheoretic";
+        MongoClient mongoClient = new MongoClient(host , port);
+        MongoDatabase db = mongoClient.getDatabase(database);
+        return db;
+    }
+
+    public static void getSimulationData(MongoCollection<Document> data,
+                                         ObjectId _id,
+                                         int[][] obs) {
+
+        MongoCursor<Document> cursor = data.find(eq("simulation_id", _id))
+                                           .sort(ascending("_id"))
+                                           .iterator();
+
+        // Transform data for use with Phi_E Calculator.
+        int column = 0;
+        while (cursor.hasNext()) {
+            Document d = cursor.next();
+            ArrayList<Integer> array = (ArrayList) (d.get("data"));
+            int[] vector = Ints.toArray(array);
+            MatrixUtils.insertVectorIntoMatrix(vector, obs, column);
+            column++;
+        }
+
+    }
+
+
+    public static Document computePhiE(int[][] observations) {
+
+        // Use tau = 1;
+        int tau = 1;
+        IntegratedInformationEmpiricalCalculatorDiscrete iicd;
+
+        // Compute Phi_E and Minimium Information Partition.
+        iicd = new IntegratedInformationEmpiricalCalculatorDiscrete(2, tau);
+        iicd.addObservations(observations);
+        iicd.computePossiblePartitions();
+        double ii = iicd.compute();
+        double mi = iicd.getMutualInformation();
+        ArrayList<List<Integer>> mib = new ArrayList<List<Integer>>();
+        mib.add(Ints.asList(iicd.minimumInformationPartition[0]));
+        mib.add(Ints.asList(iicd.minimumInformationPartition[1]));
+
+        // Put values in return document.
+        Document doc = new Document();
+        doc.put("phi_e", ii);
+        doc.put("mib", mib);
+        doc.put("tau", tau);
+        doc.put("mi", mi);
+
+        return doc;
+
+    }
+
+    public static double computeHc(int[][] observations) {
+
+        int base = 2;
+        CoalitionEntropyCalculatorDiscrete cecd;
+        cecd = new CoalitionEntropyCalculatorDiscrete(base);
+        cecd.addObservations(observations);
+        return cecd.compute();
+
+    }
+
+
+    public static void save(MongoCollection<Document> simulations,
+                            ObjectId _id,
+                            Document doc) {
+
+        // Store results in MongoDB.
+        Document setDoc = new Document();
+        setDoc.put("$set", doc);
+        simulations.updateOne(eq("_id", _id), setDoc);
+
+    }
+
+    public static void computePhiEForGeneratedData(boolean save) {
+
+        // Collection Names.
+        String simCollection = "generator_simulation";
+        String dataCollection = "generator_data";
+
+        // Query.
+        Document query = new Document();
+        Document ne = new Document("$exists", false);
+        query.put("phi_e", ne);
+
+        MongoDatabase db = connect();
+        MongoCollection<Document> sims = db.getCollection(simCollection);
+        MongoCollection<Document> data = db.getCollection(dataCollection);
+        FindIterable<Document> results = sims.find(query);
+
+        for (Document doc : results) {
+            // Get ObjectId for simulation.
+            ObjectId _id = doc.getObjectId("_id");
+            int numVars = doc.getInteger("num_vars");
+            int duration = doc.getInteger("duration");
+            int[][] obs = new int[numVars][duration];
+            getSimulationData(data, _id, obs);
+
+            // Normal.
+            Document values = computePhiE(obs);
+            double hc = computeHc(obs);
+            values.put("h_c", hc);
+            if (save)  {
+                save(sims, _id, values);
+            }
+
+            // Print results to console.
+            System.out.println("Normal");
+            System.out.println(values);
+            System.out.println();
+
+            // Shuffled.
+            obs = MatrixUtils.shuffle(obs);
+            values = computePhiE(obs);
+            hc = computeHc(obs);
+            values.put("h_c", hc);
+            if (save)  {
+                Document shuffled = new Document();
+                shuffled.put("shuffled", values);
+                save(sims, _id, shuffled);
+            }
+
+            // Print results to console.
+            System.out.println("Shuffled");
+            System.out.println(values);
+            System.out.println();
+        }
+
+    }
+
+    public static void computeNormalisedPhiEShuffled(boolean save) {
+
+        // Collection Names.
+        String simCollection = "oscillator_simulation";
+        String dataCollection = "oscillator_data";
+
+        // Query.
+        Document query = new Document();
+        Document ne = new Document("$exists", false);
+        query.put("shuffled_normalised", ne);
+        query.put("is_surrogate", false);
+
+        MongoDatabase db = connect();
+        MongoCollection<Document> sims = db.getCollection(simCollection);
+        MongoCollection<Document> data = db.getCollection(dataCollection);
+        FindIterable<Document> results = sims.find(query);
+
+        for (Document doc : results) {
+
+            // Get ObjectId for simulation.
+            ObjectId _id = doc.getObjectId("_id");
+            int numVars = doc.getInteger("num_oscillators");
+            int duration = doc.getInteger("duration");
+            int[][] obs = new int[numVars][duration];
+            getSimulationData(data, _id, obs);
+
+            // Compute.
+            Document values = computePhiE(obs);
+            if (save)  {
+                Document shuffled = new Document();
+                shuffled.put("shuffled_normalised", values);
+                save(sims, _id, shuffled);
+            }
+
+        }
+
+    }
+
     public static void main(String[] args) {
+
+        System.out.println("Start tests.");
+        testMutualInformation();
+        testMutualInformationTimeSeries();
+        testMutualInformationTimeSeriesPairs();
         testIntegratedInformation();
-        computeCoalitionEntropy(false);
-        computeIntegratedInformation(false);
-        computeIntegratedInformationEmpiricalTilde(false);
+        testCoalitionEntropy();
+        System.out.println("Tests completed.");
+
+//        computePhiEForGeneratedData(true);
+//        computeNormalisedPhiEShuffled(true);
+//        computeCoalitionEntropy(false);
+//        computeIntegratedInformation(false, false, true);
+//        computeIntegratedInformationEmpiricalTilde(false, false);
+
+
     }
 
 }
