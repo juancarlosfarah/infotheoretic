@@ -17,6 +17,7 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{titlesec}
+\usepackage{array,multirow}
 
 \setcounter{secnumdepth}{4}
 
@@ -39,6 +40,10 @@
 \begin{document}
 \maketitle
 
+\tableofcontents
+
+\clearpage
+
 \section{Introduction}
 
 In the brain, metastability is defined as the ``simultaneous realisation of two competing tendencies: the tendency of the individual components to couple together and the tendency for the components to express their independent behaviour'' \cite{Kelso2012}. The Theory of Coordination Dynamics postulates that metastability is a key aspect of neurodynamics and it has been suggested that it plays an important role in several cognitive functions and consciousness \cite{Seth2009}. 
@@ -54,10 +59,11 @@ This project will focus on a number of concepts from the fields of Information T
 \subsection{Kuramoto Model}
 \label{KuramotoModel}
 
-The Kuramoto model, proposed by Yoshiki Kuramoto, is a mathematical model for a system of coupled phase oscillators. It has widespread use in neuroscience as a framework for the study of synchronisation in dynamical systems as observed in nature \cite{Cumin2007}. The dynamics of this model are an extension of work by Winfree, which Kuramoto generalised to the form below \cite{Strogatz2000}, where $N$ is the number of coupled phase oscillators $\theta_{i}(t)$ with natural frequencies $\omega_{i}$ distributed over $g(\omega)$.
+The Kuramoto model, proposed by Yoshiki Kuramoto, is a mathematical model for a system of coupled phase oscillators. It has widespread use in neuroscience as a framework for the study of synchronisation in dynamical systems as observed in nature \cite{Cumin2007}. The dynamics of this model are an extension of work by Winfree, which Kuramoto generalised to the form shown in equation \ref{eq:kuramoto} \cite{Strogatz2000}, where $N$ is the number of coupled phase oscillators $\theta_{i}(t)$ with natural frequencies $\omega_{i}$ distributed over $g(\omega)$.
 
-$$\dot{\theta_i} = \omega_i + \sum_{j=1}^{N} K_{ij} \sin(\theta_j - \theta_i), i = 1, ..., N$$
-
+\begin{equation} \label{eq:kuramoto}
+\dot{\theta_i} = \omega_i + \sum_{j=1}^{N} K_{ij} \sin(\theta_j - \theta_i), i = 1, ..., N
+\end{equation}
 
 
 \subsection{Networks of Spiking Neurons}
@@ -126,14 +132,18 @@ $$I(X,Y) = H(X) - H(X|Y)$$
 \label{Synchrony}
 
 The synchrony of a given community $c$ at time $t$, $\psi_c(t)$, is given by the equation below. By averaging synchrony over all communities and time steps, you can calculate global synchrony, $\Psi$ \cite{Shanahan2010}.
-$$\psi_c(t) = |\langle e^{i\theta_k(t)}\rangle_{k \in c}|$$
 
-\subsubsection{Coalition Entropy}
+\begin{equation} \label{eq:sync}
+\psi_c(t) = |\langle e^{i\theta_k(t)}\rangle_{k \in c}|
+\end{equation}
+
+\subsubsection{Coalition Entropy} \label{sec:bg:hc}
 
 ``Coalition entropy measures the variety of metastable states entered by a system of oscillators and is calculated from the number of distinct states the system can generate and the probability of each state occurring.'' \cite{Bhowmik2013} We can calculate the coalition entropy $H_C$ for a system by computing ``how “mixed up” is the set of coalitions a system produces over a period of time'' \cite{Shanahan2010}. This is given by the equation below where ``$S$ is the set of distinct coalitions the system can generate and $p(s)$ is the probability of coalition $s$ arising in any given time point'' \cite{Shanahan2010}.
 
-$$H_C = - \frac{1}{\log_2 |S|}\sum_{s \in S}p(s) \log_2 (p(s))$$ 
-
+\begin{equation} \label{eq:hc}
+H_C = - \frac{1}{\log_2 |S|}\sum_{s \in S}p(s) \log_2 (p(s))
+\end{equation}
 
 \subsubsection{Transfer Entropy}
 Transfer entropy ``is an information theoretical measure that quantifies the statistical coherence between systems. It has the advantage that it does not only measure the coherence between two signals, but is able to distinguish between driving and responding elements and therefore between shared and transported information. This is called the directionality of the information flow.'' \cite{Buehlmann2010} Transfer entropy from process $J$ to process $I$ can be calculated using the equation below, where $l = k$ or $l = 1$ \cite{Schreiber2000}.
@@ -152,85 +162,382 @@ $$\phi [X, \tau, \mathcal{B}] = I(X_{t-\tau}, X_t) - \sum_{k=1}^{2} I(P_{t-\tau}
 \subsubsection{Integrated Information}
 \label{II}
 
-We will be using the empirical definition of integrated information, $\Phi_{E}$ as put forth in \cite{Barrett2011}. This is a version of integrated information that is best suited for time series data such as the one we will be using in our study. The empirical integrated information, $\Phi_{E}$ is defined as the effective information of a system with respect to its minimum information bipartition.
+As noted in \cite{Barrett2011}, there are several definitions of integrated information. We will be using the empirical definition of integrated information, $\Phi_{E}$, as well as well as a slightly modified version, $\widetilde{\Phi}_{E}$ as put forth in \cite{Barrett2011}.\\
+
+\noindent\textbf{Empirical Integrated Information ($\Phi_{E}$)}\\
+Empirical integrated information, $\Phi_{E}$, is a version of integrated information that is best suited for time series data such as the one we will be using in our study. It is defined as the effective information of a system with respect to its minimum information bipartition.
 
 $$\Phi [X, \tau] = \phi [X, \tau, \mathcal{B}^{MIB}(X, \tau)]$$
 $$\mathcal{B}^{MIB}(X, \tau) = \arg_{\mathcal{B}} \min \Big\lbrace \frac{\phi [X, \tau, \mathcal{B}]}{K(\mathcal{B})} \Big\rbrace$$
 $$K(\mathcal{B} = \lbrace P^1, P^2 \rbrace) = \min[H(P^1), H(P^2)]$$
 
-\section{Progress Summary}
+\noindent\textbf{Empirical Integrated Information Tilde ($\widetilde{\Phi}_{E}$)}\\
 
-\subsection{Literature Survey}
+Empirical integrated information tilde, $\widetilde{\Phi}_{E}$, is a variation of $\Phi_{E}$ that uses stochastic interaction instead of effective information.
 
-At present, we have concluded an initial survey of the literature covering the main subjects concerning this project. These include publications related to the following topics.
+\subsection{Related Experimental Work}
+Information Measure -> Consciousness
+Metastability -> Consciousness
+Information Measure -> Metastability ?
 
 \begin{enumerate}
-\item{Integrated Information Theory of Consciousness}
-\item{Metastability and Chimera States}
-\item{Toolkits for Computing Properties of Dynamic Systems}
+\item{Return to consciousness.}
+\item{Information Sharing in the Brain Indexes Conscious in Noncommunicative Patients}
+\item{Symbolic Analysis - Allow this to work.}
+\item{}
 \end{enumerate}
 
-\subsection{Implementation of $\Phi$ in Java}
+\subsection{Shanahan, Deco, Bhowmik}
 
-At the core of our current progress we have implemented functions that compute Empirical Integrated Information ($\Phi_{E}$), as described in Section \ref{II}. We decided that it would be best that these functions be available as part of the Java Information Dynamics Toolkit (JIDT) developed by Lizier and widely used to study the dynamics of complex systems \cite{Lizier2014}. Written completely in Java, our implementation follows the syntax, semantics and structure of other features in JIDT, which is geared towards facilitating its adoption by its current users.
+\clearpage
+\section{Implementation of $\Phi$}
 
-\subsubsection{Effective Information Calculator}
+In order to calculate the values of $\Phi$ for our sample populations, we implemented functions that compute Empirical Integrated Information ($\Phi_{E}$) and Empirical Integrated Information Tilde ($\widetilde{\Phi}_{E}$), as described in Section \ref{II}. We decided that it would be best that these functions be available as part of the Java Information Dynamics Toolkit (JIDT) developed by Lizier and widely used to study the dynamics of complex systems \cite{Lizier2014}. Written completely in Java, our implementation follows the syntax, semantics and structure of other features in the JIDT, which is geared towards facilitating its adoption by its current users.
 
-In order to calculate the integrated information of a system, by definition you need to calculate its effective information. We implemented a class that computes the effective information of time-series data given a time-step $\tau$, the number of input states for each variable in the input $base$, and a bipartition $\mathcal{B}$. Its use is straightforward as presented below.
+\subsection{Methodology}
+
+The structure put forth by the JIDT consists of defining a Java class that can calculate the measure in question. This class then exposes a series a methods that allow the user to bind the data that will be used for the calculation as well as perform any ancillary or preparatory operations required to compute the measure. Finally, the class will have a method to carry out the calculation and return the required output. Once an object of the calculator class is instantiated, it can be used for multiple calculations by binding new data to it and reinitialising the object's properties if needed. 
+
+Another feature of the JIDT is that for most measures it supports, it defines a calculator both for the discrete and continuous versions of the measures, if applicable. For instance, it has a class to calculate entropy from continuous data called \texttt{EntropyCalculator} and its corresponding version for discrete data called \texttt{EntropyCalculatorDiscrete}. In some cases, it even defines a third version for mixed data, such as is the case for multivariate conditional mutual information. For our purposes, we are only interested in calculating the integrated information from discrete time series data and thus we have focused our efforts to implement a robust calculator for discrete data. Nevertheless, extending the implementation for continuous data would be useful in order to increment the breadth of the JIDT and is suggested as a possible extension to the project.
+
+\subsection{Architecture}
+
+In addition to our implementation of $\Phi$ in Java for the JIDT, our project required a suite of tools and a supporting stack to facilitate the import, export and storage of data as well as a rigorous source version control system in order to facilitate integration with the JIDT. We thus decided to develop the utilities in Python and JavaScript, and use MongoDB as the database layer for the data inputted to and outputted from our simulations. We used Git as our version control system, hosting our remote repository on \href{http://github.com}{GitHub}, which will allow us to easily integrate with the future GitHub JIDT repository.
+
+\subsection{Empirical Integrated Information}
+
+\subsubsection{Discrete Effective Information Calculator}
+
+In order to calculate the integrated information of a system, by definition you need to calculate its effective information. We implemented a class that computes the effective information of time-series data given a time-step $\tau$, the number of input states for each variable in the input $base$, and a bipartition $\mathcal{B}$. As shown below, you initialise the calculator for a given base and $\tau$. You then bind the input data to the calculator object using its \texttt{addObservations} method.
 
 \begin{minted}{java}
 // Initialise effective information calculator.
 EffectiveInformationCalculatorDiscrete eicd;
 eicd = new EffectiveInformationCalculatorDiscrete(base, tau);
 eicd.addObservations(input);
+\end{minted}
+
+As explained in Section \ref{EI} the effective information of a system given a bipartition $\mathcal{B}$ for a given time step $\tau$ represents the difference between the mutual information of the whole system given the current state $X_t$ regarding a previous state $X_{t-\tau}$ and the sum of the respective mutual information for each member of $\mathcal{B}$. In order to avoid calculating the mutual information of the system for each partition that is passed to the calculator, the \texttt{EffectiveInformationCalculatorDiscrete} class has a method \texttt{computeForSystem}, which only needs to run once for a given data set, as it stores the result in the system property of the class.
+
+At this point you are able to compute the effective information for a given bipartition with the method \texttt{computeForBipartition}. The latter takes a partition as an argument in the form of an integer array specifying which variables to consider as one of the partitions of the system.
+
+\begin{minted}{java}
+// Calculate mutual information for the system.
+double output = eicd.computeForSystem();
 
 // Calculate effective information given a partition.
 int[] partition = {0, 1, 2};
 double output = eicd.computeForBipartition(partition);
 \end{minted}
 
-\subsubsection{Integrated Information Calculator}
 
-By definition, the integrated information of a system is calculated by taking its effective information with respect to the minimum information bipartition, as explained in Section \ref{II}. Our implementation finds the minimum information bipartition by iterating through all the possible bipartitions of a given system and uses it to calculate the integrated information of the system. Its usage is presented before.
+\noindent \textbf{Input}\\
+
+\noindent The \texttt{EffectiveInformationCalculatorDiscrete} class takes advantage of JIDT's MutualInformationCalculatorDiscrete class in order to compute the mutual information of the system and each bipartition. However, this class does not expose a method to calculate the mutual information for two-dimensional inputs. Hence we created a special Input class with two main purposes.
+
+\begin{enumerate}
+\item{To reduce the time series input to one dimension.}
+\item{To pair the input value at time step $t$ with that at $t-\tau$.}
+\end{enumerate}
+
+We achieve the first by taking advantage of JIDT's \texttt{MatrixUtils}. \texttt{MatrixUtils} exposes a method called \texttt{computeCombinedValues} which effectively reduces a two-dimensional array to a one-dimensional. Because computeCombinedValues performs the reduction in a row-wise fashion and our time-series input requires a column-wise reduction, we also take advantage of \texttt{MatrixUtils}' transpose method. We also track the change in base, which will equal the original base to the power of the number of variables, as it is needed to calculate the effective information. All this functionality is exposed in \texttt{Input}'s reduce method.
+
+Once the \texttt{Input} object has been reduced, you can pair the inputs using the pair method. For this we simply take the reduced array $R$ of length $n$ and the time step $\tau$, and output an $n \times 2$ matrix $P$ where the first array contains the first $n - \tau$ elements of $R$ and the second array contains the last $n - \tau$ elements. Thus each column in $P$ contains the paired values required to calculate the mutual information and each row is passed onto the \texttt{MutualInformationCalculatorDiscrete} as shown below.
+
+\begin{minted}{java}
+// Calculate MI for whole system.
+Input sys = new Input(data, base);
+int sysBase = sys.getReducedBase();
+int[][] sysPaired = sys.pair(tau);
+micd = new MutualInformationCalculatorDiscrete(sysBase, 0);
+micd.initialise();
+micd.addObservations(sysPaired[0], sysPaired[1]);
+double system = micd.computeAverageLocalOfObservations();
+\end{minted}
+
+\subsubsection{Discrete Integrated Information Calculator}
+
+By definition, the integrated information of a system is calculated by taking its effective information with respect to the minimum information bipartition, as explained in Section \ref{II}. Our implementation adds to the JIDT a class called \texttt{IntegratedInformationCalculatorDiscrete}. This calculator takes a time-series input ($data$), the number of input states for each variable in the input ($base$) and a time-step ($\tau$) to find the minimum information bipartition and in turn calculate the integrated information of the system. As with the \texttt{EffectiveInformationCalculatorDiscrete}, we follow the patterns set forth by the JIDT, so an instance of this calculator is initialised with $base$ and $tau$, and then $data$ is bound using the method \texttt{addObservations}.
 
 \begin{minted}{java}
 // Initialise integrated information calculator.
 IntegratedInformationCalculatorDiscrete iicd;
 iicd = new IntegratedInformationCalculatorDiscrete(base, tau);
 iicd.addObservations(input);
+\end{minted}
 
+In order to find the possible partitions, the class has a method \texttt{computePossiblePartitions}, which takes advantage of JIDT's \texttt{MathUtils}' method \texttt{generateAllSets} to generate a set of all the possible partitions and store it in the calculator's partitions property.
+
+Once the partitions have been calculated, it is possible to calculate the integrated information of the system using the method compute. This method will iterate through all of the possible bipartitions, calculate the effective information with respect to each bipartition.
+
+\begin{minted}{java}
 // Compute possible partitions and calculate integrated information.
 iicd.computePossiblePartitions();
 double output = iicd.compute();
 \end{minted}
 
-\subsubsection{Helper Methods}
-Additionally, our implementation adds various auxiliary methods to JIDT's helper classes, which can be also used by future developers of the toolkit. A selection of the methods that we have implemented include the following:
+Note that as shown in Section \ref{II} and explained in \cite{Barrett2011}, the minimum information bipartition is calculated by finding the bipartition that minimises the effective information of the system given that bipartition divided by a normalisation factor. The normalisation factor is the minimum entropy of both parts of the bipartition. This is necessary because if a partition covers most of the system, it will provide almost as much information as the entirety of the network, which required the normalisation factor to have a bias towards more equal partitions. Our implementation incorporates this through a method \texttt{computeNormalizationFactor}, which takes advantage of JIDT's reusable \texttt{EntropyCalculatorDiscrete} to calculate the partition with the minimum entropy.
 
-\begin{enumerate}
+\begin{minted}{java}
+public double computeNormalizationFactor(int[][] part1, int[][] part2) {
 
-\item{Select All Rows Except}
+	EntropyCalculatorDiscrete ecd = new EntropyCalculatorDiscrete(base);
+	ecd.initialise();
+	ecd.addObservations(part1);
+	double entropy1 = ecd.computeAverageLocalOfObservations();
+
+	ecd.initialise();
+	ecd.addObservations(part2);
+	double entropy2 = ecd.computeAverageLocalOfObservations();
+
+	return Math.min(entropy1, entropy2);
+}
+\end{minted}
+
+The normalisation factor ($k$) is then used inside the compute method to calculate and keep track of the minimum information bipartition. If the normalisation factor is zero, it means that one of the partitions has an entropy of zero, which means that this partition will not tell us anything about the rest of the system. To avoid division by zero, we return zero in those cases, otherwise we return the normalised effective information.
+
+\begin{minted}{java}
+	double k = computeNormalizationFactor(partition);
+	double ei = eicd.computeForBipartition(partition);
+	double normalizedEi = (k == 0) ? 0 : ei / k;
+\end{minted}
+
+Once the iteration is complete, the effective information with respect to the $MIB$ is then returned as the system's integrated information. 
+
+\subsection{Empirical Integrated Information Tilde}
+
+A second version of integrated information that we implemented is the empirical integrated information tilde ($\widetilde{\Phi}_{E}$). As opposed to the regular empirical integrated information, $\widetilde{\Phi}_{E}$ uses stochastic interaction instead of effective information when calculating the minimum information bipartition ($MIB$). Its advantages, as explained in Section \ref{IIT} include the fact that $\widetilde{\Phi}_{E}$ has to be positive.
+
+\subsubsection{Discrete Stochastic Interaction Calculator}
+
+In order to calculate the integrated information tilde of a system, by definition you need to calculate its stochastic interaction. We implemented a class that computes the stochastic interaction of time-series data given a time-step $\tau$, the number of input states for each variable in the input $base$, and a bipartition $\mathcal{B}$. As shown below, you initialise the calculator for a given base and $\tau$. You then bind the input data to the calculator object using its \texttt{addObservations} method.
+
+\begin{minted}{java}
+// Initialise stochastic interaction calculator.
+StochasticInteractionCalculatorDiscrete sicd;
+sicd = new StochasticInteractionCalculatorDiscrete(base, tau);
+sicd.addObservations(data);
+\end{minted}
+
+As noted in Section \ref{SI}, the stochastic interaction of a system given a bipartition $\mathcal{B}$ for a given time step $\tau$ represents the difference between the sum of the conditional entropy of each member of $B$ at state $X_{t-\tau}$ given state $X_t$ and the respective conditional entropy for system as a whole. We followed the same structure used for the \texttt{EffectiveInformationCalculatorDiscrete} class, so in order to avoid calculating the conditional entropy of the system for each partition that is passed to the calculator, the \texttt{StochasticInteractionCalculatorDiscrete} class has a method \texttt{computeForSystem}, which only needs to run once for a given data set, as it stores the result in the system property of the class. As with the effective information calculator, we use the Input class in order to transform the input to the required form for our computations.
+
+\subsubsection{Discrete Conditional Entropy Calculator}
+
+Because stochastic interaction requires conditional entropy to be calculated both for the system as the whole and for each partition, we required an implementation of conditional entropy suited for the JIDT. We followed the pattern set by the \texttt{MutualInformationCalculatorDiscrete} class to define a \texttt{ConditionalEntropyCalculatorDiscrete} class that takes a base as a parameter, exposes an \texttt{addObservations} method to bind input data and a compute method to calculate the conditional entropy. Given that conditional entropy can be defined as shown in equation \ref{eq:ce}, we take advantage of the already available \texttt{MutualInformationCalculatorDiscrete} and \texttt{EntropyCalculatorDiscrete} classes in our implementation for conditional entropy.
+
+\begin{equation} \label{eq:ce}
+H(X|Y) = H(X) - I(X; Y)
+\end{equation}
+
+\begin{minted}{java}
+public double compute() {
+
+	double mi = micd.computeAverageLocalOfObservations();
+	double h = ecd.computeAverageLocalOfObservations();
+
+	return h - mi;
+}
+\end{minted}
+
+\subsubsection{Discrete Empirical Integrated Information Tilde Calculator}
+
+The implementation of the \texttt{IntegratedInformationEmpiricalTildeCalculatorDiscrete} class is identical to that of the \texttt{IntegratedInformationEmpiricalCalculatorDiscrete} class with the exception that the former uses the \texttt{StochasticInteractionCalculatorDiscrete} class instead of the \texttt{EffectiveInformationCalculatorDiscrete} class. Its usage is the same and it exposes the same methods, which make the two great candidates for having a common interface defined. The possibility of improving our implementation by refactoring the common code between these two classes is further explained in Section \ref{sec:fw:jidt}.
+
+\subsection{Helper Methods}
+Additionally, our implementation adds various auxiliary methods to JIDT's helper classes, which can be also used by future developers of the toolkit.
+
+\subsubsection{Coalition Entropy}
+
+As explained in Section \ref{sec:bg:hc}, coalition entropy ($H_c$) measures the diversity of states reached by a given network, calculated as shown in Equation \ref{eq:hc}. This measure is applied in \cite{Shanahan2010} on the populations of Kuramoto oscillators. Since the first application of our implementation of $\Phi$ was on data outputted using the model in \cite{Shanahan2010}, we wanted to ensure that the coalition entropy in our results was consistent with those of the original study. In order to confirm this, we implemented a coalition entropy calculator following the style of the JIDT. Being able to calculate coalition entropy also allowed us to investigate its relationship to integrated information. Its use is shown below.
+
+\begin{minted}{java}
+// Compute coalition entropy.
+cecd = new CoalitionEntropyCalculatorDiscrete(base);
+cecd.addObservations(obs);
+double ce = cecd.compute();
+\end{minted}
+
+\subsubsection{Select All Rows Except}
+
+Given that integrated information is deeply tied with the concept of partitions within a given network, our implementation required that we could easily extract information from our time series input data. Though the JIDT contained a method to select a given set of rows from a matrix, it did so only for two-dimensional double arrays. Hence we had to overload the method in order to support two-dimensional integer arrays. Additionally, we implemented a method in order to select all the rows in a matrix except a given set of them, whose indexes are specified as an array of integers. This method allows us to easily divide time series input data into bipartitions. 
+
 \begin{minted}{java}
 // Extracts all but the specified rows from the matrix
 public static int[][] selectAllRowsExcept(int matrix[][], int rows[])
 \end{minted}
-\item{Contains}
+
+\subsubsection{Contains}
+
+Since we required a way of validating whether or not an integer was present in a given array we decided that it would be best to provide that functionality as a part of the JIDT. We thus implemented a lightweight method that takes an integer array and an integer, returning true if the integer is present in the array and false otherwise.
+
 \begin{minted}{java}
 // Returns true if an integer is contained in a array, false otherwise.
 public static boolean contains(int[] array, int element)
 \end{minted}
-\end{enumerate}
+
+\subsubsection{Insert Vector Into Matrix}
+
+We implemented a method to insert a vector into a matrix at a given column index, taking the vector input as an integer array. Although this implementation is specifically for integer vectors and matrices, it can be easily extended for other input types.
+
+\begin{minted}{java}
+public static void insertVectorIntoMatrix(int[] input, int[][] matrix, int column)
+\end{minted}
+
+This method is particularly useful for creating two-dimensional arrays that are then passed on to the methods that calculate the measures used in this project. Since our implementation stored data in a database that was then retrieved by iterating through a cursor, this helper method allowed us to fetch data and generate an input matrix without relying on other toolkits.
+
+\begin{minted}{java}
+// Obtain a cursor by passing a query to a MongoDB collection of documents (data).
+MongoCursor<Document> cursor = data.find(eq("simulation_id", _id))
+                                           .sort(ascending("_id"))
+                                           .iterator();
+
+// Insert array obtained from cursor as vector into matrix (obs).
+int column = 0;
+while (cursor.hasNext()) {
+	Document d = cursor.next();
+	ArrayList<Integer> array = (ArrayList) (d.get("data"));
+	int[] vector = Ints.toArray(array);
+	MatrixUtils.insertVectorIntoMatrix(vector, obs, column);
+	column++;
+}
+\end{minted}
+
+\subsubsection{Shuffle}
+
+Our \texttt{shuffle} method implements Durstenfeld's version of the Fisher-Yates shuffle to provide a way of rearranging both the elements of a given array or the vectors in a two-dimensional matrix \cite{Durstenfeld1964}. The algorithm follows the procedure outlined below.
+
+\begin{minted}{java}
+Random rnd = new Random();
+for (int i = array.length - 1; i > 0; i--) {
+
+	// Get new index (between 0 and i + 1).
+	int index = rnd.nextInt(i + 1);
+
+	// Swap elements at given indexes.
+	int a = array[index];
+	array[index] = array[i];
+	array[i] = a;
+}
+\end{minted}
+
+Note that while the shuffle method for one-dimensional arrays does the shuffling in place, the method for two-dimensional inputs returns a new two-dimensional array of integers. Both methods have been implemented for integer arrays, but they could easily be extended to take other inputs. 
+
+\begin{minted}{java}
+// Shuffle array in place using Fisher Yates shuffle.
+public static void shuffle(int[] array)
+
+// Shuffle 2D matrix using Fisher Yates shuffle.
+public static int[][] shuffle(int[][] matrix)
+\end{minted}
+
+\subsection{Data Sources and Data Store}
+
+Given the computationally expensive nature of our modules' simulations, a persistent store had to be used to save the output and results of each run. For our data store we chose MongoDB, a documented-oriented database, as a data store as it provides a fast, scalable solution that does not require strict design decisions in advance. As we developed our product, MongoDB's dynamic schemas allowed us to modify our objects without having to spend considerable time fixing compatibility issues. Additionally, MongoDB documents follow a JavaScript Object Notation (JSON)-like structure, which mirrors the structure of our Python objects.
+
+Additionally, the output from the populations of oscillators and spiking neurons (???), which we used as input to our integrated information calculator, were saved as Matlab files and stored directly on the filesystem. Using Python we were able to manipulate these and insert them as documents in our MongoDB instance. 
+
+\subsection{Utilities}
+This project required a number of auxiliary tools to setup, run and analyse the data generated by the simulations using our implementation of $\Phi$. First we created utility scripts in Python that could import data into our MongoDB database. For instance, in order to input data from a Matlab or Octave file containing data outputted by a Kuramoto oscillator simulation, you simply instantiate an \texttt{OscillatorDataImporter} object, connect to the appropriate database and load the folder containing the files. Our implementation will by default import the data using multiple threads to provide different parameters for import. In the Kuramoto oscillator case, we define by default that there are five possible thresholds that define if two oscillators are synchronised or not. Hence the five import processes are run in parallel. Since MongoDB allows concurrent inserts into the same collection, this speeds up the import process significantly.
+
+\begin{minted}{python}
+data_folder = "path/to/folder"
+db = "database_name"
+
+odi = OscillatorDataImporter()
+odi.connect(db)
+odi.load(data_folder)
+\end{minted}
+
+After running a simulation, data is stored in MongoDB and can be retrieved for analysis and visualisation. For this purpose we defined a \texttt{DataPlotter} Python class. A \texttt{DataPlotter} object gets initialised with a database name, to which it connects. It then exposes a \text{plot} method, which can optionally take various arguments, such as a query defining what data to retrieve from the database, as well as a boolean, a file system path and a file extension to indicate if the graphics should be saved, where and in what format. By default, the graphics are not saved and all the simulations in the database are considered when plotting.
+
+\begin{minted}{python}
+query = {
+	'duration': 5000,
+	'num_oscillators': 8        
+}
+
+dp = DataPlotter(database="infotheoretic")
+dp.plot(save=True,
+        path="/path/to/my/plots",
+        ext="svg",
+        query=query)
+\end{minted}
 
 
+We also implemented a data generator in order to test our implementation using synthetic data as well as a JavaScript file that provides helper functions for MongoDB to manage the creation of indexes, rearranging of simulation data and sanity checks.
 
-\section{Plan}
+\subsection{Version Control}
+Using Git as a source version control system allows us to carefully track the evolution of our codebase. Currently, the JIDT is available through a repository on \href{https://code.google.com/}{Google Code}, which does not provide the functionality required for several contributors to seamlessly work actively on an open source project. Our extension for the JIDT is hosted on GitHub, which provides an intuitive web interface allow other users to clone and fork the repository for their own deployments. Additionally they can submit pull requests to contribute to the development of the JIDT.
 
-\subsection{Model Synchronisation using Kuramoto Oscillators}
+\clearpage
+\section{Application on Populations of Oscillators}
 \label{MSUKO}
 
 Based on work by Shanahan \cite{Shanahan2010}, we will use Kuramoto oscillators to create a network of neural communities that model populations of neurons that exhibit metastability and chimera states. By running simulations on these networks, we will create discrete time series output that can be fed into our implementation of $\Phi$. Given that networks of Kuramoto oscillators can potentially be modelled faster than more complex populations of spiking neurons, this is a first step in this project. Additionally, we have results available from 200 simulations that have been run in using the model \cite{Shanahan2010}. As a first step, we will analyse data from these simulations.
 
-\subsection{Model Synchronisation using Spiking Neural Networks}
+
+\subsection{Methodology}
+
+\subsubsection{The Model} \label{sec:osc:mod}
+
+In Shanahan \cite{Shanahan2010}, the model consists of eight communities of 32 Kuramoto oscillators each fully connected within their own communities and randomly connected to 32 other oscillators in the population. The phase of each oscillator is determined by equation \ref{eq:shanahan:kuramoto}, which follows from the generalised Kuramoto model shown in equation \ref{eq:kuramoto}. 
+
+\begin{equation} \label{eq:shanahan:kuramoto}
+\frac{d\theta_i}{dt} = \omega + \frac{1}{N + 1} \sum_{j=1}^{N} K_{ij} \sin(\theta_j - \theta_i - \alpha)
+\end{equation}
+
+We preserved the parameters as used by Shanahan in \cite{Shanahan2010}, where $\omega = 1$, $N = 63$, $A = u - v$ where $u + v = 1$ and $A = 0.2$. $K_{ij}$ is then defined depending on the connection between oscillators $i$ and $j$. $K_{ij} = u$ for intra-community connections and $K_{ij} = v$ for inter-community connections and $K_{ij} = 0$ when there is no connection present. Finally, $\beta = \frac{\pi}{2} - \alpha$, which determines the phase lag.
+
+\subsubsection{The Simulations}
+
+In order to generate the data required to apply our implementation of $\Phi$ to the populations of Kuramoto oscillators described in Section \ref{sec:osc:mod} we carried out our own simulations using the Matlab code from \cite{Shanahan2010} as a base. Each of our XXXX trials ran for 5000 steps with a value of $\beta$ assigned from $0$ to $2\pi$. At each time step, the internal synchrony, as defined in Equation \ref{eq:sync} was calculated and inserted into an $8 \times 8$ matrix representing the level of synchrony between all of the communities. Thus the output for each trial was a series of 5000 matrices each of the form shown in Table \ref{tab:mat}.
+
+
+\begin{table}[ht]
+\centering
+
+\begin{tabular}{c l | c c c c c c c c}
+
+& & \multicolumn{8}{c}{Community \#} \\ [2mm]
+& & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 \\
+\hline
+\parbox[t]{2mm}{\multirow{8}{*}{\rotatebox[origin=c]{90}{Community \#}}}
+& 1 & \textbf{0.29} & 0.41 & 0.16 & 0.44 & 0.13 & 0.41 & 0.51 & 0.43 \\
+& 2 & 0.41 & \textbf{0.56} & 0.23 & 0.60 & 0.29 & 0.57 & 0.67 & 0.59 \\
+& 3 & 0.16 & 0.23 & \textbf{0.20} & 0.30 & 0.14 & 0.23 & 0.34 & 0.26 \\
+& 4 & 0.44 & 0.60 & 0.30 & \textbf{0.77} & 0.51 & 0.70 & 0.80 & 0.72 \\
+& 5 & 0.13 & 0.29 & 0.14 & 0.51 & \textbf{0.35} & 0.41 & 0.51 & 0.43 \\
+& 6 & 0.41 & 0.57 & 0.23 & 0.70 & 0.41 & \textbf{0.64} & 0.74 & 0.66 \\
+& 7 & 0.51 & 0.67 & 0.34 & 0.80 & 0.51 & 0.74 & \textbf{0.84} & 0.76 \\
+& 8 & 0.43 & 0.59 & 0.26 & 0.72 & 0.43 & 0.66 & 0.76 & \textbf{0.68} \\
+\end{tabular}
+\caption{Sample output matrix for a given time step of a simulation. \label{tab:mat}}
+\end{table}
+
+As highlighted in Table \ref{tab:mat}, we focused on the diagonal in each output matrix, which represents the internal synchronisation of each oscillator community. Once extracted, this diagonal was then discretised by applying a synchronisation threshold representing whether or not the oscillator is considered to be internally synchronised or not. Though in \cite{Shanahan2010} the only synchronisation threshold used is $0.8$, when analysing our results, we applied thresholds $0.5$, $0.6$, $0.7$, $0.8$, and $0.9$ to each simulation in order to obtain a better view of the effect of varying synchronisation threshold.
+
+As a result, for each time step we obtained an array of booleans, where $1$ represents that a oscillator is synchronised and $0$ that it is not. As an example, Table \ref{tab:arr} depicts the application of this procedure to the data shown in Table \ref{tab:mat} using a threshold of $0.6$.
+
+
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{l | c c c c c c c c}
+& \multicolumn{8}{c}{Community \#} \\ [2mm]
+& 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 \\
+\hline
+Continuous & 0.29 & 0.56 & 0.20 & 0.77 & 0.35 & 0.64 & 0.84 & 0.68 \\
+Discrete & 0 & 0 & 0 & 1 & 0 & 1 & 1 & 1 \\
+\end{tabular}
+\caption{For each time step in a simulation, the extracted diagonal array containing continuous data was converted to discrete data by applying a threshold, in this case $0.6$. \label{tab:arr}}
+\end{table}
+ 
+
+
+
+\subsection{Results}
+
+\section{Application on Populations of Spiking Neurons}
 \label{MSUSNN}
 
 Based on the work by Buehlmann and Deco \cite{Buehlmann2010} as well as by Bhowmik and Shanahan \cite{Bhowmik2013}, we will model populations of neurons that exhibit synchrony, metastability and chimera states. By running simulations on these networks, we will create discrete time series output that can be fed into our implementation of $\Phi$. In contrast to the process explained in Section \ref{MSUKO}, by modelling synchronisation using actual spiking neurons, we gain access to more fine-grained properties of the network, such as its spectral complexity, given that various frequencies can be present in an oscillating population at any given point in time \cite{Bhowmik2013}. This allows us to record the correlation between these frequencies in each sample network, in addition to the measures recorded for the populations in systems of oscillators described in Section \ref{MSUKO}.
@@ -258,11 +565,12 @@ The second model will follow that used by Bhowmik and Shanahan and is depicted i
 \label{Bhowmik2013_Schema}
 \end{figure}
 
-\subsection{Analysis}
+\subsection{Methodology}
+\subsection{Results}
 
-Having run a number of simulations as described in \ref{MSUKO} and \ref{MSUSNN}, the output generated by these will be used to calculated the network's integrated information. We will then run an analysis to investigate whether there are any connections between the properties of each network and its integrated information.
+\section{Future Work} \label{sec:fw}
 
-\subsection{Ensure Robustness of $\Phi$ Implementation for JIDT}
+\subsection{Ensure Robustness of $\Phi$ Implementation for JIDT} \label{sec:fw:jidt}
 
 One of the objectives of this project is to make the implementation of $\Phi$ for JIDT robust enough that it is included in the official distribution. In order to do this, once an initial working version of the implementation is finalised, we will send it to Lizier, who maintains the toolkit. By collaborating with Lizier, we aim to make conducting studies into integrated information using time series data more easily accessible for other researchers.
 
