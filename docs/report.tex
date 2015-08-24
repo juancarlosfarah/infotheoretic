@@ -7,8 +7,6 @@
 \usepackage{graphicx}
 \longdate
 
-
-
 \usepackage{paralist}
 \usepackage{mathcomp}
 \usepackage{bm}
@@ -18,6 +16,7 @@
 \usepackage{subcaption}
 \usepackage{titlesec}
 \usepackage{array,multirow}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
 
 \setcounter{secnumdepth}{4}
 
@@ -30,15 +29,72 @@
 \rhead{\fancyplain{}{\today}}
 \cfoot{\fancyplain{}{\thepage}}
 
-\title{Information Theory and Metastability in Neural Populations\\\Large{--- Progress Report ---}}
-\author{Juan Carlos Farah\\
-       jcf214@doc.ic.ac.uk\\ \\
-       \small{Supervisors: Professor Murray Shanahan, Pedro Mediano}\\
-       \small{Imperial College London}
-}
+\newcommand{\reporttitle}{Information Theory and Metastability in Neural Populations}
+\newcommand{\reportauthor}{Juan Carlos Farah}
+\newcommand{\supervisor}{Professor Murray Shanahan\\Pedro Mediano}
+\newcommand{\degreetype}{MSc Computing}
 
 \begin{document}
-\maketitle
+
+% load title page
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+
+%----------------------------------------------------------------------------------------
+%	LOGO SECTION
+%----------------------------------------------------------------------------------------
+
+\includegraphics[width = 4cm]{./figures/imperial}\\[0.5cm]
+
+\begin{center}
+
+%----------------------------------------------------------------------------------------
+%	HEADING SECTIONS
+%----------------------------------------------------------------------------------------
+
+\textsc{\Large Imperial College London}\\[0.5cm]
+\textsc{\large Department of Computing}\\[0.5cm]
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\HRule \\[0.4cm]
+{ \huge \bfseries \reporttitle}\\
+\HRule \\[1.5cm]
+
+%----------------------------------------------------------------------------------------
+%	AUTHOR SECTION
+%----------------------------------------------------------------------------------------
+
+\begin{minipage}{0.4\textwidth}
+\begin{flushleft} \large
+\emph{Author:}\\
+\reportauthor
+\end{flushleft}
+\end{minipage}
+~
+\begin{minipage}{0.4\textwidth}
+\begin{flushright} \large
+\emph{Supervisors:} \\
+\supervisor
+\end{flushright}
+\end{minipage}\\[4cm]
+
+
+%----------------------------------------------------------------------------------------
+%	FOOTER & DATE SECTION
+%----------------------------------------------------------------------------------------
+\vfill % Fill the rest of the page with whitespace
+Submitted in partial fulfillment of the requirements for the MSc degree in
+\degreetype~of Imperial College London\\[0.5cm]
+
+\makeatletter
+\@date
+\makeatother
+
+\end{center}
+
+\clearpage
 
 \tableofcontents
 
@@ -72,8 +128,13 @@ As further explained in Section \ref{MSUSNN}, we will model populations of spiki
 
 For the dynamics of the neurons in our network we will follow the Quadratic Integrate-and-Fire (QIF) model. The change in membrane potential over time of QIF neurons is given by the following equations, where $V$ is the membrane potential, $V_r$ is the resting potential, $V_t$ is the firing threshold, $C$ is the membrane capacitance, $\tau$ is the membrane time  constant, $I$ is the current and $R$ the resistance.
 
-$$ \frac{dV}{dt} = \frac{1}{\tau}(V - V_ r)(V-V_t) +  \frac{I}{C}$$
-$$ \tau = RC$$
+\begin{equation} \label{eq:qif}
+\frac{dV}{dt} = \frac{1}{\tau}(V - V_ r)(V-V_t) +  \frac{I}{C}
+\end{equation}
+
+\begin{equation} \label{eq:tau}
+\tau = RC
+\end{equation}
 
 Intially, as in \cite{Bhowmik2013} we will set $\frac{1}{\tau} = 2$ and assume a membrane potential between $V_r = 265$ mV and $V_t = 245$ mV. However, depending on the results of our simulations, we might be inclined to fine-tune these values to better fit our requirements.
 
@@ -86,6 +147,7 @@ It has been observed that ``periodic phenomena involving the synchronisation of 
 
 
 \subsection{Chimera States}
+\label{sec:chi}
 
 As explained in \cite{Shanahan2010}, competition is a feature of many complex systems. In the brain, one of the ways in which competition manifests itself is in the presence of chimera states. Chimera states refer to the phenomena where a coalition of populations of neurons (or oscillators) are synchronised while other coalitions are desynchronised. This can be seen from milliseconds 310 to 330 in Figure \ref{Shanahan2010_Chimera}. We observe that the black, red, blue, green and purple communities are synchronised while the gray, turquoise and mustard communities are desynchronised.
 
@@ -96,11 +158,15 @@ As explained in \cite{Shanahan2010}, competition is a feature of many complex sy
 \label{Shanahan2010_Chimera}
 \end{figure}
 
-In order to calculate how chimera-like a system is at a given time step, we follow \cite{Shanahan2010, Bhowmik2013}, fix time and calculate the variance across communities. This indicates ``the level of spontaneous partitioning into synchronized and desynchronized subsets'' \cite{Bhowmik2013} and can be averaged as in \cite{Shanahan2010} to calculate $\chi$ shown below, where $C$ is the set of $M$ number of communities and $\psi_c(t)$ is the synchrony of community $c$ at time $t$ as described in Section \ref{Synchrony}.
+In order to calculate how chimera-like a system is at a given time step, we follow \cite{Shanahan2010, Bhowmik2013}, fix time and calculate the variance across communities. This indicates ``the level of spontaneous partitioning into synchronized and desynchronized subsets'' \cite{Bhowmik2013} and can be averaged as in \cite{Shanahan2010} to calculate $\chi$ shown below, where $C$ is the set of $M$ number of communities and $\psi_c(t)$ is the synchrony of community $c$ at time $t$ as described in Section \ref{sec:sync}.
 
-$$\chi = \langle \sigma_{chi} \rangle_T$$
-$$\sigma_{chi}(t) = \frac{1}{M - 1}\sum_{c \in C}(\psi_c(t) - \langle \psi(t) \rangle_C)^2$$ 
+\begin{equation} \label{eq:var-sync}
+\sigma_{chi}(t) = \frac{1}{M - 1}\sum_{c \in C}(\psi_c(t) - \langle \psi(t) \rangle_C)^2
+\end{equation}
 
+\begin{equation} \label{eq:chi}
+\chi = \langle \sigma_{chi} \rangle_T
+\end{equation}
 
 \subsection{Integrated Information Theory of Consciousness}
 In 2004, Tononi presented his Integrated Information Theory, postulating that consciousness could be defined as the capacity of a system to integrate information \cite{Tononi2004}. He claimed that there were two major problems posed by consciousness. The first concerns the issue of how to determine if and to what extent a system experiences consciousness. That is, what can be measured to determine the consciousness of a given system. The second is related to the type of consciousness that a system may have. That is, addressing the fact that different kinds of conscious experiences are associated to different parts of the brain and how damage to one of these areas can affect one type of sensory experience, but leave others unaffected (e.g. certain lesions only affect one's capability to perceive colours).
@@ -115,31 +181,68 @@ In this section we provide an overview of the different information-theoretic me
 
 Entropy $H$ is a measure of uncertainty and for a discrete random variable $X$ that takes values in the space $\Omega_X$, can be calculated as shown below.
 
-$$H(X) = - \sum_{x \in \Omega_X}P_X(x) \log_2 P_X(x)$$
+\begin{equation} \label{eq:entropy}
+H(X) = - \sum_{x \in \Omega_X}P_X(x) \log_2 P_X(x)\\[2.5mm]
+\end{equation}
 
 The expected conditional entropy of $X$ given $Y$, where $Y$ is a discrete random variable that takes values in the space $\Omega_Y$, is denoted $H(X|Y)$ and calculated as shown below.
 
-$$H(X|Y) = \sum_{y \in \Omega_Y}H(X|Y=y)P_Y(y)$$
+\begin{equation} \label{eq:cond-entropy}
+H(X|Y) = \sum_{y \in \Omega_Y}H(X|Y=y)P_Y(y)
+\end{equation}
 
 \subsubsection{Mutual Information}
 
 The mutual information $I(X,Y)$ between $X$ and $Y$ is the reduction in entropy of $X$ given that we know $Y$.
 
-$$I(X,Y) = H(X) - H(X|Y)$$
+\begin{equation} \label{eq:mi}
+I(X,Y) = H(X) - H(X|Y)
+\end{equation}
+
+\subsubsection{Kullback-Leibler Divergence}
 
 
 \subsubsection{Synchrony}
-\label{Synchrony}
+\label{sec:sync}
 
-The synchrony of a given community $c$ at time $t$, $\psi_c(t)$, is given by the equation below. By averaging synchrony over all communities and time steps, you can calculate global synchrony, $\Psi$ \cite{Shanahan2010}.
+In order to quantify how synchronised the oscillators within a given community are at a given time step $t$, you can use Equation \ref{eq:sync} to calculate $\psi_c(t)$\cite{Shanahan2010}. 
 
 \begin{equation} \label{eq:sync}
 \psi_c(t) = |\langle e^{i\theta_k(t)}\rangle_{k \in c}|
 \end{equation}
 
+Here, $e^{i\theta_k(t)}$, which raises $e$ to the power of $i = \sqrt{-1}$ times $\theta_k(t)$, the phase of oscillator $k$ at time step $t$, is averaged over all oscillators in community $c$. This produces a value that ranges from 0 when all the oscillators are completely desynchronised to 1, when they are all in synchrony.
+
+\subsubsection{Global Synchrony}
+\label{sec:global-sync}
+
+Once you have calculated the synchrony of a community of oscillators $c$ for each time step $t$, you can average for all of the time steps in a given simulation $T$ to obtain an aggregate measure of synchrony for that community ($\widehat{\psi}$), as shown in Equation \ref{eq:comm-sync}.  To obtain the global synchrony ($\Psi$), as given by Equation \ref{eq:global-sync}, you simply average $\widehat{\psi}$ over all the communities $c$ in a given population $C$.
+
+\begin{equation} \label{eq:comm-sync}
+\widehat{\psi}_c = \frac{1}{|T|} \sum_{t \in T} \psi_c(t)
+\end{equation}
+
+\begin{equation} \label{eq:global-sync}
+\Psi = \frac{1}{|C|} \sum_{c \in C} \widehat{\psi}_c
+\end{equation}
+ 
+
+\subsubsection{Metastability Index} \label{sec:bg:lambda}
+
+In \cite{Shanahan2010}, Shanahan proposes an index for metastability that builds on the synchrony measure described in Section \ref{sec:sync}. We take $\psi_t$ for a given community $c$ over all time step $t \in T$, where $T$ is the total number of time steps in the simulation, and then measure the variance over $T$, as denoted in Equation \ref{eq:sigma-met}. This measure can then be averaged over all communities $c$ in the system $C$ to produce an index of how metastable the population is overall. We call this measure $\lambda$ following \cite{Shanahan2010} as presented in Equation \ref{eq:lambda}.
+
+\begin{equation} \label{eq:sigma-met}
+\sigma_{\psi}(c) = \frac{1}{T - 1} \sum_{t \leq T }(\psi_{c}(t) - \langle \psi_{c}\rangle_T)^2
+\end{equation}
+
+\begin{equation} \label{eq:lambda}
+\lambda = \langle \sigma_{\psi} \rangle_C
+\end{equation}
+
+
 \subsubsection{Coalition Entropy} \label{sec:bg:hc}
 
-``Coalition entropy measures the variety of metastable states entered by a system of oscillators and is calculated from the number of distinct states the system can generate and the probability of each state occurring.'' \cite{Bhowmik2013} We can calculate the coalition entropy $H_C$ for a system by computing ``how “mixed up” is the set of coalitions a system produces over a period of time'' \cite{Shanahan2010}. This is given by the equation below where ``$S$ is the set of distinct coalitions the system can generate and $p(s)$ is the probability of coalition $s$ arising in any given time point'' \cite{Shanahan2010}.
+``Coalition entropy measures the variety of metastable states entered by a system of oscillators and is calculated from the number of distinct states the system can generate and the probability of each state occurring.'' \cite{Bhowmik2013} We can calculate the coalition entropy $H_C$ for a system by computing ``how `mixed up' is the set of coalitions a system produces over a period of time'' \cite{Shanahan2010}. This is given by the equation below where ``$S$ is the set of distinct coalitions the system can generate and $p(s)$ is the probability of coalition $s$ arising in any given time point'' \cite{Shanahan2010}.
 
 \begin{equation} \label{eq:hc}
 H_C = - \frac{1}{\log_2 |S|}\sum_{s \in S}p(s) \log_2 (p(s))
@@ -148,7 +251,9 @@ H_C = - \frac{1}{\log_2 |S|}\sum_{s \in S}p(s) \log_2 (p(s))
 \subsubsection{Transfer Entropy}
 Transfer entropy ``is an information theoretical measure that quantifies the statistical coherence between systems. It has the advantage that it does not only measure the coherence between two signals, but is able to distinguish between driving and responding elements and therefore between shared and transported information. This is called the directionality of the information flow.'' \cite{Buehlmann2010} Transfer entropy from process $J$ to process $I$ can be calculated using the equation below, where $l = k$ or $l = 1$ \cite{Schreiber2000}.
 
-$$T_{J \rightarrow I} = \sum p(i_{n+1}, i_{n}^{(k)}, j_{n}^{(l)}) \log_2 \frac{p(i_{n+1} | i_{n}^{(k)}, j_{n}^{(l)})}{p(i_{n+1} | i_{n}^{(k)})} $$
+\begin{equation} \label{eq:te}
+T_{J \rightarrow I} = \sum p(i_{n+1}, i_{n}^{(k)}, j_{n}^{(l)}) \log_2 \frac{p(i_{n+1} | i_{n}^{(k)}, j_{n}^{(l)})}{p(i_{n+1} | i_{n}^{(k)})}
+\end{equation}
 
 
 \subsubsection{Effective Information}
@@ -156,24 +261,54 @@ $$T_{J \rightarrow I} = \sum p(i_{n+1}, i_{n}^{(k)}, j_{n}^{(l)}) \log_2 \frac{p
 
 The effective information, $\phi$ of a system given a bipartition $\mathcal{B} = \lbrace P^1, P^2 \rbrace$ represents how much more information is generated by the whole system than by each member of $\mathcal{B}$. Specifically, if we want to calculate the effective information given the current state $X_t$ regarding the previous state $X_{t - \tau}$, with respect to bipartition $\mathcal{B}$, we sum the mutual information generated by each of the parts in $\mathcal{B}$ and subtract that from the mutual information generated by the whole system.
 
-$$\phi [X, \tau, \mathcal{B}] = I(X_{t-\tau}, X_t) - \sum_{k=1}^{2} I(P_{t-\tau}^k, P_{t}^k)$$
+\begin{equation} \label{eq:ei}
+\phi [X, \tau, \mathcal{B}] = I(X_{t-\tau}, X_t) - \sum_{k=1}^{2} I(P_{t-\tau}^k, P_{t}^k)
+\end{equation}
 
+\subsubsection{Stochastic Interaction}
+\label{sec:bg:stochastic}
+
+A slight variation of effective information known as stochastic interaction ($\tilde{\phi}$), which is also known as expected effective information \cite{Barrett2011}. It is defined as the average Kullback-Leibler divergence between the past state given the present state of system as a whole and the product of this for each subsystem given a set of partitions \cite{Ay2015}. For our purposes, as we will only be considering bipartitions, we can use the form presented by Barrett and Seth in \cite{Barrett2011}, as shown in Equation \ref{eq:stochastic}.
+
+\begin{equation} \label{eq:stochastic}
+\tilde{\phi} [X, \tau, \{M^1, M^2\}] = \sum_{k=1}^{2} H(M_{t-\tau}^k, M_{t}^k)  - H(X_{t-\tau} | X_t)
+\end{equation}
 
 \subsubsection{Integrated Information}
 \label{II}
 
 As noted in \cite{Barrett2011}, there are several definitions of integrated information. We will be using the empirical definition of integrated information, $\Phi_{E}$, as well as well as a slightly modified version, $\widetilde{\Phi}_{E}$ as put forth in \cite{Barrett2011}.\\
 
-\noindent\textbf{Empirical Integrated Information ($\Phi_{E}$)}\\
-Empirical integrated information, $\Phi_{E}$, is a version of integrated information that is best suited for time series data such as the one we will be using in our study. It is defined as the effective information of a system with respect to its minimum information bipartition.
+\noindent\textbf{Empirical Integrated Information ($\Phi_{E}$)}\\[2.5mm]
+\noindent Empirical integrated information, $\Phi_{E}$, is a version of integrated information that is best suited for time series data such as the one we will be using in our study. It is defined as the effective information of a system with respect to its minimum information bipartition.
 
-$$\Phi [X, \tau] = \phi [X, \tau, \mathcal{B}^{MIB}(X, \tau)]$$
-$$\mathcal{B}^{MIB}(X, \tau) = \arg_{\mathcal{B}} \min \Big\lbrace \frac{\phi [X, \tau, \mathcal{B}]}{K(\mathcal{B})} \Big\rbrace$$
-$$K(\mathcal{B} = \lbrace P^1, P^2 \rbrace) = \min[H(P^1), H(P^2)]$$
+\begin{equation} \label{eq:ii}
+\Phi [X, \tau] = \phi [X, \tau, \mathcal{B}^{MIB}(X, \tau)]
+\end{equation}
 
-\noindent\textbf{Empirical Integrated Information Tilde ($\widetilde{\Phi}_{E}$)}\\
+\begin{equation} \label{eq:mib}
+\mathcal{B}^{MIB}(X, \tau) = \arg_{\mathcal{B}} \min \Big\lbrace \frac{\phi [X, \tau, \mathcal{B}]}{K(\mathcal{B})} \Big\rbrace
+\end{equation}
 
-Empirical integrated information tilde, $\widetilde{\Phi}_{E}$, is a variation of $\Phi_{E}$ that uses stochastic interaction instead of effective information.
+\begin{equation} \label{eq:norm}
+K(\mathcal{B} = \lbrace P^1, P^2 \rbrace) = \min[H(P^1), H(P^2)]\\[2.5mm]
+\end{equation}
+
+\noindent\textbf{Empirical Integrated Information Tilde ($\widetilde{\Phi}_{E}$)}\\[2.5mm]
+\noindent Empirical integrated information tilde, $\widetilde{\Phi}_{E}$, is a variation of $\Phi_{E}$ that uses stochastic interaction instead of effective information in order to determine the minimum information bipartition. Overall, $\widetilde{\Phi}_{E}$ behaves very similarly to $\Phi_{E}$, although it provides certain useful properties such as the fact that it will never give a negative value.
+
+\begin{equation} \label{eq:ii-tilde}
+\widetilde{\Phi} [X, \tau] = \tilde{\phi} [X, \tau, \widetilde{\mathcal{B}}^{MIB}(X, \tau)]
+\end{equation}
+
+\begin{equation} \label{eq:mib-tilde}
+\widetilde{\mathcal{B}}^{MIB}(X, \tau) = \arg_{\widetilde{\mathcal{B}}} \min \Big\lbrace \frac{\tilde{\phi} [X, \tau, \widetilde{\mathcal{B}}]}{\widetilde{K}(\widetilde{\mathcal{B}})} \Big\rbrace
+\end{equation}
+
+\begin{equation} \label{eq:norm-tilde}
+\widetilde{K}(\widetilde{\mathcal{B}} = \lbrace P^1, P^2 \rbrace) = \min[H(P^1), H(P^2)]
+\end{equation}
+
 
 \subsection{Related Experimental Work}
 Information Measure -> Consciousness
@@ -205,8 +340,10 @@ Another feature of the JIDT is that for most measures it supports, it defines a 
 In addition to our implementation of $\Phi$ in Java for the JIDT, our project required a suite of tools and a supporting stack to facilitate the import, export and storage of data as well as a rigorous source version control system in order to facilitate integration with the JIDT. We thus decided to develop the utilities in Python and JavaScript, and use MongoDB as the database layer for the data inputted to and outputted from our simulations. We used Git as our version control system, hosting our remote repository on \href{http://github.com}{GitHub}, which will allow us to easily integrate with the future GitHub JIDT repository.
 
 \subsection{Empirical Integrated Information}
+\label{sec:impl:phi-e}
 
 \subsubsection{Discrete Effective Information Calculator}
+\label{sec:impl:ei}
 
 In order to calculate the integrated information of a system, by definition you need to calculate its effective information. We implemented a class that computes the effective information of time-series data given a time-step $\tau$, the number of input states for each variable in the input $base$, and a bipartition $\mathcal{B}$. As shown below, you initialise the calculator for a given base and $\tau$. You then bind the input data to the calculator object using its \texttt{addObservations} method.
 
@@ -257,7 +394,7 @@ double system = micd.computeAverageLocalOfObservations();
 
 \subsubsection{Discrete Integrated Information Calculator}
 
-By definition, the integrated information of a system is calculated by taking its effective information with respect to the minimum information bipartition, as explained in Section \ref{II}. Our implementation adds to the JIDT a class called \texttt{IntegratedInformationCalculatorDiscrete}. This calculator takes a time-series input ($data$), the number of input states for each variable in the input ($base$) and a time-step ($\tau$) to find the minimum information bipartition and in turn calculate the integrated information of the system. As with the \texttt{EffectiveInformationCalculatorDiscrete}, we follow the patterns set forth by the JIDT, so an instance of this calculator is initialised with $base$ and $tau$, and then $data$ is bound using the method \texttt{addObservations}.
+By definition, the integrated information of a system is calculated by taking its effective information with respect to the minimum information bipartition, as explained in Section \ref{II}. Our implementation adds to the JIDT a class called \texttt{IntegratedInformationEmpiricalCalculatorDiscrete}. This calculator takes a time-series input ($data$), the number of input states for each variable in the input ($base$) and a time-step ($\tau$) to find the minimum information bipartition and in turn calculate the integrated information of the system. As with the \texttt{EffectiveInformationCalculatorDiscrete}, we follow the patterns set forth by the JIDT, so an instance of this calculator is initialised with $base$ and $tau$, and then $data$ is bound using the method \texttt{addObservations}.
 
 \begin{minted}{java}
 // Initialise integrated information calculator.
@@ -305,10 +442,12 @@ The normalisation factor ($k$) is then used inside the compute method to calcula
 Once the iteration is complete, the effective information with respect to the $MIB$ is then returned as the system's integrated information. 
 
 \subsection{Empirical Integrated Information Tilde}
+\label{sec:impl:phi-e-tilde}
 
 A second version of integrated information that we implemented is the empirical integrated information tilde ($\widetilde{\Phi}_{E}$). As opposed to the regular empirical integrated information, $\widetilde{\Phi}_{E}$ uses stochastic interaction instead of effective information when calculating the minimum information bipartition ($MIB$). Its advantages, as explained in Section \ref{IIT} include the fact that $\widetilde{\Phi}_{E}$ has to be positive.
 
 \subsubsection{Discrete Stochastic Interaction Calculator}
+\label{sec:impl:stochastic}
 
 In order to calculate the integrated information tilde of a system, by definition you need to calculate its stochastic interaction. We implemented a class that computes the stochastic interaction of time-series data given a time-step $\tau$, the number of input states for each variable in the input $base$, and a bipartition $\mathcal{B}$. As shown below, you initialise the calculator for a given base and $\tau$. You then bind the input data to the calculator object using its \texttt{addObservations} method.
 
@@ -347,6 +486,7 @@ The implementation of the \texttt{IntegratedInformationEmpiricalTildeCalculatorD
 Additionally, our implementation adds various auxiliary methods to JIDT's helper classes, which can be also used by future developers of the toolkit.
 
 \subsubsection{Coalition Entropy}
+\label{sec:impl:hc}
 
 As explained in Section \ref{sec:bg:hc}, coalition entropy ($H_c$) measures the diversity of states reached by a given network, calculated as shown in Equation \ref{eq:hc}. This measure is applied in \cite{Shanahan2010} on the populations of Kuramoto oscillators. Since the first application of our implementation of $\Phi$ was on data outputted using the model in \cite{Shanahan2010}, we wanted to ensure that the coalition entropy in our results was consistent with those of the original study. In order to confirm this, we implemented a coalition entropy calculator following the style of the JIDT. Being able to calculate coalition entropy also allowed us to investigate its relationship to integrated information. Its use is shown below.
 
@@ -437,6 +577,7 @@ Given the computationally expensive nature of our modules' simulations, a persis
 Additionally, the output from the populations of oscillators and spiking neurons (???), which we used as input to our integrated information calculator, were saved as Matlab files and stored directly on the filesystem. Using Python we were able to manipulate these and insert them as documents in our MongoDB instance. 
 
 \subsection{Utilities}
+\label{sec:utils}
 This project required a number of auxiliary tools to setup, run and analyse the data generated by the simulations using our implementation of $\Phi$. First we created utility scripts in Python that could import data into our MongoDB database. For instance, in order to input data from a Matlab or Octave file containing data outputted by a Kuramoto oscillator simulation, you simply instantiate an \texttt{OscillatorDataImporter} object, connect to the appropriate database and load the folder containing the files. Our implementation will by default import the data using multiple threads to provide different parameters for import. In the Kuramoto oscillator case, we define by default that there are five possible thresholds that define if two oscillators are synchronised or not. Hence the five import processes are run in parallel. Since MongoDB allows concurrent inserts into the same collection, this speeds up the import process significantly.
 
 \begin{minted}{python}
@@ -473,7 +614,7 @@ Using Git as a source version control system allows us to carefully track the ev
 \section{Application on Populations of Oscillators}
 \label{MSUKO}
 
-Based on work by Shanahan \cite{Shanahan2010}, we will use Kuramoto oscillators to create a network of neural communities that model populations of neurons that exhibit metastability and chimera states. By running simulations on these networks, we will create discrete time series output that can be fed into our implementation of $\Phi$. Given that networks of Kuramoto oscillators can potentially be modelled faster than more complex populations of spiking neurons, this is a first step in this project. Additionally, we have results available from 200 simulations that have been run in using the model \cite{Shanahan2010}. As a first step, we will analyse data from these simulations.
+Based on work by Shanahan \cite{Shanahan2010}, we will use Kuramoto oscillators to create a network of neural communities that model populations of neurons that exhibit metastability and chimera states. By running simulations on these networks, we will create discrete time series output that can be fed into our implementation of $\Phi$.
 
 
 \subsection{Methodology}
@@ -511,14 +652,12 @@ In order to generate the data required to apply our implementation of $\Phi$ to 
 & 7 & 0.51 & 0.67 & 0.34 & 0.80 & 0.51 & 0.74 & \textbf{0.84} & 0.76 \\
 & 8 & 0.43 & 0.59 & 0.26 & 0.72 & 0.43 & 0.66 & 0.76 & \textbf{0.68} \\
 \end{tabular}
-\caption{Sample output matrix for a given time step of a simulation. \label{tab:mat}}
+\caption{Each trial outputted $5000$ $8 \times 8$ matrices displaying the synchrony measure between each of the communities. \label{tab:mat}}
 \end{table}
 
 As highlighted in Table \ref{tab:mat}, we focused on the diagonal in each output matrix, which represents the internal synchronisation of each oscillator community. Once extracted, this diagonal was then discretised by applying a synchronisation threshold representing whether or not the oscillator is considered to be internally synchronised or not. Though in \cite{Shanahan2010} the only synchronisation threshold used is $0.8$, when analysing our results, we applied thresholds $0.5$, $0.6$, $0.7$, $0.8$, and $0.9$ to each simulation in order to obtain a better view of the effect of varying synchronisation threshold.
 
 As a result, for each time step we obtained an array of booleans, where $1$ represents that a oscillator is synchronised and $0$ that it is not. As an example, Table \ref{tab:arr} depicts the application of this procedure to the data shown in Table \ref{tab:mat} using a threshold of $0.6$.
-
-
 
 \begin{table}[ht]
 \centering
@@ -532,8 +671,52 @@ Discrete & 0 & 0 & 0 & 1 & 0 & 1 & 1 & 1 \\
 \caption{For each time step in a simulation, the extracted diagonal array containing continuous data was converted to discrete data by applying a threshold, in this case $0.6$. \label{tab:arr}}
 \end{table}
  
+Each of the extracted arrays was then transposed and inserted into an $8 \times 5000$ matrix, with each row representing a community of oscillator and each column a time step. A sample output matrix is show in Table \ref{tab:timeseries}. This provides the final output of each trial as a time series that can be inputted into our implementation of $\Phi$.
 
+\begin{table}[ht]
+\centering
+\begin{tabular}{c l | C{8mm} C{8mm} C{8mm} C{8mm} C{8mm} C{8mm} C{8mm} C{8mm} C{8mm}}
 
+& & \multicolumn{9}{c}{Time Step} \\ [2mm]
+& & 1 & 2 & 3 & 4 & . . . & 4997 & 4998 & 4999 & 5000 \\
+\hline
+\parbox[t]{2mm}{\multirow{8}{*}{\rotatebox[origin=c]{90}{Community \#}}}
+& 1 & 0 & 0 & 0 & 0 & . . . & 0 & 0 & 0 & 0 \\
+& 2 & 0 & 0 & 0 & 0 & . . . & 1 & 0 & 0 & 1 \\
+& 3 & 0 & 0 & 0 & 1 & . . . & 1 & 0 & 0 & 1 \\
+& 4 & 0 & 0 & 1 & 1 & . . . & 0 & 0 & 0 & 0 \\
+& 5 & 0 & 0 & 0 & 0 & . . . & 0 & 1 & 1 & 1 \\
+& 6 & 0 & 1 & 1 & 1 & . . . & 0 & 0 & 1 & 1 \\
+& 7 & 0 & 1 & 1 & 0 & . . . & 1 & 1 & 1 & 1 \\
+& 8 & 0 & 0 & 0 & 0 & . . . & 1 & 1 & 1 & 1 \\
+\end{tabular}
+\caption{The final output from each trial was an $8 \times 5000$ matrix representing the time series of which communities were synchronised at each time step in the run. \label{tab:timeseries}}
+\end{table}
+
+\subsubsection{The Measures}
+
+Each simulation we ran was given a unique ID and stored as a document in our database. For each, we then took its output time series and calculated a number of measures, which were recorded in its database entry. Our strategy was to cover the measures used by Shanahan in \cite{Shanahan2010} as well as those associated with our implementation of $\Phi$ and study the relationship between these.\\
+
+\noindent \textbf{Global Synchrony}\\
+\noindent The synchrony of a given community $c$ at time $t$, $\psi_c(t)$, is given by the aforementioned Equation \ref{eq:sync}. As explained in Section \ref{sec:global-sync}, this measure can then be averaged over all communities and time steps in order to calculate global synchrony, $\Psi$ \cite{Shanahan2010}. We calculated $\Psi$ for each trial by extracting the continuous synchrony values from each matrix as presented in Table \ref{tab:arr} and inputting them to implementations of Equations \ref{eq:comm-sync} and \ref{eq:global-sync} inside the Python data importer described in Section \ref{sec:utils}.\\
+
+\noindent \textbf{Measure for Chimera States}\\
+\noindent As explained in Section \ref{sec:chi}, chimera states describe the situation where a group of communities are synchronised while the rest are desynchronised. A measure for this is proposed by Shanahan in \cite{Shanahan2010}. We calculated $\chi$ by extracting the continuous synchrony values from each matrix as presented in Table \ref{tab:arr} and inputting them to implementations of Equations \ref{eq:var-sync} and \ref{eq:chi} inside the Python data importer described in Section \ref{sec:utils}.\\
+
+\noindent \textbf{Measure for Metastability}\\
+\noindent We applied the metastability index proposed by Shanahan as $\lambda$ in \cite{Shanahan2010}. This measure measures the average variance in synchrony ($\psi_c(t)$) over time across each community $c$ in the system. We calculated $\lambda$ by extracting the continuous synchrony values from each matrix as presented in Table \ref{tab:arr} and inputting them to implementations of Equations \ref{eq:sigma-met} and \ref{eq:lambda} inside the Python data importer described in Section \ref{sec:utils}.\\
+
+\noindent \textbf{Coalition Entropy}\\
+\noindent Following \cite{Shanahan2010} and \cite{Bhowmik2013}, we measured the coalition entropy ($H_C$) of the systems in our simulations. As presented in Section \ref{sec:bg:hc}, $H_C$ is computed from the possible number of different states that can be reached by the system and the probability of any one of them arising \cite{Bhowmik2013}. We calculated $H_{C}$ by implementing Equation \ref{eq:hc} in our extension for the JIDT as described in Section \ref{sec:impl:hc}.\\
+
+\noindent \textbf{Empirical Integrated Information $\Phi_{E}$}\\
+\noindent At the core of our analysis, we calculated the empirical integrated information ($\Phi_E$) for each simulation. As explained in Section \ref{II}, empirical integrated information was proposed by Barrett and Seth in \cite{Barrett2011} to compute integrated information for time series data. We calculated $\Phi_{E}$ by implementing Equation \ref{eq:phi-e} in our extension for the JIDT as described in Section \ref{sec:impl:phi-e}. We also recorded the minimum information bipartition ($MIB$) alongside the value for $\Phi_{E}$.\\
+
+\noindent \textbf{Empirical Integrated Information Tilde ($\widetilde{\Phi}_{E}$)}\\
+\noindent A second measure we used to calculate integrated information in our study was empirical integrated information tilde ($\widetilde{\Phi}_{E}$), which uses stochastic interaction instead of effective information in order to determine the $MIB$, as detailed in Section \ref{II}. We calculated $\widetilde{\Phi}_{E}$ by implementing Equations \ref{eq:ii-tilde},  \ref{eq:mib-tilde} and \ref{eq:norm-tilde} in our extension for the JIDT as described in Section \ref{sec:impl:phi-e-tilde}. We also recorded its minimum information bipartition alongside the value for $\widetilde{\Phi}_{E}$.\\
+
+\noindent \textbf{Mutual Information}\\
+\noindent As a sanity check, for each simulation we also computed the mutual information ($I(X_{t-\tau}, X_{t})$) for the system $X$ as a whole at state $t$ vs state $t-\tau$. This allowed us to compare how effective information and integrated information behaved vis-à-vis the more traditional information-theoretic measure that they are based on. We calculated $I(X_{t-\tau}, X_{t})$ by using the implementation of Equation \ref{eq:mi} available as part of the JIDT and made available in our effective information calculator as described in Section \ref{sec:impl:ei}.\\
 
 \subsection{Results}
 
