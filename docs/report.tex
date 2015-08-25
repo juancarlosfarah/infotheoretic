@@ -694,8 +694,12 @@ Each of the extracted arrays was then transposed and inserted into an $8 \times 
 \end{table}
 
 \subsubsection{The Measures}
+\label{sec:app:osc:measures}
 
 Each simulation we ran was given a unique ID and stored as a document in our database. For each, we then took its output time series and calculated a number of measures, which were recorded in its database entry. Our strategy was to cover the measures used by Shanahan in \cite{Shanahan2010} as well as those associated with our implementation of $\Phi$ and study the relationship between these.\\
+
+\noindent \textbf{Mutual Information}\\
+\noindent As a sanity check, for each simulation we also computed the mutual information $I(X_{t-\tau}, X_{t})$ for the system $X$ as a whole at state $t$ vs state $t-\tau$. This allowed us to compare how effective information and integrated information behaved vis-\`{a}-vis mutual information, the more traditional information-theoretic measure that they are based on. We calculated $I(X_{t-\tau}, X_{t})$ by using the implementation of Equation \ref{eq:mi} available as part of the JIDT and made available in our effective information calculator as described in Section \ref{sec:impl:ei}.\\
 
 \noindent \textbf{Global Synchrony}\\
 \noindent The synchrony of a given community $c$ at time $t$, $\psi_c(t)$, is given by the aforementioned Equation \ref{eq:sync}. As explained in Section \ref{sec:global-sync}, this measure can then be averaged over all communities and time steps in order to calculate global synchrony, $\Psi$ \cite{Shanahan2010}. We calculated $\Psi$ for each trial by extracting the continuous synchrony values from each matrix as presented in Table \ref{tab:arr} and inputting them to implementations of Equations \ref{eq:comm-sync} and \ref{eq:global-sync} inside the Python data importer described in Section \ref{sec:utils}.\\
@@ -715,10 +719,22 @@ Each simulation we ran was given a unique ID and stored as a document in our dat
 \noindent \textbf{Empirical Integrated Information Tilde ($\widetilde{\Phi}_{E}$)}\\
 \noindent A second measure we used to calculate integrated information in our study was empirical integrated information tilde ($\widetilde{\Phi}_{E}$), which uses stochastic interaction instead of effective information in order to determine the $MIB$, as detailed in Section \ref{II}. We calculated $\widetilde{\Phi}_{E}$ by implementing Equations \ref{eq:ii-tilde},  \ref{eq:mib-tilde} and \ref{eq:norm-tilde} in our extension for the JIDT as described in Section \ref{sec:impl:phi-e-tilde}. We also recorded its minimum information bipartition alongside the value for $\widetilde{\Phi}_{E}$.\\
 
-\noindent \textbf{Mutual Information}\\
-\noindent As a sanity check, for each simulation we also computed the mutual information ($I(X_{t-\tau}, X_{t})$) for the system $X$ as a whole at state $t$ vs state $t-\tau$. This allowed us to compare how effective information and integrated information behaved vis-à-vis the more traditional information-theoretic measure that they are based on. We calculated $I(X_{t-\tau}, X_{t})$ by using the implementation of Equation \ref{eq:mi} available as part of the JIDT and made available in our effective information calculator as described in Section \ref{sec:impl:ei}.\\
-
 \subsection{Results}
+
+After running the XXXX simulations and computing the measures detailed in Section \ref{sec:app:osc:measures}, we analysed various relationships between these measures. First, in order to confirm the consistency of our oscillator simulations with those conducted by Shanahan, we replicated a number of the correlations presented in \cite{Shanahan2010}. This initial step allowed us to be more confident about our results once new parameters and measures were considered. We then extended this analysis by examining the same measures, but covering a wider range of parameters such as the $\beta$ range and synchronisation threshold ($\gamma$). Finally, we build on this analysis to then study the correspondence between the original measures considered in \cite{Shanahan2010} and our implementations of integrated information.
+
+\subsubsection{Metastability Index vs $\beta$}
+\label{sec:app:osc:res:meta-v-beta}
+
+\subsubsection{Chimera Index vs $\beta$}
+\label{sec:app:osc:res:chi-v-beta}
+
+\subsubsection{Global Synchrony vs $\beta$}
+\label{sec:app:osc:res:sync-v-beta}
+
+\subsubsection{Coalition Entropy vs $\beta$}
+\label{sec:app:osc:res:hc-v-beta}
+
 
 \section{Application on Populations of Spiking Neurons}
 \label{MSUSNN}
