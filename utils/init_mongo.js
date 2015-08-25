@@ -8,21 +8,26 @@ function createIndexes() {
     var db = db.getSiblingDB("infotheoretic");
     db.oscillator_data.ensureIndex({ "simulation_id": -1, "_id": 1 });
     db.generator_data.ensureIndex({ "simulation_id": -1, "_id": 1 });
+    db.snn_data.ensureIndex({ "simulation_id": -1, "_id": 1 });
+    db.snn_simulation.ensureIndex({ "source": 1 });
 }
 
 // Remove Simulation Data
 // =======================
-function removeSimulationData(query) {
-
-    var c = db.oscillator_simulation.find(query);
+function removeSimulationData(type, query) {
+    var simCollectionName = type + "_simulation";
+    var dataCollectionName = type + "_data";
+    var simCollection = db[simCollectionName];
+    var dataCollection = db[dataCollectionName];
+    var c = simCollection.find(query);
 
     while (c.hasNext()) {
         var doc = c.next();
         var sim_id = doc['_id'];
-        db.oscillator_data.remove({"simulation_id": sim_id});
+        dataCollection.remove({"simulation_id": sim_id});
     }
 
-    db.oscillator_simulation.remove(q);
+    simCollection.remove(query);
 
 }
 
