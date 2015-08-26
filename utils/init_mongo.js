@@ -53,3 +53,23 @@ db.generator_data.aggregate([ { "$group": { "_id": "$simulation_id",
 db.snn_simulation.find({ "source": /part1/}).count();
 db.snn_simulation.find({ "source": /part1/}).sort({"_id": -1}).limit(1).pretty();
 removeSimulationData("snn", { "source": /^gamma\-0\.95\/part1/ });
+
+// Transform Data
+// ==============
+function transform(collectionName) {
+    var collection = db[collectionName];
+    var c = collection.find({});
+    while (c.hasNext()) {
+        var doc = c.next();
+        var _id = doc['_id'];
+        var subdoc = {
+            "phi_e": doc['phi_e'],
+            "phi_e_tilde": doc['phi_e_tilde'],
+            "mib": doc['mib'],
+            "mib_tilde": doc['mib_tilde'],
+            "mi": doc['mi'],
+            "tau": 1
+        };
+        collection.update({ "_id": _id }, { "$set": { "tau_1": subdoc } });
+    }
+}
