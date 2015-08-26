@@ -156,9 +156,11 @@ class SpikingNeuralNetworkDataImporter:
 
 
 if __name__ == '__main__':
-    data_folder = "/Users/juancarlosfarah/Git/data/snn/gamma-0.8/part1"
+    threshold = 0.95
+    data_folder = "/Users/juancarlosfarah/Git/data/snn/gamma-" +\
+                  str(threshold) + "/part1"
     default_db = "infotheoretic"
 
     snndi = SpikingNeuralNetworkDataImporter()
     snndi.connect(default_db)
-    snndi.load_folder(data_folder, 0.8)
+    snndi.load_folder(data_folder, threshold)
