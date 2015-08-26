@@ -4,17 +4,20 @@ import pymongo
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.interpolate as spi
+from matplotlib import cm
 from copy import deepcopy
+from mpl_toolkits.mplot3d import Axes3D
 
 
 class DataPlotter:
 
-    def __init__(self, database=None):
+    def __init__(self, community_type, database=None):
         if database is not None:
             self.db = self.connect(database)
         else:
             self.db = database
 
+        self.community_type = community_type
         self.colors = ["orange", "red", "blue", "green", "purple",
                        "yellow", "brown", "pink", "magenta", "black"]
 
@@ -24,49 +27,20 @@ class DataPlotter:
         mc = pymongo.MongoClient(host=host, port=port)
         return mc.get_database(database)
 
-    def plot_one(self, threshold):
-
-        cursor = self.db.oscillator_simulation.find({"threshold": threshold})
-
-        beta = []
-        global_sync = []
-        integrated_information = []
-
-        for doc in cursor:
-            beta.append(doc['beta'])
-            global_sync.append(doc['global_sync'])
-            integrated_information.append(doc['integrated_information_e'])
-
-        fig = plt.figure()
-        plt.scatter(global_sync, integrated_information)
-        plt.xlabel("Global Synchrony")
-        plt.ylabel("Integrated Information Empirical")
-        plt.title("Integrated Information Empirical over Global Synchrony\n" +
-                  "Threshold = " + str(threshold))
-        plt.show(fig)
-
-        fig = plt.figure()
-        plt.scatter(beta, integrated_information)
-        plt.xlabel("Beta")
-        plt.ylabel("Integrated Information Empirical")
-        plt.title("Integrated Information Empirical over Beta\n" +
-                  "Threshold = " + str(threshold))
-        plt.show(fig)
-
-        return
-
     def plot(self,
-             phi="phi_e",
              save=False,
              path="$HOME",
              ext="svg",
              query=None,
+             tau=1,
              thresholds=None):
-
-        duration = "Various"
 
         if not query:
             query = dict()
+
+        duration = "Various"
+        tau_key = "tau_" + str(tau)
+        query[tau_key] = {"$exists": True}
 
         if "duration" in query:
             duration = query['duration']
@@ -80,208 +54,422 @@ class DataPlotter:
         for threshold in thresholds:
             q = deepcopy(query)
             q['threshold'] = threshold
-            cursors[threshold] = self.db.oscillator_simulation.find(q)
+            cursors[threshold] = self.db[self.community_type + '_simulation']\
+                                     .find(q)
             colors[threshold] = available_colors[count]
             count += 1
 
-        beta = dict()
+        if self.community_type == 'oscillator':
+            beta = dict()
+            chi = dict()
+        elif self.community_type == 'snn':
+            weight = dict()
+            scp = dict()
+
         global_sync = dict()
         phi_e_tilde = dict()
         coalition_entropy = dict()
-        chi = dict()
         lamda = dict()
         phi_e = dict()
 
         for key in cursors:
-            beta[key] = []
+            if self.community_type == 'oscillator':
+                beta[key] = []
+                chi[key] = []
+            elif self.community_type == 'snn':
+                weight[key] = []
+                scp[key] = []
+
             global_sync[key] = []
-            chi[key] = []
             lamda[key] = []
             coalition_entropy[key] = []
             phi_e_tilde[key] = []
             phi_e[key] = []
 
             for doc in cursors[key]:
-                beta[key].append(doc['beta'])
+                subdoc = doc[tau_key]
+                if self.community_type == 'oscillator':
+                    beta[key].append(doc['beta'])
+                    chi[key].append(doc['chi'])
+                elif self.community_type == 'snn':
+                    weight[key].append(doc['weight'])
+                    scp[key].append(doc['synaptic_connection_probability'])
+
                 global_sync[key].append(doc['global_sync'])
                 lamda[key].append(doc['lambda'])
-                chi[key].append(doc['chi'])
                 coalition_entropy[key].append(doc['coalition_entropy'])
-                phi_e_tilde[key].append(doc['phi_e_tilde'])
-                phi_e[key].append(doc['phi_e'])
 
+                # Tau dependent measures.
+                phi_e_tilde[key].append(subdoc['phi_e_tilde'])
+                phi_e[key].append(subdoc['phi_e'])
+
+        # Plot both Empirical Phi and Empirical Phi Tilde
+        run = 0
+        for phi in [phi_e, phi_e_tilde]:
+            phi_label = "Integrated Information Empirical"
+            if run == 1:
+                phi_label = "Integrated Information Empirical Tilde"
+
+
+            fig = plt.figure()
+            handles = []
+            labels = []
+            for key in cursors:
+                labels.append(key)
+                plt.xlabel("Global Synchrony")
+                plt.ylabel(phi_label)
+                plt.title(phi_label + " vs Global Synchrony\n"
+                          "Duration = " + str(duration) + ", Tau = " + str(tau))
+                handles.append(plt.scatter(global_sync[key],
+                                           phi[key],
+                                           color=colors[key],
+                                           label=key))
+                avg_phi_e = np.average(phi[key])
+                print "Average Phi E at " + str(key)\
+                      + " threshold is " + str(avg_phi_e)
+            plt.legend(handles, labels, title="Threshold")
+
+            if save:
+                fig.savefig(path + "1." + ext)
+            else:
+                plt.show(fig)
+
+            fig = plt.figure()
+            handles = []
+            labels = []
+            for key in cursors:
+                labels.append(key)
+                plt.xlabel("Lambda")
+                plt.ylabel(phi_label)
+                plt.title(phi_label + " vs Lambda\n"
+                          "Duration = " + str(duration) + ", Tau = " + str(tau))
+                handles.append(plt.scatter(lamda[key],
+                                           phi[key],
+                                           color=colors[key],
+                                           label=key))
+            plt.legend(handles, labels, title="Threshold")
+
+            if save:
+                fig.savefig(path + "6." + ext)
+            else:
+                plt.show(fig)
+
+            fig = plt.figure()
+            handles = []
+            labels = []
+            for key in cursors:
+                labels.append(key)
+                plt.xlabel("Coalition Entropy")
+                plt.ylabel(phi_label)
+                plt.title(phi_label + " vs Coalition Entropy\n"
+                          "Duration = " + str(duration) + ", Tau = " + str(tau))
+                handles.append(plt.scatter(coalition_entropy[key],
+                                           phi[key],
+                                           color=colors[key],
+                                           label=key))
+            plt.legend(handles, labels, title="Threshold")
+
+            if save:
+                fig.savefig(path + "8." + ext)
+            else:
+                plt.show(fig)
+
+            # fig = plt.figure()
+            # handles = []
+            # labels = []
+            # values = []
+            # for key in cursors:
+            #     labels.append(str(key))
+            #     values.append(phi[key])
+            #
+            # plt.xlabel(phi_label)
+            # plt.ylabel("Frequency")
+            # plt.title(phi_label + "\n"
+            #           "Duration = " + str(duration) + ", Tau = " + str(tau))
+            #
+            # handles.append(plt.hist(values, label=labels, bins=50))
+            # plt.legend(title="Threshold")
+            #
+            # if save:
+            #     fig.savefig(path + "10." + ext)
+            # else:
+            #     plt.show(fig)
+            #
+            # fig = plt.figure()
+            # handles = []
+            # labels = []
+            # values = []
+            # for key in cursors:
+            #     labels.append(str(key))
+            #     values.append(coalition_entropy[key])
+            #
+            # plt.xlabel("Coalition Entropy")
+            # plt.ylabel("Frequency")
+            # plt.title("Coalition Entropy\n"
+            #           "Duration = " + str(duration) + ", Tau = " + str(tau))
+            #
+            # handles.append(plt.hist(values, label=labels, bins=50))
+            # plt.legend(title="Threshold")
+            #
+            # if save:
+            #     fig.savefig(path + "hc-frequency." + ext)
+            # else:
+            #     plt.show(fig)
+
+            if self.community_type == 'oscillator':
+
+                fig = plt.figure()
+                handles = []
+                labels = []
+                for key in cursors:
+                    labels.append(key)
+                    plt.xlabel("Beta")
+                    plt.ylabel("Coalition Entropy")
+                    plt.title("Coalition Entropy vs Beta\n"
+                              "Duration = " + str(duration) +
+                              ", Tau = " + str(tau))
+                    handles.append(plt.scatter(beta[key],
+                                               coalition_entropy[key],
+                                               color=colors[key],
+                                               label=key))
+                plt.legend(handles, labels, title="Threshold")
+
+                if save:
+                    fig.savefig(path + "7." + ext)
+                else:
+                    plt.show(fig)
+
+                fig = plt.figure()
+                handles = []
+                labels = []
+                for key in cursors:
+                    labels.append(key)
+                    plt.xlabel("Beta")
+                    plt.ylabel(phi_label)
+                    plt.title(phi_label + " vs Beta\n"
+                              "Duration = " + str(duration) +
+                              ", Tau = " + str(tau))
+                    handles.append(plt.scatter(beta[key],
+                                               phi[key],
+                                               color=colors[key],
+                                               label=key))
+                plt.legend(handles, labels, title="Threshold")
+
+                if save:
+                    fig.savefig(path + "2." + ext)
+                else:
+                    plt.show(fig)
+
+                fig = plt.figure()
+                handles = []
+                labels = []
+                for key in cursors:
+                    labels.append(key)
+                    plt.xlabel("Beta")
+                    plt.ylabel("Chi")
+                    plt.title("Chi vs Beta\n"
+                              "Duration = " + str(duration) + ", Tau = 1")
+                    handles.append(plt.scatter(beta[key],
+                                               chi[key],
+                                               color=colors[key],
+                                               label=key))
+                plt.legend(handles, labels, title="Threshold")
+
+                if save:
+                    fig.savefig(path + "3." + ext)
+                else:
+                    plt.show(fig)
+
+                fig = plt.figure()
+                handles = []
+                labels = []
+                for key in cursors:
+                    labels.append(key)
+                    plt.xlabel("Beta")
+                    plt.ylabel("Lambda")
+                    plt.title("Lambda vs Beta\n"
+                              "Duration = " + str(duration) + ", Tau = 1")
+                    handles.append(plt.scatter(beta[key],
+                                               lamda[key],
+                                               color=colors[key],
+                                               label=key))
+                plt.legend(handles, labels, title="Threshold")
+
+                if save:
+                    fig.savefig(path + "4." + ext)
+                else:
+                    plt.show(fig)
+
+                fig = plt.figure()
+                handles = []
+                labels = []
+                for key in cursors:
+                    labels.append(key)
+                    plt.xlabel("Chi")
+                    plt.ylabel(phi_label)
+                    plt.title(phi_label + " vs Chi\n"
+                              "Duration = " + str(duration) + ", Tau = 1")
+                    handles.append(plt.scatter(chi[key],
+                                               phi[key],
+                                               color=colors[key],
+                                               label=key))
+                plt.legend(handles, labels, title="Threshold")
+
+                if save:
+                    fig.savefig(path + "5." + ext)
+                else:
+                    plt.show(fig)
+
+            elif self.community_type == 'snn':
+
+                fig = plt.figure()
+                handles = []
+                labels = []
+                for key in cursors:
+                    labels.append(key)
+                    plt.xlabel("Weight")
+                    plt.ylabel(phi_label)
+                    plt.title(phi_label + " vs Weight\n"
+                              "Duration = " + str(duration) +
+                              ", Tau = " + str(tau))
+                    handles.append(plt.scatter(weight[key],
+                                               phi[key],
+                                               color=colors[key],
+                                               label=key))
+                plt.legend(handles, labels, title="Threshold")
+
+                if save:
+                    fig.savefig(path + "5." + ext)
+                else:
+                    plt.show(fig)
+
+                fig = plt.figure()
+                handles = []
+                labels = []
+                for key in cursors:
+                    labels.append(key)
+                    plt.xlabel("Synaptic Connection Probability")
+                    plt.ylabel(phi_label)
+                    plt.title(phi_label + " vs "
+                              "Synaptic Connection Probability\n"
+                              "Duration = " + str(duration) +
+                              ", Tau = " + str(tau))
+                    handles.append(plt.scatter(scp[key],
+                                               phi[key],
+                                               color=colors[key],
+                                               label=key))
+                plt.legend(handles, labels, title="Threshold")
+
+                if save:
+                    fig.savefig(path + "5." + ext)
+                else:
+                    plt.show(fig)
+
+                fig = plt.figure()
+                ax = fig.add_subplot(111, projection='3d')
+                handles = []
+                labels = []
+                for key in cursors:
+                    labels.append(key)
+                    plt.title(phi_label + " vs "
+                              "Synaptic Connection Probability and Weight\n"
+                              "Duration = " + str(duration) +
+                              ", Tau = " + str(tau))
+                    handles.append(ax.scatter(scp[key],
+                                              weight[key],
+                                              phi[key],
+                                              color=colors[key],
+                                              label=key))
+                plt.legend(handles, labels, title="Threshold")
+                ax.set_xlabel("Synaptic Connection Probability")
+                ax.set_ylabel("Weight")
+                ax.set_zlabel(phi_label)
+
+                if save:
+                    fig.savefig(path + "5." + ext)
+                else:
+                    plt.show(fig)
+
+                # Triangular 3D surface plots.
+                for key in cursors:
+                    fig = plt.figure()
+                    ax = fig.gca(projection='3d')
+                    plt.title("Coalition Entropy vs "
+                              "Synaptic Connection Probability and Weight\n"
+                              "Duration = " + str(duration) +
+                              ", Tau = " + str(tau) +
+                              ", Threshold = " + str(key))
+                    ax.plot_trisurf(scp[key],
+                                    weight[key],
+                                    coalition_entropy[key],
+                                    linewidth=0.2,
+                                    cmap=cm.jet)
+                    ax.set_xlabel("Synaptic Connection Probability")
+                    ax.set_ylabel("Weight")
+                    ax.set_zlabel("Coalition Entropy")
+
+                    if save:
+                        fig.savefig(path + "5." + ext)
+                    else:
+                        plt.show(fig)
+
+                for key in cursors:
+                    fig = plt.figure()
+                    ax = fig.gca(projection='3d')
+                    plt.title("Lambda vs "
+                              "Synaptic Connection Probability and Weight\n"
+                              "Duration = " + str(duration) +
+                              ", Tau = " + str(tau) +
+                              ", Threshold = " + str(key))
+                    ax.plot_trisurf(scp[key],
+                                    weight[key],
+                                    lamda[key],
+                                    linewidth=0.2,
+                                    cmap=cm.jet)
+                    ax.set_xlabel("Synaptic Connection Probability")
+                    ax.set_ylabel("Weight")
+                    ax.set_zlabel("Lambda")
+
+                    if save:
+                        fig.savefig(path + "5." + ext)
+                    else:
+                        plt.show(fig)
+
+                for key in cursors:
+                    fig = plt.figure()
+                    ax = fig.gca(projection='3d')
+                    plt.title(phi_label + " vs "
+                              "Synaptic Connection Probability and Weight\n"
+                              "Duration = " + str(duration) +
+                              ", Tau = " + str(tau) +
+                              ", Threshold = " + str(key))
+                    ax.plot_trisurf(scp[key],
+                                    weight[key],
+                                    phi[key],
+                                    linewidth=0.2,
+                                    cmap=cm.jet)
+                    ax.set_xlabel("Synaptic Connection Probability")
+                    ax.set_ylabel("Weight")
+                    ax.set_zlabel(phi_label)
+
+                    if save:
+                        fig.savefig(path + "5." + ext)
+                    else:
+                        plt.show(fig)
+
+            run += 1
+
+        # Plot correlation between Phi Empirical and Phi Empirical Tilde
         fig = plt.figure()
         handles = []
         labels = []
         for key in cursors:
             labels.append(key)
-            plt.xlabel("Global Synchrony")
-            plt.ylabel("Integrated Information Empirical")
-            plt.title("Integrated Information Empirical vs Global Synchrony\n"
-                      "Duration = " + str(duration) + ", Tau = 1")
-            handles.append(plt.scatter(global_sync[key],
-                                       phi_e[key],
-                                       color=colors[key],
-                                       label=key))
-            avg_phi_e = np.average(phi_e[key])
-            print "Average Phi E at " + str(key) + " threshold is " + str(avg_phi_e)
-        plt.legend(handles, labels, title="Threshold")
-
-        if save:
-            fig.savefig(path + "1." + ext)
-        else:
-            plt.show(fig)
-
-        fig = plt.figure()
-        handles = []
-        labels = []
-        for key in cursors:
-            labels.append(key)
-            plt.xlabel("Beta")
-            plt.ylabel("Integrated Information Empirical")
-            plt.title("Integrated Information Empirical vs Beta\n"
-                      "Duration = " + str(duration) + ", Tau = 1")
-            handles.append(plt.scatter(beta[key],
-                                       phi_e[key],
-                                       color=colors[key],
-                                       label=key))
-        plt.legend(handles, labels, title="Threshold")
-
-        if save:
-            fig.savefig(path + "2." + ext)
-        else:
-            plt.show(fig)
-
-        fig = plt.figure()
-        handles = []
-        labels = []
-        for key in cursors:
-            labels.append(key)
-            plt.xlabel("Beta")
-            plt.ylabel("Chi")
-            plt.title("Chi vs Beta\n"
-                      "Duration = " + str(duration) + ", Tau = 1")
-            handles.append(plt.scatter(beta[key],
-                                       chi[key],
-                                       color=colors[key],
-                                       label=key))
-        plt.legend(handles, labels, title="Threshold")
-
-        if save:
-            fig.savefig(path + "3." + ext)
-        else:
-            plt.show(fig)
-
-        fig = plt.figure()
-        handles = []
-        labels = []
-        for key in cursors:
-            labels.append(key)
-            plt.xlabel("Beta")
-            plt.ylabel("Lambda")
-            plt.title("Lambda vs Beta\n"
-                      "Duration = " + str(duration) + ", Tau = 1")
-            handles.append(plt.scatter(beta[key],
-                                       lamda[key],
-                                       color=colors[key],
-                                       label=key))
-        plt.legend(handles, labels, title="Threshold")
-
-        if save:
-            fig.savefig(path + "4." + ext)
-        else:
-            plt.show(fig)
-
-        fig = plt.figure()
-        handles = []
-        labels = []
-        for key in cursors:
-            labels.append(key)
-            plt.xlabel("Chi")
-            plt.ylabel("Integrated Information Empirical")
-            plt.title("Integrated Information Empirical vs Chi\n"
-                      "Duration = " + str(duration) + ", Tau = 1")
-            handles.append(plt.scatter(chi[key],
-                                       phi_e[key],
-                                       color=colors[key],
-                                       label=key))
-        plt.legend(handles, labels, title="Threshold")
-
-        if save:
-            fig.savefig(path + "5." + ext)
-        else:
-            plt.show(fig)
-
-        fig = plt.figure()
-        handles = []
-        labels = []
-        for key in cursors:
-            labels.append(key)
-            plt.xlabel("Lambda")
-            plt.ylabel("Integrated Information Empirical")
-            plt.title("Integrated Information Empirical vs Lambda\n"
-                      "Duration = " + str(duration) + ", Tau = 1")
-            handles.append(plt.scatter(lamda[key],
-                                       phi_e[key],
-                                       color=colors[key],
-                                       label=key))
-        plt.legend(handles, labels, title="Threshold")
-
-        if save:
-            fig.savefig(path + "6." + ext)
-        else:
-            plt.show(fig)
-
-        fig = plt.figure()
-        handles = []
-        labels = []
-        for key in cursors:
-            labels.append(key)
-            plt.xlabel("Beta")
-            plt.ylabel("Coalition Entropy")
-            plt.title("Coalition Entropy vs Beta\n"
-                      "Duration = " + str(duration) + ", Tau = 1")
-            handles.append(plt.scatter(beta[key],
-                                       coalition_entropy[key],
-                                       color=colors[key],
-                                       label=key))
-        plt.legend(handles, labels, title="Threshold")
-
-        if save:
-            fig.savefig(path + "7." + ext)
-        else:
-            plt.show(fig)
-
-        fig = plt.figure()
-        handles = []
-        labels = []
-        for key in cursors:
-            labels.append(key)
-            plt.xlabel("Coalition Entropy")
-            plt.ylabel("Integrated Information Empirical")
-            plt.title("Integrated Information Empirical vs Coalition Entropy\n"
-                      "Duration = " + str(duration) + ", Tau = 1")
-            handles.append(plt.scatter(coalition_entropy[key],
-                                       phi_e[key],
-                                       color=colors[key],
-                                       label=key))
-        plt.legend(handles, labels, title="Threshold")
-
-        if save:
-            fig.savefig(path + "8." + ext)
-        else:
-            plt.show(fig)
-
-        fig = plt.figure()
-        handles = []
-        labels = []
-        for key in cursors:
-            labels.append(key)
-            plt.xlabel("Integrated Information Empirical Tilde")
-            plt.ylabel("Integrated Information Empirical")
-            plt.title("Integrated Information Empirical vs "
-                      "Integrated Information Empirical Tilde\n"
-                      "Duration = " + str(duration) + ", Tau = 1")
+            plt.xlabel("Empirical Integrated Information Tilde")
+            plt.ylabel("Empirical Integrated Information")
+            plt.title("Empirical Integrated Information vs "
+                      "Empirical Integrated Information Tilde\n"
+                      "Duration = " + str(duration) + ", Tau = " + str(tau))
             handles.append(plt.scatter(phi_e_tilde[key],
                                        phi_e[key],
                                        color=colors[key],
@@ -290,48 +478,6 @@ class DataPlotter:
 
         if save:
             fig.savefig(path + "9." + ext)
-        else:
-            plt.show(fig)
-
-        fig = plt.figure()
-        handles = []
-        labels = []
-        values = []
-        for key in cursors:
-            labels.append(str(key))
-            values.append(phi_e[key])
-
-        plt.xlabel("Integrated Information Empirical")
-        plt.ylabel("Frequency")
-        plt.title("Integrated Information Empirical\n"
-                  "Duration = " + str(duration) + ", Tau = 1")
-
-        handles.append(plt.hist(values, label=labels, bins=50))
-        plt.legend(title="Threshold")
-
-        if save:
-            fig.savefig(path + "10." + ext)
-        else:
-            plt.show(fig)
-
-        fig = plt.figure()
-        handles = []
-        labels = []
-        values = []
-        for key in cursors:
-            labels.append(str(key))
-            values.append(coalition_entropy[key])
-
-        plt.xlabel("Coalition Entropy")
-        plt.ylabel("Frequency")
-        plt.title("Coalition Entropy\n"
-                  "Duration = " + str(duration) + ", Tau = 1")
-
-        handles.append(plt.hist(values, label=labels, bins=50))
-        plt.legend(title="Threshold")
-
-        if save:
-            fig.savefig(path + "hc-frequency." + ext)
         else:
             plt.show(fig)
 
@@ -895,7 +1041,6 @@ class DataPlotter:
         else:
             plt.show(fig)
 
-
     def plot_mi_analysis(self,
                          save=False,
                          path="$HOME",
@@ -1280,20 +1425,25 @@ if __name__ == "__main__":
         'num_oscillators': 8,
         'is_surrogate': False,
     }
-    all_thresholds = [0.9, 0.8, 0.7, 0.6, 0.5]
+    osc_thresholds = [0.9, 0.8, 0.7, 0.6, 0.5]
+    snn_thresholds = [0.95, 0.8]
 
-    dp = DataPlotter(database="infotheoretic")
+    dp = DataPlotter(community_type='snn', database='infotheoretic')
     # plot_surrogate_correlation(phi="phi_e",
     #                            save=False,
     #                            path="/Users/juancarlosfarah/Git/infotheoretic/docs/surrogate/",
     #                            ext="png")
 
-    # dp.plot(phi='phi_e',
-    #         save=False,
-    #         path="/Users/juancarlosfarah/Git/infotheoretic/docs/phi_e_tilde/",
-    #         ext="svg",
-    #         query=q,
-    #         thresholds=all_thresholds)
+    q_snn = {
+        'tau_5.phi_e': {'$exists': True},
+        'tau_5.phi_e_tilde': {'$exists': True}
+    }
+    dp.plot(save=False,
+            path="/Users/juancarlosfarah/Git/infotheoretic/docs/phi_e_tilde/",
+            ext="svg",
+            tau=5,
+            query=q_snn,
+            thresholds=snn_thresholds)
 
     # plot_mi_results(save=False,
     #                 path="$HOME",
@@ -1302,7 +1452,7 @@ if __name__ == "__main__":
     #                 duration=5000,
     #                 num_oscillators=8)
 
-    dp.plot_surrogate_analysis()
-    dp.plot_normalised_surrogate()
+    # dp.plot_surrogate_analysis()
+    # dp.plot_normalised_surrogate()
 
     # plot_curves()
