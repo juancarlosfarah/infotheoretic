@@ -338,28 +338,33 @@ public class Main {
         System.out.println(cecd.compute());
     }
 
-    public static void computeIntegratedInformation(boolean override,
+    public static void computeIntegratedInformation(String type,
+                                                    int tau,
+                                                    boolean override,
                                                     boolean shuffle,
                                                     boolean save) {
 
-        // Use tau = 1;
-        int tau = 1;
         IntegratedInformationEmpiricalCalculatorDiscrete iicd;
+        IntegratedInformationEmpiricalTildeCalculatorDiscrete iicdt;
 
         // Test with data from Kuramoto Oscillator simulations.
         String host = "localhost";
         int port = 27017;
         String database = "infotheoretic";
-        MongoClient mongoClient = new MongoClient(host , port);
+        MongoClient mongoClient = new MongoClient(host, port);
         MongoDatabase db = mongoClient.getDatabase(database);
         MongoCollection<Document> simulation;
         MongoCollection<Document> data;
-        simulation = db.getCollection("oscillator_simulation");
-        data = db.getCollection("oscillator_data");
+        simulation = db.getCollection(type + "_simulation");
+        data = db.getCollection(type + "_data");
+        String tauKey = "tau_" + tau;
 
         Document query = new Document();
-        Document ne = new Document("$exists", override);
-        query.put("phi_e", ne);
+        if (!override) {
+//            String subKey = shuffle ? "shuffle" : "original";
+            Document ne = new Document("$exists", false);
+            query.put(tauKey, ne);
+        }
 
         // Counter to keep track of number of updated documents.
         int count = 0;
@@ -373,9 +378,15 @@ public class Main {
             MongoCursor<Document> cursor = data.find(eq("simulation_id", _id))
                                                .sort(ascending("_id"))
                                                .iterator();
-            int num_oscillators = doc.getInteger("num_oscillators");
+            int num_communities;
+            if (type.equals("oscillator")) {
+                num_communities = doc.getInteger("num_oscillators");
+            } else{
+                num_communities = doc.getInteger("num_communities");
+            }
+
             int duration = doc.getInteger("duration");
-            int[][] obs = new int[num_oscillators][duration * 10];
+            int[][] obs = new int[num_communities][duration * 10];
 
             // Transform data for use with Phi_E Calculator.
             int column = 0;
@@ -392,7 +403,7 @@ public class Main {
                 column++;
             }
 
-            // Compute Phi_E and Minimium Information Bipartition.
+            // Compute Phi_E and Minimum Information Bipartition.
             iicd = new IntegratedInformationEmpiricalCalculatorDiscrete(2, tau);
             iicd.addObservations(obs);
             iicd.computePossiblePartitions();
@@ -402,29 +413,46 @@ public class Main {
             mib.add(Ints.asList(iicd.minimumInformationPartition[0]));
             mib.add(Ints.asList(iicd.minimumInformationPartition[1]));
 
+            // Compute Phi_E Tilde and Minimum Information Bipartition.
+            iicdt = new IntegratedInformationEmpiricalTildeCalculatorDiscrete(2,
+                    tau);
+            iicdt.addObservations(obs);
+            iicdt.computePossiblePartitions();
+            double ii_tilde = iicdt.compute();
+            ArrayList<List<Integer>> mib_tilde = new ArrayList<List<Integer>>();
+            mib_tilde.add(Ints.asList(iicd.minimumInformationPartition[0]));
+            mib_tilde.add(Ints.asList(iicd.minimumInformationPartition[1]));
+
             // Store results in MongoDB.
             if (save) {
                 Document setDoc = new Document();
+//                Document subDoc = new Document();
                 Document update = new Document();
+                Document tauDoc = new Document();
                 update.put("phi_e", ii);
                 update.put("mib", mib);
-                update.put("tau", tau);
                 update.put("mi", mi);
+                update.put("phi_e_tilde", ii_tilde);
+                update.put("mib_tilde", mib_tilde);
+                update.put("tau", tau);
 
-                if (shuffle) {
-                    Document subDoc = new Document("shuffled", update);
-                    setDoc.put("$set", subDoc);
-                } else {
-                    setDoc.put("$set", update);
-                }
+//                if (shuffle) {
+//                    subDoc.put("shuffled", update);
+//                } else {
+//                    subDoc.put("original", update);
+//                }
+
+                tauDoc.put(tauKey, update);
+                setDoc.put("$set", tauDoc);
 
                 simulation.updateOne(eq("_id", _id), setDoc);
             }
 
             // Show counter.
             count++;
-            System.out.println("Finished processing simulation " + count + ".");
-
+            System.out.println("Finished processing simulation #" + count +
+                               " with ID: " + _id);
+            cursor.close();
         }
 
         // Disconnect from DB.
@@ -441,7 +469,7 @@ public class Main {
         String host = "localhost";
         int port = 27017;
         String database = "infotheoretic";
-        MongoClient mongoClient = new MongoClient(host , port);
+        MongoClient mongoClient = new MongoClient(host, port);
         MongoDatabase db = mongoClient.getDatabase(database);
         MongoCollection<Document> simulation;
         MongoCollection<Document> data;
@@ -494,97 +522,12 @@ public class Main {
             // Show counter.
             count++;
             System.out.println("Finished processing simulation " + count + ".");
-
+            cursor.close();
         }
 
         // Disconnect from DB.
         mongoClient.close();
     }
-
-    public static void computeIntegratedInformationEmpiricalTilde
-            (boolean override, boolean shuffle) {
-
-        // Use tau = 1;
-        int tau = 1;
-        IntegratedInformationEmpiricalTildeCalculatorDiscrete iicd;
-
-        // Test with data from Kuramoto Oscillator simulations.
-        String host = "localhost";
-        int port = 27017;
-        String database = "infotheoretic";
-        MongoClient mongoClient = new MongoClient(host , port);
-        MongoDatabase db = mongoClient.getDatabase(database);
-        MongoCollection<Document> simulation;
-        MongoCollection<Document> data;
-        simulation = db.getCollection("oscillator_simulation");
-        data = db.getCollection("oscillator_data");
-
-        Document query = new Document();
-        Document ne = new Document("$exists", override);
-        query.put("phi_e_tilde", ne);
-
-        // Counter to keep track of number of updated documents.
-        int count = 0;
-
-        for (Document doc : simulation.find(query)) {
-
-            // Get ObjectId for simulation.
-            ObjectId _id = doc.getObjectId("_id");
-
-            // Get data for this simulation.
-            MongoCursor<Document> cursor = data.find(eq("simulation_id", _id))
-                                               .sort(ascending("_id"))
-                                               .iterator();
-            int num_oscillators = doc.getInteger("num_oscillators");
-            int duration = doc.getInteger("duration");
-            int[][] obs = new int[num_oscillators][duration];
-
-            // Transform data for use with Phi_E Calculator.
-            int column = 0;
-            while (cursor.hasNext()) {
-                Document d = cursor.next();
-                ArrayList<Integer> array = (ArrayList) (d.get("data"));
-                int[] vector = Ints.toArray(array);
-                MatrixUtils.insertVectorIntoMatrix(vector, obs, column);
-                column++;
-            }
-
-            // Compute Phi_E and Minimium Information Bipartition.
-            iicd = new IntegratedInformationEmpiricalTildeCalculatorDiscrete(2,
-                    tau);
-            iicd.addObservations(obs);
-            iicd.computePossiblePartitions();
-            double ii = iicd.compute();
-            ArrayList<List<Integer>> mib = new ArrayList<List<Integer>>();
-            mib.add(Ints.asList(iicd.minimumInformationPartition[0]));
-            mib.add(Ints.asList(iicd.minimumInformationPartition[1]));
-
-            // Store results in MongoDB.
-            Document setDoc = new Document();
-            Document update = new Document();
-            update.put("phi_e_tilde", ii);
-            update.put("mib_tilde", mib);
-
-            if (shuffle) {
-                Document subDoc = new Document("shuffled", update);
-                setDoc.put("$set", subDoc);
-            } else {
-                setDoc.put("$set", update);
-            }
-
-            simulation.updateOne(eq("_id", _id), setDoc);
-
-            // Show counter.
-            count++;
-            System.out.println("Finished processing simulation " + count + ".");
-
-        }
-
-        // Disconnect from DB.
-        mongoClient.close();
-
-    }
-
 
     public static MongoDatabase connect() {
         String host = "localhost";
@@ -761,20 +704,19 @@ public class Main {
 
     public static void main(String[] args) {
 
-        System.out.println("Start tests.");
-        testMutualInformation();
-        testMutualInformationTimeSeries();
-        testMutualInformationTimeSeriesPairs();
-        testIntegratedInformation();
-        testCoalitionEntropy();
-        System.out.println("Tests completed.");
+//        System.out.println("Start tests.");
+//        testMutualInformation();
+//        testMutualInformationTimeSeries();
+//        testMutualInformationTimeSeriesPairs();
+//        testIntegratedInformation();
+//        testCoalitionEntropy();
+//        System.out.println("Tests completed.");
 
 //        computePhiEForGeneratedData(true);
 //        computeNormalisedPhiEShuffled(true);
 //        computeCoalitionEntropy(false);
-//        computeIntegratedInformation(false, false, true);
-//        computeIntegratedInformationEmpiricalTilde(false, false);
-
+        computeIntegratedInformation("snn", 5, false, false, true);
+//        computeIntegratedInformationEmpiricalTilde("snn", 5, false, false);
 
     }
 
