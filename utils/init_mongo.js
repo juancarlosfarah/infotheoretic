@@ -47,3 +47,9 @@ function duplicate() {
 // ===========================================
 db.generator_data.aggregate([ { "$group": { "_id": "$simulation_id",
                                             "sum": { "$sum": 1 }}}]);
+
+// Useful commands
+// ===============
+db.snn_simulation.find({ "source": /part1/}).count();
+db.snn_simulation.find({ "source": /part1/}).sort({"_id": -1}).limit(1).pretty();
+removeSimulationData("snn", { "source": /^gamma\-0\.95\/part1/ });
