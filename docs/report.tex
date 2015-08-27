@@ -145,9 +145,11 @@ It has been observed that ``periodic phenomena involving the synchronisation of 
 
 ``Metastability is quantified by the variance of synchrony within an individual oscillator cluster over time, averaged for all clusters in the system, and so characterizes the tendency of a system to continuously migrate between a variety of synchronous states.'' \cite{Bhowmik2013}
 
-
+% ==============
+% CHIMERA STATES
+% ==============
 \subsection{Chimera States}
-\label{sec:chi}
+\label{sec:bg:chi}
 
 As explained in \cite{Shanahan2010}, competition is a feature of many complex systems. In the brain, one of the ways in which competition manifests itself is in the presence of chimera states. Chimera states refer to the phenomena where a coalition of populations of neurons (or oscillators) are synchronised while other coalitions are desynchronised. This can be seen from milliseconds 310 to 330 in Figure \ref{Shanahan2010_Chimera}. We observe that the black, red, blue, green and purple communities are synchronised while the gray, turquoise and mustard communities are desynchronised.
 
@@ -158,7 +160,7 @@ As explained in \cite{Shanahan2010}, competition is a feature of many complex sy
 \label{Shanahan2010_Chimera}
 \end{figure}
 
-In order to calculate how chimera-like a system is at a given time step, we follow \cite{Shanahan2010, Bhowmik2013}, fix time and calculate the variance across communities. This indicates ``the level of spontaneous partitioning into synchronized and desynchronized subsets'' \cite{Bhowmik2013} and can be averaged as in \cite{Shanahan2010} to calculate $\chi$ shown below, where $C$ is the set of $M$ number of communities and $\psi_c(t)$ is the synchrony of community $c$ at time $t$ as described in Section \ref{sec:sync}.
+In order to calculate how chimera-like a system is at a given time step, we follow \cite{Shanahan2010, Bhowmik2013}, fix time and calculate the variance across communities. This indicates ``the level of spontaneous partitioning into synchronized and desynchronized subsets'' \cite{Bhowmik2013} and can be averaged as in \cite{Shanahan2010} to calculate $\chi$ shown below, where $C$ is the set of $M$ number of communities and $\psi_c(t)$ is the synchrony of community $c$ at time $t$ as described in Section \ref{sec:bg:sync}.
 
 \begin{equation} \label{eq:var-sync}
 \sigma_{chi}(t) = \frac{1}{M - 1}\sum_{c \in C}(\psi_c(t) - \langle \psi(t) \rangle_C)^2
@@ -203,7 +205,7 @@ I(X,Y) = H(X) - H(X|Y)
 
 
 \subsubsection{Synchrony}
-\label{sec:sync}
+\label{sec:bg:sync}
 
 In order to quantify how synchronised the oscillators within a given community are at a given time step $t$, you can use Equation \ref{eq:sync} to calculate $\psi_c(t)$\cite{Shanahan2010}. 
 
@@ -214,7 +216,7 @@ In order to quantify how synchronised the oscillators within a given community a
 Here, $e^{i\theta_k(t)}$, which raises $e$ to the power of $i = \sqrt{-1}$ times $\theta_k(t)$, the phase of oscillator $k$ at time step $t$, is averaged over all oscillators in community $c$. This produces a value that ranges from 0 when all the oscillators are completely desynchronised to 1, when they are all in synchrony.
 
 \subsubsection{Global Synchrony}
-\label{sec:global-sync}
+\label{sec:bg:global-sync}
 
 Once you have calculated the synchrony of a community of oscillators $c$ for each time step $t$, you can average for all of the time steps in a given simulation $T$ to obtain an aggregate measure of synchrony for that community ($\widehat{\psi}$), as shown in Equation \ref{eq:comm-sync}.  To obtain the global synchrony ($\Psi$), as given by Equation \ref{eq:global-sync}, you simply average $\widehat{\psi}$ over all the communities $c$ in a given population $C$.
 
@@ -227,9 +229,10 @@ Once you have calculated the synchrony of a community of oscillators $c$ for eac
 \end{equation}
  
 
-\subsubsection{Metastability Index} \label{sec:bg:lambda}
+\subsubsection{Metastability Index}
+\label{sec:bg:lambda}
 
-In \cite{Shanahan2010}, Shanahan proposes an index for metastability that builds on the synchrony measure described in Section \ref{sec:sync}. We take $\psi_t$ for a given community $c$ over all time step $t \in T$, where $T$ is the total number of time steps in the simulation, and then measure the variance over $T$, as denoted in Equation \ref{eq:sigma-met}. This measure can then be averaged over all communities $c$ in the system $C$ to produce an index of how metastable the population is overall. We call this measure $\lambda$ following \cite{Shanahan2010} as presented in Equation \ref{eq:lambda}.
+In \cite{Shanahan2010}, Shanahan proposes an index for metastability that builds on the synchrony measure described in Section \ref{sec:bg:sync}. We take $\psi_t$ for a given community $c$ over all time step $t \in T$, where $T$ is the total number of time steps in the simulation, and then measure the variance over $T$, as denoted in Equation \ref{eq:sigma-met}. This measure can then be averaged over all communities $c$ in the system $C$ to produce an index of how metastable the population is overall. We call this measure $\lambda$ following \cite{Shanahan2010} as presented in Equation \ref{eq:lambda}.
 
 \begin{equation} \label{eq:sigma-met}
 \sigma_{\psi}(c) = \frac{1}{T - 1} \sum_{t \leq T }(\psi_{c}(t) - \langle \psi_{c}\rangle_T)^2
@@ -324,6 +327,9 @@ Information Measure -> Metastability ?
 
 \subsection{Shanahan, Deco, Bhowmik}
 
+% =======================================================================================
+% IMPLEMENTATION
+% =======================================================================================
 \clearpage
 \section{Implementation of $\Phi$}
 
@@ -610,16 +616,25 @@ We also implemented a data generator in order to test our implementation using s
 \subsection{Version Control}
 Using Git as a source version control system allows us to carefully track the evolution of our codebase. Currently, the JIDT is available through a repository on \href{https://code.google.com/}{Google Code}, which does not provide the functionality required for several contributors to seamlessly work actively on an open source project. Our extension for the JIDT is hosted on GitHub, which provides an intuitive web interface allow other users to clone and fork the repository for their own deployments. Additionally they can submit pull requests to contribute to the development of the JIDT.
 
+% =======================================================================================
+% APPLICATION ON POPULATIONS OF OSCILLATORS
+% =======================================================================================
 \clearpage
 \section{Application on Populations of Oscillators}
 \label{MSUKO}
 
 Based on work by Shanahan \cite{Shanahan2010}, we will use Kuramoto oscillators to create a network of neural communities that model populations of neurons that exhibit metastability and chimera states. By running simulations on these networks, we will create discrete time series output that can be fed into our implementation of $\Phi$.
 
-
+% ===========
+% METHODOLOGY
+% ===========
 \subsection{Methodology}
 
-\subsubsection{The Model} \label{sec:osc:mod}
+% ---------
+% The Model
+% ---------
+\subsubsection{The Model}
+\label{sec:osc:mod}
 
 In Shanahan \cite{Shanahan2010}, the model consists of eight communities of 32 Kuramoto oscillators each fully connected within their own communities and randomly connected to 32 other oscillators in the population. The phase of each oscillator is determined by equation \ref{eq:shanahan:kuramoto}, which follows from the generalised Kuramoto model shown in equation \ref{eq:kuramoto}. 
 
@@ -629,7 +644,11 @@ In Shanahan \cite{Shanahan2010}, the model consists of eight communities of 32 K
 
 We preserved the parameters as used by Shanahan in \cite{Shanahan2010}, where $\omega = 1$, $N = 63$, $A = u - v$ where $u + v = 1$ and $A = 0.2$. $K_{ij}$ is then defined depending on the connection between oscillators $i$ and $j$. $K_{ij} = u$ for intra-community connections and $K_{ij} = v$ for inter-community connections and $K_{ij} = 0$ when there is no connection present. Finally, $\beta = \frac{\pi}{2} - \alpha$, which determines the phase lag.
 
+% ---------------
+% The Simulations
+% ---------------
 \subsubsection{The Simulations}
+\label{sec:osc:sims}
 
 In order to generate the data required to apply our implementation of $\Phi$ to the populations of Kuramoto oscillators described in Section \ref{sec:osc:mod} we carried out our own simulations using the Matlab code from \cite{Shanahan2010} as a base. Each of our XXXX trials ran for 5000 steps with a value of $\beta$ assigned from $0$ to $2\pi$. At each time step, the internal synchrony, as defined in Equation \ref{eq:sync} was calculated and inserted into an $8 \times 8$ matrix representing the level of synchrony between all of the communities. Thus the output for each trial was a series of 5000 matrices each of the form shown in Table \ref{tab:mat}.
 
@@ -693,6 +712,9 @@ Each of the extracted arrays was then transposed and inserted into an $8 \times 
 \caption{The final output from each trial was an $8 \times 5000$ matrix representing the time series of which communities were synchronised at each time step in the run. \label{tab:timeseries}}
 \end{table}
 
+% ------------
+% The Measures
+% ------------
 \subsubsection{The Measures}
 \label{sec:app:osc:measures}
 
@@ -702,10 +724,10 @@ Each simulation we ran was given a unique ID and stored as a document in our dat
 \noindent As a sanity check, for each simulation we also computed the mutual information $I(X_{t-\tau}, X_{t})$ for the system $X$ as a whole at state $t$ vs state $t-\tau$. This allowed us to compare how effective information and integrated information behaved vis-\`{a}-vis mutual information, the more traditional information-theoretic measure that they are based on. We calculated $I(X_{t-\tau}, X_{t})$ by using the implementation of Equation \ref{eq:mi} available as part of the JIDT and made available in our effective information calculator as described in Section \ref{sec:impl:ei}.\\
 
 \noindent \textbf{Global Synchrony}\\
-\noindent The synchrony of a given community $c$ at time $t$, $\psi_c(t)$, is given by the aforementioned Equation \ref{eq:sync}. As explained in Section \ref{sec:global-sync}, this measure can then be averaged over all communities and time steps in order to calculate global synchrony, $\Psi$ \cite{Shanahan2010}. We calculated $\Psi$ for each trial by extracting the continuous synchrony values from each matrix as presented in Table \ref{tab:arr} and inputting them to implementations of Equations \ref{eq:comm-sync} and \ref{eq:global-sync} inside the Python data importer described in Section \ref{sec:utils}.\\
+\noindent The synchrony of a given community $c$ at time $t$, $\psi_c(t)$, is given by the aforementioned Equation \ref{eq:sync}. As explained in Section \ref{sec:bg:global-sync}, this measure can then be averaged over all communities and time steps in order to calculate global synchrony, $\Psi$ \cite{Shanahan2010}. We calculated $\Psi$ for each trial by extracting the continuous synchrony values from each matrix as presented in Table \ref{tab:arr} and inputting them to implementations of Equations \ref{eq:comm-sync} and \ref{eq:global-sync} inside the Python data importer described in Section \ref{sec:utils}.\\
 
 \noindent \textbf{Measure for Chimera States}\\
-\noindent As explained in Section \ref{sec:chi}, chimera states describe the situation where a group of communities are synchronised while the rest are desynchronised. A measure for this is proposed by Shanahan in \cite{Shanahan2010}. We calculated $\chi$ by extracting the continuous synchrony values from each matrix as presented in Table \ref{tab:arr} and inputting them to implementations of Equations \ref{eq:var-sync} and \ref{eq:chi} inside the Python data importer described in Section \ref{sec:utils}.\\
+\noindent As explained in Section \ref{sec:bg:chi}, chimera states describe the situation where a group of communities are synchronised while the rest are desynchronised. A measure for this is proposed by Shanahan in \cite{Shanahan2010}. We calculated $\chi$ by extracting the continuous synchrony values from each matrix as presented in Table \ref{tab:arr} and inputting them to implementations of Equations \ref{eq:var-sync} and \ref{eq:chi} inside the Python data importer described in Section \ref{sec:utils}.\\
 
 \noindent \textbf{Measure for Metastability}\\
 \noindent We applied the metastability index proposed by Shanahan as $\lambda$ in \cite{Shanahan2010}. This measure measures the average variance in synchrony ($\psi_c(t)$) over time across each community $c$ in the system. We calculated $\lambda$ by extracting the continuous synchrony values from each matrix as presented in Table \ref{tab:arr} and inputting them to implementations of Equations \ref{eq:sigma-met} and \ref{eq:lambda} inside the Python data importer described in Section \ref{sec:utils}.\\
@@ -719,22 +741,147 @@ Each simulation we ran was given a unique ID and stored as a document in our dat
 \noindent \textbf{Empirical Integrated Information Tilde ($\widetilde{\Phi}_{E}$)}\\
 \noindent A second measure we used to calculate integrated information in our study was empirical integrated information tilde ($\widetilde{\Phi}_{E}$), which uses stochastic interaction instead of effective information in order to determine the $MIB$, as detailed in Section \ref{II}. We calculated $\widetilde{\Phi}_{E}$ by implementing Equations \ref{eq:ii-tilde},  \ref{eq:mib-tilde} and \ref{eq:norm-tilde} in our extension for the JIDT as described in Section \ref{sec:impl:phi-e-tilde}. We also recorded its minimum information bipartition alongside the value for $\widetilde{\Phi}_{E}$.\\
 
+% =======
+% RESULTS
+% =======
 \subsection{Results}
 
 After running the XXXX simulations and computing the measures detailed in Section \ref{sec:app:osc:measures}, we analysed various relationships between these measures. First, in order to confirm the consistency of our oscillator simulations with those conducted by Shanahan, we replicated a number of the correlations presented in \cite{Shanahan2010}. This initial step allowed us to be more confident about our results once new parameters and measures were considered. We then extended this analysis by examining the same measures, but covering a wider range of parameters such as the $\beta$ range and synchronisation threshold ($\gamma$). Finally, we build on this analysis to then study the correspondence between the original measures considered in \cite{Shanahan2010} and our implementations of integrated information.
 
-\subsubsection{Metastability Index vs $\beta$}
+% --------------
+% Lambda vs Beta
+% --------------
+\subsubsection{Metastability Index ($\lambda$) vs $\beta$}
 \label{sec:app:osc:res:meta-v-beta}
 
-\subsubsection{Chimera Index vs $\beta$}
+The first correlation we tested was that between Shanahan's $\lambda$ measure for metastability, described in Section \ref{sec:bg:lambda}, and $\beta$, the parameter determining the phase lag, as defined in Section \ref{sec:osc:mod}. We plotted the correlation for $\beta$ ranging from $0$ to $\frac{\pi}{4}$ and obtained a result consistent with \cite{Shanahan2010}. As shown in Figure \ref{fig:lambda-vs-beta-orig}, $\lambda$ peaks at approximately $\beta = 0.08$, which falls in the range of $0.05 < \beta < 0.15$ found by Shanahan.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 0.35]{figures/lambda_vs_beta_orig}
+\end{center}
+\caption{
+	Lambda vs Beta Original
+	\label{fig:lambda-vs-beta-orig}
+}
+\end{figure}
+
+In order to gain a better picture of how $\beta$ and $\lambda$ interacted, we extended our $\beta$ range to cover the whole $0$ to $2\pi$ period. What we encountered was a second peak with an almost symmetrical shape as the peak in the original plot, centred around $\beta = 3.1$. The rest of the range remained flat, with $\lambda$ values close to zero, as depicted in Figure \ref{fig:lambda-vs-beta-ext}.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 0.35]{figures/lambda_vs_beta_ext}
+\end{center}
+\caption{
+	Lambda vs Beta Extended
+	\label{fig:lambda-vs-beta-ext}
+}
+\end{figure}
+
+% -----------
+% Chi vs Beta
+% -----------
+\subsubsection{Chimera Index ($\chi$) vs $\beta$}
 \label{sec:app:osc:res:chi-v-beta}
+
+The second correlation we examined corresponded again to a measure presented by Shanahan in \cite{Shanahan2010}. We plotted Shanahan's chimera index $\chi$, as presented in Section \ref{sec:bg:chi}, versus $\beta$. Once again we started with $\beta$ ranging from $0$ to $\frac{\pi}{4}$, obtaining a result consistent with \cite{Shanahan2010}. As shown in Figure \ref{fig:chi-vs-beta-orig}, $\chi$ peaks at approximately $\beta = 0.08$, which falls in the range of $0.05 < \beta < 0.15$ found by Shanahan.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 0.35]{figures/chi_vs_beta_orig}
+\end{center}
+\caption{
+	Chi vs Beta
+	\label{fig:chi-vs-beta-orig}
+}
+\end{figure}
+
+As with the metastability index, we extended our $\beta$ range to cover the whole $0$ to $2\pi$ period. Again we encountered a second peak with an almost symmetrical shape as the one in the original plot. The new apex was also centred around $\beta = 3.1$, with the rest of the range remaining at $\chi$ values close to zero. This is depicted in Figure \ref{fig:chi-vs-beta-ext}.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 0.35]{figures/chi_vs_beta_ext}
+\caption{
+	Chi vs Beta Extended
+	\label{fig:chi-vs-beta-ext}
+}
+\end{center}
+\end{figure}
 
 \subsubsection{Global Synchrony vs $\beta$}
 \label{sec:app:osc:res:sync-v-beta}
 
+As synchrony is a key measure in determining the coalitions that are formed during each simulation, it was particularly important that our values for synchrony ($\psi$) and global synchrony ($\Psi$), as defined in Sections \ref{sec:bg:sync} and \ref{sec:bg:global-sync}, were behaving as expected. We thus examined the correlation between $\Psi$ and $\beta$. As shown in Figure \ref{fig:psi-vs-beta-orig}, our results were consistent with \cite{Shanahan2010}.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 0.35]{figures/psi_vs_beta_orig}
+\caption{
+	Psi vs Beta
+	\label{fig:psi-vs-beta-orig}
+}
+\end{center}
+\end{figure}
+
+To continue our analysis, we broadened our $\beta$ range to $0 < \beta < 2\pi$. As shown in Figure \ref{fig:psi-vs-beta-ext}... .
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 0.35]{figures/psi_vs_beta_ext}
+\caption{
+	Psi vs Beta
+	\label{fig:psi-vs-beta-ext}
+}
+\end{center}
+\end{figure}
+
 \subsubsection{Coalition Entropy vs $\beta$}
 \label{sec:app:osc:res:hc-v-beta}
 
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 0.35]{figures/hc_vs_beta_orig}
+\caption{
+	Coalition Entropy vs Beta
+	\label{fig:hc-vs-beta-orig}
+}
+\end{center}
+\end{figure}
+
+As with $\Psi$, we examined ...
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 0.35]{figures/hc_vs_beta_ext}
+\caption{
+	Coalition Entropy vs Beta
+	\label{fig:hc-vs-beta-ext}
+}
+\end{center}
+\end{figure}
+
+We then extended our analysis to cover multiple thresholds ($\gamma$) for determining whether an oscillator was synchronised or not. As outlined in Section \ref{sec:osc:sims}, we applied thresholds $0.5$, $0.6$, $0.7$, $0.8$, and $0.9$ to each simulation.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 0.35]{figures/hc_vs_beta_orig_multi}
+\caption{
+	Coalition Entropy vs Beta
+	\label{fig:hc-vs-beta-orig-multi}
+}
+\end{center}
+\end{figure}
+
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 0.35]{figures/hc_vs_beta_ext_multi}
+\caption{
+	Coalition Entropy vs Beta
+	\label{fig:hc-vs-beta-ext-multi}
+}
+\end{center}
+\end{figure}
 
 \section{Application on Populations of Spiking Neurons}
 \label{MSUSNN}
