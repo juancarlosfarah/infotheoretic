@@ -73,3 +73,15 @@ function transform(collectionName) {
         collection.update({ "_id": _id }, { "$set": { "tau_1": subdoc } });
     }
 }
+
+// Transform for beta < 0
+// ======================
+function transform_beta() {
+    var c = db.oscillator_simulation.find({ "beta": { "$lt": 0 }});
+    while (c.hasNext()) {
+        var doc = c.next();
+        var _id = doc['_id'];
+        var b = doc['beta'] + (2 * Math.PI);
+        db.oscillator_simulation.update({"_id": _id}, {"$set": {"beta": b}});
+    }
+}
