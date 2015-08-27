@@ -116,9 +116,10 @@ class DataPlotter:
         # Plot both Empirical Phi and Empirical Phi Tilde
         run = 0
         for phi in [phi_e, phi_e_tilde]:
-            phi_label = "Integrated Information Empirical"
+            phi_label = r"Empirical Integrated Information ($\Phi_{E}$)"
             if run == 1:
-                phi_label = "Integrated Information Empirical Tilde"
+                phi_label = r"Empirical Integrated Information Tilde (" \
+                            r"$\widetilde{\Phi}_{E}$)"
 
             # Phi vs Global Synchrony
             # -----------------------
@@ -127,9 +128,12 @@ class DataPlotter:
             # labels = []
             # for key in cursors:
             #     labels.append(key)
-            #     plt.xlabel("Global Synchrony")
+            #     plt.xlabel(r"Global Synchrony ($\Psi$)")
             #     plt.ylabel(phi_label)
-            #     plt.title(phi_label + " vs Global Synchrony\nTau = " + str(tau))
+            #     plt.ylim(ymin=-0.01, ymax=0.8)
+            #     plt.xlim(xmin=0, xmax=1)
+            #     #  plt.title(phi_label + " vs Global Synchrony\n"
+            #     #                        "Tau = " + str(tau))
             #     handles.append(plt.scatter(global_sync[key],
             #                                phi[key],
             #                                color=colors[key],
@@ -137,7 +141,9 @@ class DataPlotter:
             #     avg_phi_e = np.average(phi[key])
             #     print "Average Phi E at " + str(key)\
             #           + " threshold is " + str(avg_phi_e)
-            # plt.legend(handles, labels, title="Threshold")
+            # labels, handles = zip(*sorted(zip(labels, handles),
+            #                               key=lambda x: x[0]))
+            # plt.legend(handles, labels, loc=2, title=r"Threshold ($\gamma$)")
             #
             # if save:
             #     fig.savefig(path + "1." + ext)
@@ -151,15 +157,18 @@ class DataPlotter:
             # labels = []
             # for key in cursors:
             #     labels.append(key)
-            #     plt.xlabel("Lambda")
+            #     plt.xlabel(r"Metastability Index ($\lambda$)")
             #     plt.ylabel(phi_label)
-            #     plt.title(phi_label + " vs Lambda\nTau = " + str(tau))
+            #     plt.ylim(ymin=-0.01, ymax=0.8)
+            #     plt.xlim(xmin=0, xmax=0.05)
+            #     # plt.title(phi_label + " vs Lambda\nTau = " + str(tau))
             #     handles.append(plt.scatter(lamda[key],
             #                                phi[key],
             #                                color=colors[key],
             #                                label=key))
-            # plt.legend(handles, labels, title="Threshold")
-            #
+            # labels, handles = zip(*sorted(zip(labels, handles),
+            #                               key=lambda x: x[0]))
+            # plt.legend(handles, labels, loc=2, title=r"Threshold ($\gamma$)")
             # if save:
             #     fig.savefig(path + "6." + ext)
             # else:
@@ -172,15 +181,19 @@ class DataPlotter:
             # labels = []
             # for key in cursors:
             #     labels.append(key)
-            #     plt.xlabel("Coalition Entropy")
+            #     plt.xlabel(r"Coalition Entropy ($H_C$)")
             #     plt.ylabel(phi_label)
-            #     plt.title(phi_label + " vs Coalition Entropy\n"
-            #               "Tau = " + str(tau))
+            #     plt.ylim(ymin=-0.15, ymax=0.8)
+            #     plt.xlim(xmin=0, xmax=1)
+            #     # plt.title(phi_label + " vs Coalition Entropy\n"
+            #     #           "Tau = " + str(tau))
             #     handles.append(plt.scatter(coalition_entropy[key],
             #                                phi[key],
             #                                color=colors[key],
             #                                label=key))
-            # plt.legend(handles, labels, title="Threshold")
+            # labels, handles = zip(*sorted(zip(labels, handles),
+            #                               key=lambda x: x[0]))
+            # plt.legend(handles, labels, loc=2, title=r"Threshold ($\gamma$)")
             #
             # if save:
             #     fig.savefig(path + "8." + ext)
@@ -348,24 +361,28 @@ class DataPlotter:
 
                 # Phi vs Beta
                 # -----------
-                # fig = plt.figure()
-                # handles = []
-                # labels = []
-                # for key in cursors:
-                #     labels.append(key)
-                #     plt.xlabel("Beta")
-                #     plt.ylabel(phi_label)
-                #     plt.title(phi_label + " vs Beta\nTau = " + str(tau))
-                #     handles.append(plt.scatter(beta[key],
-                #                                phi[key],
-                #                                color=colors[key],
-                #                                label=key))
-                # plt.legend(handles, labels, title=r"Threshold $\gamma$")
-                #
-                # if save:
-                #     fig.savefig(path + "2." + ext)
-                # else:
-                #     plt.show(fig)
+                fig = plt.figure()
+                handles = []
+                labels = []
+                for key in cursors:
+                    labels.append(key)
+                    plt.xlabel("Beta")
+                    plt.ylabel(phi_label)
+                    plt.ylim(ymin=0, ymax=0.05)
+                    plt.xlim(xmin=0, xmax=0.8)
+                    plt.title(phi_label + " vs Beta\nTau = " + str(tau))
+                    handles.append(plt.scatter(beta[key],
+                                               phi[key],
+                                               color=colors[key],
+                                               label=key))
+                labels, handles = zip(*sorted(zip(labels, handles),
+                                              key=lambda x: x[0]))
+                plt.legend(handles, labels, title=r"Threshold ($\gamma$)")
+
+                if save:
+                    fig.savefig(path + "2." + ext)
+                else:
+                    plt.show(fig)
 
                 # Phi vs Chi
                 # ----------
@@ -376,11 +393,15 @@ class DataPlotter:
                 #     labels.append(key)
                 #     plt.xlabel("Chi")
                 #     plt.ylabel(phi_label)
-                #     plt.title(phi_label + " vs Chi\nTau = 1")
+                #     plt.ylim(ymin=0, ymax=0.05)
+                #     plt.xlim(xmin=0, xmax=0.8)
+                #     # plt.title(phi_label + " vs Chi\nTau = 1")
                 #     handles.append(plt.scatter(chi[key],
                 #                                phi[key],
                 #                                color=colors[key],
                 #                                label=key))
+                # labels, handles = zip(*sorted(zip(labels, handles),
+                #                               key=lambda x: x[0]))
                 # plt.legend(handles, labels, title="Threshold")
                 #
                 # if save:
@@ -402,6 +423,8 @@ class DataPlotter:
                                                phi[key],
                                                color=colors[key],
                                                label=key))
+                labels, handles = zip(*sorted(zip(labels, handles),
+                                              key=lambda x: x[0]))
                 plt.legend(handles, labels, title="Threshold")
 
                 if save:
@@ -423,6 +446,8 @@ class DataPlotter:
                                                phi[key],
                                                color=colors[key],
                                                label=key))
+                labels, handles = zip(*sorted(zip(labels, handles),
+                                              key=lambda x: x[0]))
                 plt.legend(handles, labels, title="Threshold")
 
                 if save:
@@ -524,16 +549,21 @@ class DataPlotter:
         # labels = []
         # for key in cursors:
         #     labels.append(key)
-        #     plt.xlabel("Empirical Integrated Information Tilde")
-        #     plt.ylabel("Empirical Integrated Information")
-        #     plt.title("Empirical Integrated Information vs "
-        #               "Empirical Integrated Information Tilde\n"
-        #               "Tau = " + str(tau))
-        #     handles.append(plt.scatter(phi_e_tilde[key],
-        #                                phi_e[key],
+        #     plt.xlabel(r"Empirical Integrated Information ($\Phi_{E}$)")
+        #     plt.ylabel(r"Empirical Integrated Information Tilde "
+        #                r"($\widetilde{\Phi}_{E}$)")
+        #     plt.ylim(ymin=0, ymax=0.8)
+        #     plt.xlim(xmin=-0.2, xmax=0.8)
+        #     # plt.title("Empirical Integrated Information vs "
+        #     #           "Empirical Integrated Information Tilde\n"
+        #     #           "Tau = " + str(tau))
+        #     handles.append(plt.scatter(phi_e[key],
+        #                                phi_e_tilde[key],
         #                                color=colors[key],
         #                                label=key))
-        # plt.legend(handles, labels, title="Threshold")
+        # labels, handles = zip(*sorted(zip(labels, handles),
+        #                               key=lambda x: x[0]))
+        # plt.legend(handles, labels, title=r"Threshold $\gamma$")
         #
         # if save:
         #     fig.savefig(path + "9." + ext)
