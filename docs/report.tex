@@ -175,6 +175,9 @@ In 2004, Tononi presented his Integrated Information Theory, postulating that co
 
 We will focus on the former of these concerns. Tononi proposed that a good measure for consciousness would be $\Phi$, which computes a system's ability to generate information as a whole, rather than as a sum of its parts. We further explain integrated information in Section \ref{II}.
 
+% ========
+% MEASURES
+% ========
 \subsection{Measures}
 \label{Measures}
 In this section we provide an overview of the different information-theoretic measure that we will use to analyse the neural populations and networks of oscillators used in this study.
@@ -228,7 +231,9 @@ Once you have calculated the synchrony of a community of oscillators $c$ for eac
 \Psi = \frac{1}{|C|} \sum_{c \in C} \widehat{\psi}_c
 \end{equation}
  
-
+% -------------------
+% Metastability Index
+% -------------------
 \subsubsection{Metastability Index}
 \label{sec:bg:lambda}
 
@@ -242,7 +247,9 @@ In \cite{Shanahan2010}, Shanahan proposes an index for metastability that builds
 \lambda = \langle \sigma_{\psi} \rangle_C
 \end{equation}
 
-
+% -----------------
+% Coalition Entropy
+% -----------------
 \subsubsection{Coalition Entropy} \label{sec:bg:hc}
 
 ``Coalition entropy measures the variety of metastable states entered by a system of oscillators and is calculated from the number of distinct states the system can generate and the probability of each state occurring.'' \cite{Bhowmik2013} We can calculate the coalition entropy $H_C$ for a system by computing ``how `mixed up' is the set of coalitions a system produces over a period of time'' \cite{Shanahan2010}. This is given by the equation below where ``$S$ is the set of distinct coalitions the system can generate and $p(s)$ is the probability of coalition $s$ arising in any given time point'' \cite{Shanahan2010}.
@@ -251,6 +258,9 @@ In \cite{Shanahan2010}, Shanahan proposes an index for metastability that builds
 H_C = - \frac{1}{\log_2 |S|}\sum_{s \in S}p(s) \log_2 (p(s))
 \end{equation}
 
+% ----------------
+% Transfer Entropy
+% ----------------
 \subsubsection{Transfer Entropy}
 Transfer entropy ``is an information theoretical measure that quantifies the statistical coherence between systems. It has the advantage that it does not only measure the coherence between two signals, but is able to distinguish between driving and responding elements and therefore between shared and transported information. This is called the directionality of the information flow.'' \cite{Buehlmann2010} Transfer entropy from process $J$ to process $I$ can be calculated using the equation below, where $l = k$ or $l = 1$ \cite{Schreiber2000}.
 
@@ -258,7 +268,9 @@ Transfer entropy ``is an information theoretical measure that quantifies the sta
 T_{J \rightarrow I} = \sum p(i_{n+1}, i_{n}^{(k)}, j_{n}^{(l)}) \log_2 \frac{p(i_{n+1} | i_{n}^{(k)}, j_{n}^{(l)})}{p(i_{n+1} | i_{n}^{(k)})}
 \end{equation}
 
-
+% ---------------------
+% Effective Information
+% ---------------------
 \subsubsection{Effective Information}
 \label{EI}
 
@@ -268,6 +280,9 @@ The effective information, $\phi$ of a system given a bipartition $\mathcal{B} =
 \phi [X, \tau, \mathcal{B}] = I(X_{t-\tau}, X_t) - \sum_{k=1}^{2} I(P_{t-\tau}^k, P_{t}^k)
 \end{equation}
 
+% ----------------------
+% Stochastic Interaction
+% ----------------------
 \subsubsection{Stochastic Interaction}
 \label{sec:bg:stochastic}
 
@@ -277,6 +292,9 @@ A slight variation of effective information known as stochastic interaction ($\t
 \tilde{\phi} [X, \tau, \{M^1, M^2\}] = \sum_{k=1}^{2} H(M_{t-\tau}^k, M_{t}^k)  - H(X_{t-\tau} | X_t)
 \end{equation}
 
+% ----------------------
+% Integrated Information
+% ----------------------
 \subsubsection{Integrated Information}
 \label{II}
 
@@ -650,9 +668,11 @@ We preserved the parameters as used by Shanahan in \cite{Shanahan2010}, where $\
 \subsubsection{The Simulations}
 \label{sec:osc:sims}
 
-In order to generate the data required to apply our implementation of $\Phi$ to the populations of Kuramoto oscillators described in Section \ref{sec:osc:mod} we carried out our own simulations using the Matlab code from \cite{Shanahan2010} as a base. Each of our XXXX trials ran for 5000 steps with a value of $\beta$ assigned from $0$ to $2\pi$. At each time step, the internal synchrony, as defined in Equation \ref{eq:sync} was calculated and inserted into an $8 \times 8$ matrix representing the level of synchrony between all of the communities. Thus the output for each trial was a series of 5000 matrices each of the form shown in Table \ref{tab:mat}.
+In order to generate the data required to apply our implementation of $\Phi$ to the populations of Kuramoto oscillators described in Section \ref{sec:osc:mod} we carried out our own simulations using the Matlab code from \cite{Shanahan2010} as a base. Each of our 7500 trials ran for 25 seconds with a value of $\beta$ assigned from $0$ to $2\pi$. Every 5ms, the internal synchrony, as defined in Equation \ref{eq:sync} was calculated and inserted into an $8 \times 8$ matrix representing the level of synchrony between all of the communities. Thus the output for each trial was a series of 5000 matrices each of the form shown in Table \ref{tab:mat}.
 
 
+% Synchrony Matrix
+% ----------------
 \begin{table}[ht]
 \centering
 
@@ -671,7 +691,7 @@ In order to generate the data required to apply our implementation of $\Phi$ to 
 & 7 & 0.51 & 0.67 & 0.34 & 0.80 & 0.51 & 0.74 & \textbf{0.84} & 0.76 \\
 & 8 & 0.43 & 0.59 & 0.26 & 0.72 & 0.43 & 0.66 & 0.76 & \textbf{0.68} \\
 \end{tabular}
-\caption{Each trial outputted $5000$ $8 \times 8$ matrices displaying the synchrony measure between each of the communities. \label{tab:mat}}
+\caption{Each trial outputted $5000$ $8 \times 8$ matrices displaying the synchrony measure between each of the communities. The diagonal represents the internal synchrony of each community of oscillators. \label{tab:mat}}
 \end{table}
 
 As highlighted in Table \ref{tab:mat}, we focused on the diagonal in each output matrix, which represents the internal synchronisation of each oscillator community. Once extracted, this diagonal was then discretised by applying a synchronisation threshold representing whether or not the oscillator is considered to be internally synchronised or not. Though in \cite{Shanahan2010} the only synchronisation threshold used is $0.8$, when analysing our results, we applied thresholds $0.5$, $0.6$, $0.7$, $0.8$, and $0.9$ to each simulation in order to obtain a better view of the effect of varying synchronisation threshold.
@@ -746,7 +766,7 @@ Each simulation we ran was given a unique ID and stored as a document in our dat
 % =======
 \subsection{Results}
 
-After running the XXXX simulations and computing the measures detailed in Section \ref{sec:app:osc:measures}, we analysed various relationships between these measures. First, in order to confirm the consistency of our oscillator simulations with those conducted by Shanahan, we replicated a number of the correlations presented in \cite{Shanahan2010}. This initial step allowed us to be more confident about our results once new parameters and measures were considered. We then extended this analysis by examining the same measures, but covering a wider range of parameters such as the $\beta$ range and synchronisation threshold ($\gamma$). Finally, we build on this analysis to then study the correspondence between the original measures considered in \cite{Shanahan2010} and our implementations of integrated information.
+After running the 7500 simulations and computing the measures detailed in Section \ref{sec:app:osc:measures}, we analysed various relationships between these measures. First, in order to confirm the consistency of our oscillator simulations with those conducted by Shanahan, we replicated a number of the correlations presented in \cite{Shanahan2010}. This initial step allowed us to be more confident about our results once new parameters and measures were considered. We then extended this analysis by examining the same measures, but covering a wider range of parameters such as the $\beta$ range and synchronisation threshold ($\gamma$). Finally, we build on this analysis to then study the correspondence between the original measures considered in \cite{Shanahan2010} and our implementations of integrated information.
 
 % --------------
 % Lambda vs Beta
@@ -754,7 +774,7 @@ After running the XXXX simulations and computing the measures detailed in Sectio
 \subsubsection{Metastability Index ($\lambda$) vs $\beta$}
 \label{sec:app:osc:res:meta-v-beta}
 
-The first correlation we tested was that between Shanahan's $\lambda$ measure for metastability, described in Section \ref{sec:bg:lambda}, and $\beta$, the parameter determining the phase lag, as defined in Section \ref{sec:osc:mod}. We plotted the correlation for $\beta$ ranging from $0$ to $\frac{\pi}{4}$ and obtained a result consistent with \cite{Shanahan2010}. As shown in Figure \ref{fig:lambda-vs-beta-orig}, $\lambda$ peaks at approximately $\beta = 0.08$, which falls in the range of $0.05 < \beta < 0.15$ found by Shanahan.
+The first correlation we tested was the one between Shanahan's $\lambda$ measure for metastability, described in Section \ref{sec:bg:lambda}, and $\beta$, the parameter determining the phase lag, as defined in Section \ref{sec:osc:mod}. We plotted the correlation for $\beta$ ranging from $0$ to $\frac{\pi}{4}$ and obtained a result consistent with \cite{Shanahan2010}. As shown in Figure \ref{fig:lambda-vs-beta-orig}, $\lambda$ peaks at approximately $\beta = 0.08$, which falls in the range of $0.05 < \beta < 0.15$ found by Shanahan.
 
 \begin{figure}[H]
 \begin{center}
@@ -811,7 +831,7 @@ As with the metastability index, we extended our $\beta$ range to cover the whol
 \subsubsection{Global Synchrony vs $\beta$}
 \label{sec:app:osc:res:sync-v-beta}
 
-As synchrony is a key measure in determining the coalitions that are formed during each simulation, it was particularly important that our values for synchrony ($\psi$) and global synchrony ($\Psi$), as defined in Sections \ref{sec:bg:sync} and \ref{sec:bg:global-sync}, were behaving as expected. We thus examined the correlation between $\Psi$ and $\beta$. As shown in Figure \ref{fig:psi-vs-beta-orig}, our results were consistent with \cite{Shanahan2010}.
+As synchrony is a key measure in determining the coalitions that are formed during each simulation, it was particularly important that our values for synchrony ($\psi$) and global synchrony ($\Psi$), as defined in Sections \ref{sec:bg:sync} and \ref{sec:bg:global-sync}, were behaving as expected. We thus examined the correlation between $\Psi$ and $\beta$. As shown in Figure \ref{fig:psi-vs-beta-orig}, our results were consistent with \cite{Shanahan2010}, with $\Psi$ tending towards full synchronisation across all communities for $\beta > \frac{\pi}{8}$.
 
 \begin{figure}[H]
 \begin{center}
@@ -823,7 +843,7 @@ As synchrony is a key measure in determining the coalitions that are formed duri
 \end{center}
 \end{figure}
 
-To continue our analysis, we broadened our $\beta$ range to $0 < \beta < 2\pi$. As shown in Figure \ref{fig:psi-vs-beta-ext}... .
+To continue our analysis, we broadened our $\beta$ range to $0 < \beta < 2\pi$. As shown in Figure \ref{fig:psi-vs-beta-ext}, after $\beta = \frac{3\pi}{4}$ $\Psi$ starts declining and falls sharply at just under $\beta = \pi$. It then tends towards zero until $\frac{7\pi}{4}$, where it starts rising once more.
 
 \begin{figure}[H]
 \begin{center}
@@ -838,8 +858,10 @@ To continue our analysis, we broadened our $\beta$ range to $0 < \beta < 2\pi$. 
 % -------------------------
 % Coalition Entropy vs Beta
 % -------------------------
-\subsubsection{Coalition Entropy vs $\beta$}
+\subsubsection{Coalition Entropy ($H_C$) vs $\beta$}
 \label{sec:app:osc:res:hc-v-beta}
+
+A final correlation considered in \cite{Shanahan2010} that we examined in our project was the one between coalition entropy ($H_C$) and $\beta$. As shown in Figure \ref{fig:hc-vs-beta-orig}, $H_C$ peaks at a $\beta$ value of approximately $0.15$, which is consistent with \cite{Shanahan2010}. Figure \ref{fig:hc-vs-beta-orig} also presents the same broader spread of $H_C$ values around $0.35 < \beta < 0.5$ that can be seen in \cite{Shanahan2010}.
 
 \begin{figure}[H]
 \begin{center}
@@ -851,7 +873,7 @@ To continue our analysis, we broadened our $\beta$ range to $0 < \beta < 2\pi$. 
 \end{center}
 \end{figure}
 
-As with $\Psi$, we examined ...
+When we examined the broader range of $0 \leq \beta \leq 2\pi$, we again saw a second symmetrical peak centred on $\beta = 3$, with $H_C$ tending towards zero for $\pi < \beta< 2\pi$.
 
 \begin{figure}[H]
 \begin{center}
@@ -865,6 +887,26 @@ As with $\Psi$, we examined ...
 
 We then extended our analysis to cover multiple thresholds ($\gamma$) for determining whether an oscillator was synchronised or not. As outlined in Section \ref{sec:osc:sims}, we applied thresholds $0.5$, $0.6$, $0.7$, $0.8$, and $0.9$ to each simulation.
 
+As shown in Figure \ref{fig:hc-vs-beta-orig-multi} we can see that as $\gamma$ increases, the peak for $H_C$ shifts to the right and its maximum value decreases slightly. These values are highlighted in Table \ref{tab:max-hc-beta}. Additionally, we observed that the right skew of the peak clearly visible for $\gamma = 0.5$ diminishes as $\gamma$ increases and for $\gamma = 0.9$, the peak appears to be mostly symmetrical.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{ c | c c }
+\multicolumn{3}{c}{Maximum $H_C$} \\ [2mm]
+$\gamma$ & $\beta$ & $H_C$\\
+\hline
+0.5 & 0.056 & 0.979 \\
+0.6 & 0.075 & 0.974 \\
+0.7 & 0.111 & 0.958 \\
+0.8 & 0.147 & 0.954 \\
+0.9 & 0.226 & 0.947 \\
+\end{tabular}
+\caption{
+	The values of $\beta$ where coalition entropy ($H_C$) is maximised for each threshold ($\gamma$).
+	\label{tab:max-hc-beta}
+}
+\end{table}
+
 \begin{figure}[H]
 \begin{center}
 \includegraphics[scale = 0.35]{figures/hc_vs_beta_orig_multi}
@@ -875,6 +917,7 @@ We then extended our analysis to cover multiple thresholds ($\gamma$) for determ
 \end{center}
 \end{figure}
 
+When we extended our $\beta$ range to $0 \leq \beta \leq 2\pi$, we observed the same symmetrical peak for each threshold as previously observed for $\gamma = 0.8$. Similarly, for all thresholds, $H_C$ tends towards zero for $\pi < \beta< 2\pi$.
 
 \begin{figure}[H]
 \begin{center}
@@ -885,6 +928,136 @@ We then extended our analysis to cover multiple thresholds ($\gamma$) for determ
 }
 \end{center}
 \end{figure}
+
+% -----------
+% Phi vs Beta
+% -----------
+\subsection{Empirical Integrated Information ($\Phi_{E}$) vs $\beta$}
+
+Having completed an analysis of the relationships considered by Shanahan in \cite{Shanahan2010}, we started analysing comparable correlations using our measures of integrated information. To begin with, we considered empirical integrated information ($\Phi_{E}$), as defined in Section \ref{II}, and $\beta$.
+
+Figure \ref{fig:phi-vs-beta-orig} plots $\Phi_{E}$ versus $\beta$ for a range of $0 \leq \beta \leq \frac{\pi}{4}$. We observe that the peak reaches its apex at $\beta \approx 0.16$. This closely follows what we found for $H_C$ when plotted against $\beta$, where $H_C$ reached a maximum at $\beta \approx 0.15$. It is worth noting, however, that the peak for $\Phi_{E}$ versus $\beta$ is narrower than that of $H_C$ versus $\beta$, and that the former, before it starts rising at $\beta \approx 0.07$, presents a dip, where $\Phi_{E}$ reaches values of down to approximately $-0.06$. From $\beta \approx 0.27$, the value for $\Phi_{E}$ stabilises at close to zero. 
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 0.35]{figures/phi_vs_beta_orig}
+\caption{
+	Phi E vs Beta
+	\label{fig:phi-vs-beta-orig}
+}
+\end{center}
+\end{figure}
+
+When considering multiple thresholds ($\gamma$), we observed a behaviour similar to the one for coalition entropy described in Section \ref{sec:app:osc:res:hc-v-beta}. As $\gamma$ increases, the value of $\beta$ corresponding to the maximum value of $\Phi_E$ also increases. However, the maximum value of $\Phi_E$ doesn't necessarily decrease. It deacreases from $\gamma = 0.5$ to $\gamma = 0.7$, but then increases from $\gamma = 0.7$ to $\gamma = 0.9$. This is summarised in Table \ref{tab:max-phi-beta}.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{ c | c c }
+\multicolumn{3}{c}{Maximum $\Phi_E$} \\ [2mm]
+$\gamma$ & $\beta$ & $\Phi_E$\\
+\hline
+0.5 & 0.056 & 0.546 \\
+0.6 & 0.082 & 0.525 \\
+0.7 & 0.114 & 0.465 \\
+0.8 & 0.160 & 0.500 \\
+0.9 & 0.238 & 0.632 \\
+\end{tabular}
+\caption{
+	The values of $\beta$ where empirical integrated information ($\Phi_E$) is maximised for each threshold ($\gamma$).
+	\label{tab:max-phi-beta}
+}
+\end{table}
+
+This is the reference Figure \ref{fig:phi-vs-beta-orig-multi}.
+
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 0.35]{figures/phi_vs_beta_orig_multi}
+\caption{
+	Phi E vs Beta
+	\label{fig:phi-vs-beta-orig-multi}
+}
+\end{center}
+\end{figure}
+
+This is the reference Figure \ref{fig:phi-vs-beta-ext}.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 0.35]{figures/phi_vs_beta_ext}
+\caption{
+	Phi E vs Beta
+	\label{fig:phi-vs-beta-ext}
+}
+\end{center}
+\end{figure}
+
+This is the reference Figure \ref{fig:phi-vs-beta-ext-multi}.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 0.35]{figures/phi_vs_beta_ext_multi}
+\caption{
+	Phi E vs Beta
+	\label{fig:phi-vs-beta-ext-multi}
+}
+\end{center}
+\end{figure}
+
+
+% -----------------
+% Phi Tilde vs Beta
+% -----------------
+
+This is the reference Figure \ref{fig:phi-tilde-vs-beta-orig}.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 0.35]{figures/phi_tilde_vs_beta_orig}
+\caption{
+	Phi E Tilde vs Beta
+	\label{fig:phi-tilde-vs-beta-orig}
+}
+\end{center}
+\end{figure}
+
+This is the reference Figure \ref{fig:phi-tilde-vs-beta-ext}.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 0.35]{figures/phi_tilde_vs_beta_ext}
+\caption{
+	Phi E Tilde vs Beta
+	\label{fig:phi-tilde-vs-beta-ext}
+}
+\end{center}
+\end{figure}
+
+This is the reference Figure \ref{fig:phi-tilde-vs-beta-orig-multi}.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 0.35]{figures/phi_tilde_vs_beta_orig_multi}
+\caption{
+	Phi E Tilde vs Beta
+	\label{fig:phi-tilde-vs-beta-orig-multi}
+}
+\end{center}
+\end{figure}
+
+This is the reference Figure \ref{fig:phi-tilde-vs-beta-ext-multi}.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 0.35]{figures/phi_tilde_vs_beta_ext_multi}
+\caption{
+	Phi E Tilde vs Beta
+	\label{fig:phi-tilde-vs-beta-ext-multi}
+}
+\end{center}
+\end{figure}
+
 
 % ----------
 % Phi vs Psi
@@ -987,6 +1160,7 @@ This is the reference Figure \ref{fig:phi-tilde-vs-hc-multi}.
 }
 \end{center}
 \end{figure}
+
 
 % ----------------
 % Phi Tilde vs Phi
