@@ -85,3 +85,9 @@ function transform_beta() {
         db.oscillator_simulation.update({"_id": _id}, {"$set": {"beta": b}});
     }
 }
+
+// Count number of oscillator simulations.
+// =======================================
+db.oscillator_simulation.find({ "duration": 5000,
+                                "num_oscillators": 8,
+                                "is_surrogate": false }).count();
