@@ -586,6 +586,31 @@ public class Main {
 
     }
 
+    public static Document computePhiETilde(int[][] observations) {
+
+        // Use tau = 1;
+        int tau = 1;
+        IntegratedInformationEmpiricalTildeCalculatorDiscrete iicd;
+
+        // Compute Phi_E and Minimium Information Partition.
+        iicd = new IntegratedInformationEmpiricalTildeCalculatorDiscrete(2,
+                                                                         tau);
+        iicd.addObservations(observations);
+        iicd.computePossiblePartitions();
+        double ii = iicd.compute();
+        ArrayList<List<Integer>> mib = new ArrayList<List<Integer>>();
+        mib.add(Ints.asList(iicd.minimumInformationPartition[0]));
+        mib.add(Ints.asList(iicd.minimumInformationPartition[1]));
+
+        // Put values in return document.
+        Document doc = new Document();
+        doc.put("phi_e_tilde", ii);
+        doc.put("mib_tilde", mib);
+
+        return doc;
+
+    }
+
     public static double computeHc(int[][] observations) {
 
         int base = 2;
@@ -702,6 +727,54 @@ public class Main {
 
     }
 
+    public static void computeSortedSurrogateDataAnalysis(boolean save) {
+
+        // Collection Names.
+        String simCollection = "oscillator_simulation";
+        String dataCollection = "oscillator_data";
+
+        // Query.
+        Document query = new Document();
+        Document ne = new Document("$exists", false);
+        query.put("sorted", ne);
+        query.put("is_surrogate", false);
+        query.put("duration", 5000);
+        query.put("num_oscillators", 8);
+
+        MongoDatabase db = connect();
+        MongoCollection<Document> sims = db.getCollection(simCollection);
+        MongoCollection<Document> data = db.getCollection(dataCollection);
+        FindIterable<Document> results = sims.find(query);
+
+        for (Document doc : results) {
+
+            // Get ObjectId for simulation.
+            ObjectId _id = doc.getObjectId("_id");
+            int numVars = doc.getInteger("num_oscillators");
+            int duration = doc.getInteger("duration");
+            int[][] obs = new int[numVars][duration];
+            getSimulationData(data, _id, obs);
+
+            // Compute sorted.
+            System.out.println("Make sure to uncomment line in Input.java.");
+            System.exit(1);
+            Document values = computePhiE(obs);
+            Document tilde = computePhiETilde(obs);
+
+            double hc = computeHc(obs);
+            values.put("coalition_entropy", hc);
+            values.put("mib_tilde", tilde.get("mib_tilde"));
+            values.put("phi_e_tilde", tilde.get("phi_e_tilde"));
+
+            if (save)  {
+                Document sorted = new Document();
+                sorted.put("sorted", values);
+                save(sims, _id, sorted);
+            }
+        }
+
+    }
+
     public static void main(String[] args) {
 
 //        System.out.println("Start tests.");
@@ -715,8 +788,9 @@ public class Main {
 //        computePhiEForGeneratedData(true);
 //        computeNormalisedPhiEShuffled(true);
 //        computeCoalitionEntropy(false);
-        computeIntegratedInformation("snn", 5, false, false, true);
+//        computeIntegratedInformation("snn", 5, false, false, true);
 //        computeIntegratedInformationEmpiricalTilde("snn", 5, false, false);
+//        computeSortedSurrogateDataAnalysis(false);
 
     }
 

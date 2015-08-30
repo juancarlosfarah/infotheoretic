@@ -33,6 +33,9 @@ public class Input {
             int[][] t = MatrixUtils.transpose(original);
             this.reduced = MatrixUtils.computeCombinedValues(t, base);
 
+            // Uncomment if you need to sort.
+//            Arrays.sort(this.reduced);
+
             // Reduced base will equal the original base
             // to the power of the number of variables.
             reducedBase = (int)(Math.pow(base, original.length));
