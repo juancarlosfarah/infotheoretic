@@ -383,6 +383,7 @@ K(\mathcal{B} = \lbrace P^1, P^2 \rbrace) = \min[H(P^1), H(P^2)]\\[2.5mm]
 % =======================================================================================
 \clearpage
 \section{Implementation of $\Phi$}
+\label{sec:impl}
 
 In order to calculate the values of $\Phi$ for our sample populations, we implemented functions that compute Empirical Integrated Information ($\Phi_{E}$) and Empirical Integrated Information Tilde ($\widetilde{\Phi}_{E}$), as described in Section \ref{II}. We decided that it would be best that these functions be available as part of the Java Information Dynamics Toolkit (JIDT) developed by Lizier and widely used to study the dynamics of complex systems \cite{Lizier2014}. Written completely in Java, our implementation follows the syntax, semantics and structure of other features in the JIDT, which is geared towards facilitating its adoption by its current users.
 
@@ -674,12 +675,14 @@ Using Git as a source version control system allows us to carefully track the ev
 \section{Application on Populations of Oscillators}
 \label{MSUKO}
 
-Based on work by Shanahan \cite{Shanahan2010}, we will use Kuramoto oscillators to create a network of neural communities that model populations of neurons that exhibit metastability and chimera states. By running simulations on these networks, we will create discrete time series output that can be fed into our implementation of $\Phi$.
+Based on work by Shanahan \cite{Shanahan2010}, we used Kuramoto oscillators to create a series of systems of communities that modelled populations of neurons exhibiting metastability and chimera states. By running simulations on these networks, we were able to create discrete time series output that indicated which communities were synchronised at any give time step. These time series were inputted into our implementations of integrated information ($\Phi$) and used to compute various measures described in \ref{sec:app:osc:measures}. We were then able to analyse how these measures interacted with $\Phi$.
 
 % ===========
 % METHODOLOGY
 % ===========
 \subsection{Methodology}
+\label{sec:osc:methods}
+Our aim was to extend the work presented in \cite{Shanahan2010} and apply them to the measures proposed by Seth and Barrett in \cite{Barrett2011}, which we implemented as examined in detail in Section \ref{sec:impl}. In order to draw strong parallels between data extracted and analysed from our simulations and findings exposed in \cite{Shanahan2010}, we replicated, where possible, the methodology, methods and calculations used by Shanahan, as explained in this section. Nevertheless, we structured our simulations and trials in a way that best fit our main purpose of analysing the behaviour of integrated information with regards to other information-theoretic measures.
 
 % ---------
 % The Model
@@ -727,9 +730,11 @@ In order to generate the data required to apply our implementation of $\Phi$ to 
 \caption{Each trial outputted $5000$ $8 \times 8$ matrices displaying the synchrony measure between each of the communities. The diagonal represents the internal synchrony of each community of oscillators. \label{tab:mat}}
 \end{table}
 
-As highlighted in Table \ref{tab:mat}, we focused on the diagonal in each output matrix, which represents the internal synchronisation of each oscillator community. Once extracted, this diagonal was then discretised by applying a synchronisation threshold representing whether or not the oscillator is considered to be internally synchronised or not. Though in \cite{Shanahan2010} the only synchronisation threshold used is $0.8$, when analysing our results, we applied thresholds $0.5$, $0.6$, $0.7$, $0.8$, and $0.9$ to each simulation in order to obtain a better view of the effect of varying synchronisation threshold.
+As highlighted in Table \ref{tab:mat}, we focused on the diagonal in each output matrix, which represents the internal synchronisation of each oscillator community. This implies that we are considering that if a community is internally synchronised, then it is also externally synchronised.
 
-As a result, for each time step we obtained an array of booleans, where $1$ represents that a oscillator is synchronised and $0$ that it is not. As an example, Table \ref{tab:arr} depicts the application of this procedure to the data shown in Table \ref{tab:mat} using a threshold of $0.6$.
+Once extracted, this diagonal was then discretised by applying a synchronisation threshold representing whether or not the community is considered to be synchronised or not. Though in \cite{Shanahan2010} the only synchronisation threshold used is $0.8$, when analysing our results, we applied thresholds $0.5$, $0.6$, $0.7$, $0.8$, and $0.9$ to each simulation in order to obtain a better view of the effect of varying synchronisation threshold.
+
+As a result, for each time step we obtained an array of booleans, where $1$ represents that a community of oscillators is synchronised and $0$ that it is not. As an example, Table \ref{tab:arr} depicts the application of this procedure to the data shown in Table \ref{tab:mat} using a threshold of $0.6$.
 
 \begin{table}[ht]
 \centering
@@ -743,7 +748,7 @@ Discrete & 0 & 0 & 0 & 1 & 0 & 1 & 1 & 1 \\
 \caption{For each time step in a simulation, the extracted diagonal array containing continuous data was converted to discrete data by applying a threshold, in this case $0.6$. \label{tab:arr}}
 \end{table}
  
-Each of the extracted arrays was then transposed and inserted into an $8 \times 5000$ matrix, with each row representing a community of oscillator and each column a time step. A sample output matrix is show in Table \ref{tab:timeseries}. This provides the final output of each trial as a time series that can be inputted into our implementation of $\Phi$.
+Each of the extracted arrays was then transposed and inserted into an $8 \times 5000$ matrix, with each row representing a community of oscillators and each column a time step. A sample output matrix is show in Table \ref{tab:timeseries}. This provides the final output of each trial as a time series that can be inputted into our implementation of $\Phi$.
 
 \begin{table}[ht]
 \centering
@@ -789,15 +794,16 @@ Each simulation we ran was given a unique ID and stored as a document in our dat
 \noindent Following \cite{Shanahan2010} and \cite{Bhowmik2013}, we measured the coalition entropy ($H_C$) of the systems in our simulations. As presented in Section \ref{sec:bg:hc}, $H_C$ is computed from the possible number of different states that can be reached by the system and the probability of any one of them arising \cite{Bhowmik2013}. We calculated $H_{C}$ by implementing Equation \ref{eq:hc} in our extension for the JIDT as described in Section \ref{sec:impl:hc}.\\
 
 \noindent \textbf{Empirical Integrated Information $\Phi_{E}$}\\
-\noindent At the core of our analysis, we calculated the empirical integrated information ($\Phi_E$) for each simulation. As explained in Section \ref{II}, empirical integrated information was proposed by Barrett and Seth in \cite{Barrett2011} to compute integrated information for time series data. We calculated $\Phi_{E}$ by implementing Equation \ref{eq:phi-e} in our extension for the JIDT as described in Section \ref{sec:impl:phi-e}. We also recorded the minimum information bipartition ($MIB$) alongside the value for $\Phi_{E}$.\\
+\noindent At the core of our analysis, we calculated the empirical integrated information ($\Phi_E$) for each simulation. As explained in Section \ref{II}, empirical integrated information was proposed by Barrett and Seth in \cite{Barrett2011} to compute integrated information for time series data. We calculated $\Phi_{E}$ by implementing Equation \ref{eq:ii} in our extension for the JIDT as described in Section \ref{sec:impl:phi-e}. We also recorded the minimum information bipartition ($MIB$) alongside the value for $\Phi_{E}$. For all calculations of $\Phi_E$ we used a value of $\tau = 1$, which means that we were considering the previous time step, corresponding to a 5ms time difference as described in Section \ref{sec:osc:sims}.\\
 
 \noindent \textbf{Empirical Integrated Information Tilde ($\widetilde{\Phi}_{E}$)}\\
-\noindent A second measure we used to calculate integrated information in our study was empirical integrated information tilde ($\widetilde{\Phi}_{E}$), which uses stochastic interaction instead of effective information in order to determine the $MIB$, as detailed in Section \ref{II}. We calculated $\widetilde{\Phi}_{E}$ by implementing Equations \ref{eq:ii-tilde},  \ref{eq:mib-tilde} and \ref{eq:norm-tilde} in our extension for the JIDT as described in Section \ref{sec:impl:phi-e-tilde}. We also recorded its minimum information bipartition alongside the value for $\widetilde{\Phi}_{E}$.\\
+\noindent A second measure we used to calculate integrated information in our study was empirical integrated information tilde ($\widetilde{\Phi}_{E}$), which uses stochastic interaction instead of effective information in order to determine the $MIB$, as detailed in Section \ref{II}. We calculated $\widetilde{\Phi}_{E}$ by implementing Equations \ref{eq:ii-tilde},  \ref{eq:mib-tilde} and \ref{eq:norm-tilde} in our extension for the JIDT as described in Section \ref{sec:impl:phi-e-tilde}. We also recorded its minimum information bipartition alongside the value for $\widetilde{\Phi}_{E}$. As with $\Phi_E$, for all calculations of $\widetilde{\Phi}_{E}$, we used a value of $\tau = 1$.\\
 
 % =======
 % RESULTS
 % =======
 \subsection{Results}
+\label{sec:app:osc:res}
 
 After running the 7500 simulations and computing the measures detailed in Section \ref{sec:app:osc:measures}, we analysed various relationships between these measures. First, in order to confirm the consistency of our oscillator simulations with those conducted by Shanahan, we replicated a number of the correlations presented in \cite{Shanahan2010}. This initial step allowed us to be more confident about our results once new parameters and measures were considered. We then extended this analysis by examining the same measures, but covering a wider range of parameters such as the $\beta$ range and synchronisation threshold ($\gamma$). Finally, we build on this analysis to then study the correspondence between the original measures considered in \cite{Shanahan2010} and our implementations of integrated information.
 
@@ -814,7 +820,7 @@ The first correlation we tested was the one between Shanahan's $\lambda$ measure
 \includegraphics[scale = 0.35]{figures/lambda_vs_beta_orig}
 \end{center}
 \caption{
-	Lambda vs Beta Original
+	Metastability Index ($\lambda$) vs $\beta$ for $0 \leq \beta \leq \frac{\pi}{4}$.
 	\label{fig:lambda-vs-beta-orig}
 }
 \end{figure}
@@ -826,7 +832,7 @@ In order to gain a better picture of how $\beta$ and $\lambda$ interacted, we ex
 \includegraphics[scale = 0.35]{figures/lambda_vs_beta_ext}
 \end{center}
 \caption{
-	Lambda vs Beta Extended
+	Metastability Index ($\lambda$) vs $\beta$ for $0 \leq \beta \leq 2\pi$.
 	\label{fig:lambda-vs-beta-ext}
 }
 \end{figure}
@@ -844,7 +850,7 @@ The second correlation we examined corresponded again to a measure presented by 
 \includegraphics[scale = 0.35]{figures/chi_vs_beta_orig}
 \end{center}
 \caption{
-	Chi vs Beta
+	Chimera Index ($\chi$) vs $\beta$ for $0 \leq \beta \leq \frac{\pi}{4}$.
 	\label{fig:chi-vs-beta-orig}
 }
 \end{figure}
@@ -855,7 +861,7 @@ As with the metastability index, we extended our $\beta$ range to cover $0 \leq 
 \begin{center}
 \includegraphics[scale = 0.35]{figures/chi_vs_beta_ext}
 \caption{
-	Chi vs Beta Extended
+	Chimera Index ($\chi$) vs $\beta$ for $0 \leq \beta \leq 2\pi$.
 	\label{fig:chi-vs-beta-ext}
 }
 \end{center}
@@ -870,7 +876,7 @@ As synchrony is a key measure in determining the coalitions that are formed duri
 \begin{center}
 \includegraphics[scale = 0.35]{figures/psi_vs_beta_orig}
 \caption{
-	Psi vs Beta
+	Global Synchrony ($\Psi$) vs $\beta$ for $0 \leq \beta \leq \frac{\pi}{4}$.
 	\label{fig:psi-vs-beta-orig}
 }
 \end{center}
@@ -882,7 +888,7 @@ To continue our analysis, we broadened our $\beta$ range to $0 < \beta < 2\pi$. 
 \begin{center}
 \includegraphics[scale = 0.35]{figures/psi_vs_beta_ext}
 \caption{
-	Psi vs Beta
+	Global Synchrony ($\Psi$) vs $\beta$ for $0 \leq \beta \leq 2\pi$.
 	\label{fig:psi-vs-beta-ext}
 }
 \end{center}
@@ -900,7 +906,7 @@ A final correlation considered in \cite{Shanahan2010} that we examined in our pr
 \begin{center}
 \includegraphics[scale = 0.35]{figures/hc_vs_beta_orig}
 \caption{
-	Coalition Entropy vs Beta
+	Coalition Entropy ($H_C$) vs $\beta$ for $0 \leq \beta \leq \frac{\pi}{4}$.
 	\label{fig:hc-vs-beta-orig}
 }
 \end{center}
@@ -912,7 +918,7 @@ When we examined the broader range of $0 \leq \beta \leq 2\pi$, we again saw a s
 \begin{center}
 \includegraphics[scale = 0.35]{figures/hc_vs_beta_ext}
 \caption{
-	Coalition Entropy vs Beta
+	Coalition Entropy ($H_C$) vs $\beta$ for $0 \leq \beta \leq 2\pi$.
 	\label{fig:hc-vs-beta-ext}
 }
 \end{center}
@@ -944,7 +950,7 @@ $\gamma$ & $\beta$ & $H_C$\\
 \begin{center}
 \includegraphics[scale = 0.35]{figures/hc_vs_beta_orig_multi}
 \caption{
-	Coalition Entropy vs Beta
+	Coalition Entropy ($H_C$) vs $\beta$ for $0 \leq \beta \leq \frac{\pi}{4}$ at multiple thresholds ($\gamma$).
 	\label{fig:hc-vs-beta-orig-multi}
 }
 \end{center}
@@ -956,7 +962,7 @@ When we extended our $\beta$ range to $0 \leq \beta \leq 2\pi$, we observed the 
 \begin{center}
 \includegraphics[scale = 0.35]{figures/hc_vs_beta_ext_multi}
 \caption{
-	Coalition Entropy vs Beta
+	Coalition Entropy ($H_C$) vs $\beta$ for $0 \leq \beta \leq 2\pi$ at multiple thresholds ($\gamma$).
 	\label{fig:hc-vs-beta-ext-multi}
 }
 \end{center}
@@ -976,7 +982,7 @@ Figure \ref{fig:phi-vs-beta-orig} shows the correlation between $\Phi_{E}$ and $
 \begin{center}
 \includegraphics[scale = 0.35]{figures/phi_vs_beta_orig}
 \caption{
-	Phi E vs Beta
+	Empirical Integrated Information ($\Phi_E$) vs $\beta$ for $0 \leq \beta \leq \frac{\pi}{4}$.
 	\label{fig:phi-vs-beta-orig}
 }
 \end{center}
@@ -988,7 +994,7 @@ As we the previous measures plotted against $\beta$, we extended the range to $0
 \begin{center}
 \includegraphics[scale = 0.35]{figures/phi_vs_beta_ext}
 \caption{
-	Phi E vs Beta
+	Empirical Integrated Information ($\Phi_E$) vs $\beta$ for $0 \leq \beta \leq 2\pi$.
 	\label{fig:phi-vs-beta-ext}
 }
 \end{center}
@@ -1019,7 +1025,7 @@ $\gamma$ & $\beta$ & $\Phi_E$\\
 \begin{center}
 \includegraphics[scale = 0.35]{figures/phi_vs_beta_orig_multi}
 \caption{
-	Phi E vs Beta
+	Empirical Integrated Information ($\Phi_E$) vs $\beta$ for $0 \leq \beta \leq \frac{\pi}{4}$ at multiple thresholds ($\gamma$).
 	\label{fig:phi-vs-beta-orig-multi}
 }
 \end{center}
@@ -1031,7 +1037,7 @@ With an extended $\beta$ range, all the multiple thresholds exhibit the same beh
 \begin{center}
 \includegraphics[scale = 0.35]{figures/phi_vs_beta_ext_multi}
 \caption{
-	Phi E vs Beta
+	Empirical Integrated Information ($\Phi_E$) vs $\beta$ for $0 \leq \beta \leq 2\pi$ at multiple thresholds ($\gamma$).
 	\label{fig:phi-vs-beta-ext-multi}
 }
 \end{center}
@@ -1052,7 +1058,7 @@ We observed comparable results when analysing the relationship between the alter
 		\begin{center}
 		\includegraphics[scale = 0.2]{figures/phi_tilde_vs_beta_orig}
 		\caption{
-			Phi E Tilde vs Beta
+				$\widetilde{\Phi}_E$ vs $\beta$ for $0 \leq \beta \leq \frac{\pi}{4}$.
 			\label{fig:phi-tilde-vs-beta-orig}
 		}
 		\end{center}
@@ -1062,7 +1068,7 @@ We observed comparable results when analysing the relationship between the alter
 		\begin{center}
 		\includegraphics[scale = 0.2]{figures/phi_tilde_vs_beta_ext}
 		\caption{
-			Phi E Tilde vs Beta
+			$\widetilde{\Phi}_E$ vs $\beta$ for $0 \leq \beta \leq 2\pi$.
 			\label{fig:phi-tilde-vs-beta-ext}
 		}
 		\end{center}
@@ -1072,7 +1078,7 @@ We observed comparable results when analysing the relationship between the alter
 		\begin{center}
 		\includegraphics[scale = 0.2]{figures/phi_tilde_vs_beta_orig_multi}
 		\caption{
-			Phi E Tilde vs Beta
+			$\widetilde{\Phi}_E$ vs $\beta$ for $0 \leq \beta \leq \frac{\pi}{4}$\\ at multiple $\gamma$.
 			\label{fig:phi-tilde-vs-beta-orig-multi}
 		}
 		\end{center}
@@ -1082,7 +1088,7 @@ We observed comparable results when analysing the relationship between the alter
 		\begin{center}
 		\includegraphics[scale = 0.2]{figures/phi_tilde_vs_beta_ext_multi}
 		\caption{
-			Phi E Tilde vs Beta
+			$\widetilde{\Phi}_E$ vs $\beta$ for $0 \leq \beta \leq 2\pi$\\ at multiple $\gamma$.
 			\label{fig:phi-tilde-vs-beta-ext-multi}
 		}
 		\end{center}
@@ -1103,7 +1109,7 @@ We also considered the relationship between our measures for integrated informat
 \begin{center}
 \includegraphics[scale = 0.35]{figures/phi_vs_psi_multi}
 \caption{
-	Phi E vs Global Synchrony
+	Empirical Integrated Information ($\Phi_E$) vs Global Synchrony ($\Psi$).
 	\label{fig:phi-vs-psi-multi}
 }
 \end{center}
@@ -1121,7 +1127,7 @@ As can be seen in Figure \ref{fig:phi-tilde-vs-psi-multi}, the relationship betw
 \begin{center}
 \includegraphics[scale = 0.35]{figures/phi_tilde_vs_psi_multi}
 \caption{
-	Phi E Tilde vs Global Synchrony
+	Empirical Integrated Information Tilde ($\widetilde{\Phi}_E$) vs Global Synchrony ($\Psi$).
 	\label{fig:phi-tilde-vs-psi-multi}
 }
 \end{center}
@@ -1139,7 +1145,7 @@ An important relationship that we were looking to examine was the correlation be
 \begin{center}
 \includegraphics[scale = 0.35]{figures/phi_vs_lambda_multi}
 \caption{
-	Phi E vs Metastability Index
+	Empirical Integrated Information ($\Phi_E$) vs Metastability Index ($\lambda$).
 	\label{fig:phi-vs-lambda-multi}
 }
 \end{center}
@@ -1153,7 +1159,7 @@ Initially we plotted the results for all of our values of $\gamma$, as shown in 
 		\begin{center}
 		\includegraphics[scale = 0.2]{figures/phi_vs_lambda_5}
 		\caption{
-			Phi vs Lambda
+			$\Phi_E$ vs $\lambda$ at $\gamma = 0.5$.
 			\label{fig:phi_vs_lambda_5}
 		}
 		\end{center}
@@ -1163,7 +1169,7 @@ Initially we plotted the results for all of our values of $\gamma$, as shown in 
 		\begin{center}
 		\includegraphics[scale = 0.2]{figures/phi_vs_lambda_9}
 		\caption{
-			Phi vs Lambda
+			$\Phi_E$ vs $\lambda$ at $\gamma = 0.9$.
 			\label{fig:phi_vs_lambda_9}
 		}
 		\end{center}
@@ -1177,7 +1183,7 @@ We then considered thresholds 0.6, 0.7 and 0.8 to better examine the relationshi
 \begin{center}
 \includegraphics[scale = 0.35]{figures/phi_vs_lambda_mid}
 \caption{
-	Phi E vs Metastability Index
+	Empirical Integrated Information ($\Phi_E$) vs Metastability Index ($\lambda$) at mid-range synchronisation thresholds ($\gamma$).
 	\label{fig:phi-vs-lambda-mid}
 }
 \end{center}
@@ -1195,7 +1201,7 @@ We proceeded to extend our analysis between integrated information and Shanahan'
 \begin{center}
 \includegraphics[scale = 0.35]{figures/phi_tilde_vs_lambda_mid}
 \caption{
-	Phi E Tilde vs Metastability Index
+	Empirical Integrated Information Tilde ($\widetilde{\Phi}_E$) vs Metastability Index ($\lambda$) at mid-range synchronisation thresholds ($\gamma$).
 	\label{fig:phi-tilde-vs-lambda-mid}
 }
 \end{center}
@@ -1213,7 +1219,7 @@ A second measure related to the metastability of a system is Shanahan's chimera 
 \begin{center}
 \includegraphics[scale = 0.35]{figures/phi_vs_chi_multi}
 \caption{
-	Phi E vs Chimera Index
+	Empirical Integrated Information ($\Phi_E$) vs Chimera Index ($\chi$).
 	\label{fig:phi-vs-chi-multi}
 }
 \end{center}
@@ -1227,7 +1233,7 @@ Once more, we first created a plot for results encompassing all of the values of
 		\begin{center}
 		\includegraphics[scale = 0.2]{figures/phi_vs_chi_5}
 		\caption{
-			Phi vs Chi
+			$\Phi_E$ vs $\lambda$ at $\gamma = 0.5$.
 			\label{fig:phi_vs_chi_5}
 		}
 		\end{center}
@@ -1237,7 +1243,7 @@ Once more, we first created a plot for results encompassing all of the values of
 		\begin{center}
 		\includegraphics[scale = 0.2]{figures/phi_vs_chi_9}
 		\caption{
-			Phi vs Chi
+			$\Phi_E$ vs $\lambda$ at $\gamma = 0.9$.
 			\label{fig:phi_vs_chi_9}
 		}
 		\end{center}
@@ -1251,7 +1257,7 @@ We thus plotted thresholds 0.6, 0.7 and 0.8 separately, obtaining the same resul
 \begin{center}
 \includegraphics[scale = 0.35]{figures/phi_vs_chi_mid}
 \caption{
-	Phi E vs Chimera Index
+	Empirical Integrated Information ($\Phi_E$) vs Chimera Index ($\chi$) at mid-range synchronisation thresholds ($\gamma$).
 	\label{fig:phi-vs-chi-mid}
 }
 \end{center}
@@ -1269,7 +1275,7 @@ As with all our analyses involving integrated information, we then plotted the s
 \begin{center}
 \includegraphics[scale = 0.35]{figures/phi_tilde_vs_chi_mid}
 \caption{
-	Phi E Tilde vs Chimera Index
+	Empirical Integrated Information Tilde ($\widetilde{\Phi}_E$) vs Chimera Index ($\chi$) at mid-range synchronisation thresholds ($\gamma$).
 	\label{fig:phi-tilde-vs-chi-mid}
 }
 \end{center}
@@ -1289,7 +1295,7 @@ We first plotted $\Phi_E$ against $H_C$, as shown in Figure \ref{fig:phi-vs-hc-m
 \begin{center}
 \includegraphics[scale = 0.35]{figures/phi_vs_hc_multi}
 \caption{
-	Phi E vs Coalition Entropy
+		Empirical Integrated Information ($\Phi_E$) vs Coalition Entropy ($H_C$).
 	\label{fig:phi-vs-hc-multi}
 }
 \end{center}
@@ -1307,7 +1313,7 @@ We then examined $\widetilde{\Phi}_{E}$ against $H_C$, as shown in Figure \ref{f
 \begin{center}
 \includegraphics[scale = 0.35]{figures/phi_tilde_vs_hc_multi}
 \caption{
-	Phi E Tilde vs Coalition Entropy
+	Empirical Integrated Information Tilde ($\widetilde{\Phi}_E$) vs Coalition Entropy ($H_C$).
 	\label{fig:phi-tilde-vs-hc-multi}
 }
 \end{center}
@@ -1325,11 +1331,22 @@ We were also interested in investigating the relationship between $\Phi_{E}$ and
 \begin{center}
 \includegraphics[scale = 0.35]{figures/phi_tilde_vs_phi}
 \caption{
-	Phi E Tilde vs Phi E
+	Empirical Integrated Information Tilde ($\widetilde{\Phi}_E$) vs Empirical Integrated Information ($\Phi_E$).
 	\label{fig:phi-tilde-vs-phi}
 }
 \end{center}
 \end{figure}
+
+\subsection{Surrogate Data Analysis}
+\label{sec:app:osc:surrogate}
+
+In order to provide insight into the robustness of our results concerning integrated information, we conducted some analysis using surrogate data. For our purposes we used both transformations of data generated by the oscillator simulations as well as synthetic data generated based on predefined models. We examined not only how our surrogate data analysis affected $\Phi_E$ and $\widetilde{\Phi}_E$, but also mutual information, as this measure is  the key building block of $\Phi_E$.
+
+\subsubsection{Sorted Time Series}
+
+\subsubsection{Shuffled Time Series}
+
+\subsubsection{Synthetic Data}
 
 \subsection{Discussion}
 
