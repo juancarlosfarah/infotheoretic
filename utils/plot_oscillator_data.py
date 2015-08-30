@@ -10,6 +10,16 @@ from copy import deepcopy
 import matplotlib.lines as mlines
 from mpl_toolkits.mplot3d import Axes3D
 
+# Custom sizes for text in plots.
+# ===============================
+plt.rcParams.update({'axes.labelsize': 'xx-large'})
+plt.rcParams.update({'xtick.labelsize': 'x-large'})
+plt.rcParams.update({'ytick.labelsize': 'x-large'})
+plt.rcParams.update({'axes.titlesize': 'xx-large'})
+plt.rcParams.update({'figure.titlesize': 'xx-large'})
+plt.rcParams.update({'legend.fontsize': 'x-large'})
+plt.rcParams.update({'font.family': 'serif'})
+
 
 class DataPlotter:
 
@@ -35,17 +45,9 @@ class DataPlotter:
              ext="svg",
              query=None,
              tau=1,
-             thresholds=None):
-
-        # Custom sizes for text in plots.
-        plt.rcParams.update({'axes.labelsize': 'xx-large'})
-        plt.rcParams.update({'xtick.labelsize': 'x-large'})
-        plt.rcParams.update({'ytick.labelsize': 'x-large'})
-        plt.rcParams.update({'axes.titlesize': 'xx-large'})
-        plt.rcParams.update({'figure.titlesize': 'xx-large'})
-        plt.rcParams.update({'legend.fontsize': 'x-large'})
-        plt.rcParams.update({'font.family': 'serif'})
-
+             thresholds=None,
+             is_sorted=False,
+             is_shuffled=False):
 
         if not query:
             query = dict()
@@ -87,6 +89,7 @@ class DataPlotter:
         coalition_entropy = dict()
         lamda = dict()
         phi_e = dict()
+        mi = dict()
 
         for key in cursors:
             if self.community_type == 'oscillator':
@@ -101,9 +104,15 @@ class DataPlotter:
             coalition_entropy[key] = []
             phi_e_tilde[key] = []
             phi_e[key] = []
+            mi[key] = []
 
             for doc in cursors[key]:
                 subdoc = doc[tau_key]
+                if is_sorted:
+                    subdoc = doc['sorted']
+                elif is_shuffled:
+                    subdoc = doc['shuffled']
+
                 if self.community_type == 'oscillator':
                     beta[key].append(doc['beta'])
                     chi[key].append(doc['chi'])
@@ -113,11 +122,18 @@ class DataPlotter:
 
                 global_sync[key].append(doc['global_sync'])
                 lamda[key].append(doc['lambda'])
-                coalition_entropy[key].append(doc['coalition_entropy'])
+                mi[key].append(doc['mi'])
 
-                # Tau dependent measures.
+                # Tau and surrogate dependent measures.
                 phi_e_tilde[key].append(subdoc['phi_e_tilde'])
                 phi_e[key].append(subdoc['phi_e'])
+
+                if is_sorted or is_shuffled:
+                    coalition_entropy[key].append(subdoc['coalition_entropy'])
+                    mi[key].append(subdoc['mi'])
+                else:
+                    coalition_entropy[key].append(doc['coalition_entropy'])
+                    mi[key].append(doc['mi'])
 
         # Plot both Empirical Phi and Empirical Phi Tilde
         run = 0
@@ -195,34 +211,40 @@ class DataPlotter:
 
             # Phi vs Coalition Entropy
             # ------------------------
-            # fig = plt.figure()
-            # handles = []
-            # labels = []
-            # for key in cursors:
-            #     labels.append(key)
-            #     plt.xlabel(r"Coalition Entropy ($H_C$)")
-            #     plt.ylabel(phi_label)
-            #     if run == 0:
-            #         plt.ylim(ymin=-0.15, ymax=0.7)
-            #     else:
-            #         plt.ylim(ymin=-0.01, ymax=0.8)
-            #     plt.xlim(xmin=0, xmax=1)
-            #     # plt.title(phi_label + " vs Coalition Entropy\n"
-            #     #           "Tau = " + str(tau))
-            #     handles.append(plt.scatter(coalition_entropy[key],
-            #                                phi[key],
-            #                                color=colors[key],
-            #                                label=key))
-            # labels, handles = zip(*sorted(zip(labels, handles),
-            #                               key=lambda x: x[0]))
-            # legend = plt.legend(handles, labels, loc=2,
-            #                     title=r"Threshold ($\gamma$)")
-            # plt.setp(legend.get_title(), fontsize='xx-large')
-            #
-            # if save:
-            #     fig.savefig(path + "8." + ext)
-            # else:
-            #     plt.show(fig)
+            fig = plt.figure()
+            handles = []
+            labels = []
+            for key in cursors:
+                labels.append(key)
+                plt.xlabel(r"Coalition Entropy ($H_C$)")
+                plt.ylabel(phi_label)
+                if run == 0:
+                    plt.ylim(ymin=-0.15, ymax=0.7)
+
+                    if is_sorted:
+                        plt.ylim(ymin=-0.55, ymax=0.15)
+                else:
+                    plt.ylim(ymin=-0.01, ymax=0.8)
+                    if is_sorted:
+                        plt.ylim(ymin=-0.3, ymax=0.15)
+                plt.xlim(xmin=0, xmax=1)
+                # plt.title(phi_label + " vs Coalition Entropy\n"
+                #           "Tau = " + str(tau))
+                handles.append(plt.scatter(coalition_entropy[key],
+                                           phi[key],
+                                           color=colors[key],
+                                           label=key))
+            labels, handles = zip(*sorted(zip(labels, handles),
+                                          key=lambda x: x[0]))
+            location = 3 if is_sorted else 2
+            legend = plt.legend(handles, labels, loc=location,
+                                title=r"Threshold ($\gamma$)")
+            plt.setp(legend.get_title(), fontsize='xx-large')
+
+            if save:
+                fig.savefig(path + "8." + ext)
+            else:
+                plt.show(fig)
 
             # Phi Frequency
             # -------------
@@ -309,11 +331,10 @@ class DataPlotter:
                     # legend = plt.legend(handles, labels,
                     #                     title=r"Threshold ($\gamma$)")
                     # plt.setp(legend.get_title(), fontsize='xx-large')
-
-                    if save:
-                        fig.savefig(path + "7." + ext)
-                    else:
-                        plt.show(fig)
+                    # if save:
+                    #     fig.savefig(path + "7." + ext)
+                    # else:
+                    #     plt.show(fig)
 
                     # Global Synchrony vs Beta
                     # ------------------------
@@ -422,8 +443,14 @@ class DataPlotter:
                 #             plt.ylim(ymin=-0.1, ymax=0.5)
                 #         else:
                 #             plt.ylim(ymin=-0.15, ymax=0.7)
+                #
+                #         if is_sorted:
+                #             plt.ylim(ymin=-0.5, ymax=0.1)
                 #     else:
                 #         plt.ylim(ymin=-0.01, ymax=0.7)
+                #
+                #         if is_sorted:
+                #             plt.ylim(ymin=-0.25, ymax=0.1)
                 #
                 #     if 'beta' in query:
                 #         plt.xlim(xmin=0, xmax=0.8)
@@ -1445,9 +1472,6 @@ class DataPlotter:
         else:
             plt.show(fig)
 
-    def plot_hc(self):
-        pass
-
     def plot_surrogate_analysis(self,
                                 path="/",
                                 save=False,
@@ -1603,25 +1627,26 @@ class DataPlotter:
 if __name__ == "__main__":
 
     # Results for Kuramoto Oscillators
-    q = {
-        'num_oscillators': 8,
-        'is_surrogate': False,
-        # 'beta': {'$lte': (math.pi / 4)}
-    }
+    # --------------------------------
+    # q = {
+    #     'num_oscillators': 8,
+    #     'is_surrogate': False,
+    #     # 'beta': {'$lte': (math.pi / 4)}
+    # }
     # osc_thresholds = [0.5]
     # osc_thresholds = [0.6]
     # osc_thresholds = [0.7]
     # osc_thresholds = [0.8]
     # osc_thresholds = [0.9]
     # osc_thresholds = [0.6, 0.7, 0.8]
-    osc_thresholds = [0.9, 0.8, 0.7, 0.6, 0.5]
-    dp = DataPlotter(community_type='oscillator', database='infotheoretic')
-    dp.plot(save=False,
-            path="/Users/juancarlosfarah/Git/infotheoretic/docs/phi_e_tilde/",
-            ext="svg",
-            tau=1,
-            query=q,
-            thresholds=osc_thresholds)
+    # osc_thresholds = [0.9, 0.8, 0.7, 0.6, 0.5]
+    # dp = DataPlotter(community_type='oscillator', database='infotheoretic')
+    # dp.plot(save=False,
+    #         path="/Users/juancarlosfarah/Git/infotheoretic/docs/phi_e_tilde/",
+    #         ext="svg",
+    #         tau=1,
+    #         query=q,
+    #         thresholds=osc_thresholds)
 
     # Results for Spiking Neural Networks
     # dp = DataPlotter(community_type='snn', database='infotheoretic')
@@ -1649,7 +1674,47 @@ if __name__ == "__main__":
     #                 duration=5000,
     #                 num_oscillators=8)
 
+    # Surrogate Data
+    # --------------
+    dp = DataPlotter('oscillator', database='infotheoretic')
     # dp.plot_surrogate_analysis()
     # dp.plot_normalised_surrogate()
+    q = {
+        'sorted': {'$exists': True},
+        'beta': {'$lte': (math.pi / 4)}
+    }
+    osc_thresholds = [0.9, 0.8, 0.7, 0.6, 0.5]
+    dp.plot(save=False,
+            path="/Users/juancarlosfarah/Git/infotheoretic/docs/phi_e_tilde/",
+            ext="svg",
+            tau=1,
+            query=q,
+            is_sorted=True,
+            thresholds=osc_thresholds)
+
+    # Results for Kuramoto Oscillators
+    # --------------------------------
+    # q = {
+    #     'num_oscillators': 8,
+    #     'is_surrogate': False,
+    #     # 'beta': {'$lte': (math.pi / 4)}
+    # }
+    # osc_thresholds = [0.5]
+    # osc_thresholds = [0.6]
+    # osc_thresholds = [0.7]
+    # osc_thresholds = [0.8]
+    # osc_thresholds = [0.9]
+    # osc_thresholds = [0.6, 0.7, 0.8]
+    # osc_thresholds = [0.9, 0.8, 0.7, 0.6, 0.5]
+    # dp = DataPlotter(community_type='oscillator', database='infotheoretic')
+    # dp.plot(save=False,
+    #         path="/Users/juancarlosfarah/Git/infotheoretic/docs/phi_e_tilde/",
+    #         ext="svg",
+    #         tau=1,
+    #         query=q,
+    #         thresholds=osc_thresholds)
 
     # plot_curves()
+
+    # Allow main code to be commented out.
+    pass
