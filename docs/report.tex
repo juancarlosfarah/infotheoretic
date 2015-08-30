@@ -149,26 +149,18 @@ It has been observed that ``periodic phenomena involving the synchronisation of 
 % CHIMERA STATES
 % ==============
 \subsection{Chimera States}
-\label{sec:bg:chi}
+\label{sec:bg:chimera}
 
 As explained in \cite{Shanahan2010}, competition is a feature of many complex systems. In the brain, one of the ways in which competition manifests itself is in the presence of chimera states. Chimera states refer to the phenomena where a coalition of populations of neurons (or oscillators) are synchronised while other coalitions are desynchronised. This can be seen from milliseconds 310 to 330 in Figure \ref{Shanahan2010_Chimera}. We observe that the black, red, blue, green and purple communities are synchronised while the gray, turquoise and mustard communities are desynchronised.
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale = 0.5]{Shanahan2010_Chimera}
-\caption{``Inter-community synchrony: Pairwise synchrony is plotted between one selected community (shown in black) and each of the eight communities (including itself). From time 310 to 330 the selected community is synchronised with several others, forming a temporary coalition.'' \cite{Shanahan2010}}
-\label{Shanahan2010_Chimera}
+\caption{
+	``Inter-community synchrony: Pairwise synchrony is plotted between one selected community (shown in black) and each of the eight communities (including itself). From time 310 to 330 the selected community is synchronised with several others, forming a temporary coalition.'' \cite{Shanahan2010}
+	\label{Shanahan2010_Chimera}
+}
 \end{figure}
-
-In order to calculate how chimera-like a system is at a given time step, we follow \cite{Shanahan2010, Bhowmik2013}, fix time and calculate the variance across communities. This indicates ``the level of spontaneous partitioning into synchronized and desynchronized subsets'' \cite{Bhowmik2013} and can be averaged as in \cite{Shanahan2010} to calculate $\chi$ shown below, where $C$ is the set of $M$ number of communities and $\psi_c(t)$ is the synchrony of community $c$ at time $t$ as described in Section \ref{sec:bg:sync}.
-
-\begin{equation} \label{eq:var-sync}
-\sigma_{chi}(t) = \frac{1}{M - 1}\sum_{c \in C}(\psi_c(t) - \langle \psi(t) \rangle_C)^2
-\end{equation}
-
-\begin{equation} \label{eq:chi}
-\chi = \langle \sigma_{chi} \rangle_T
-\end{equation}
 
 \subsection{Integrated Information Theory of Consciousness}
 In 2004, Tononi presented his Integrated Information Theory, postulating that consciousness could be defined as the capacity of a system to integrate information \cite{Tononi2004}. He claimed that there were two major problems posed by consciousness. The first concerns the issue of how to determine if and to what extent a system experiences consciousness. That is, what can be measured to determine the consciousness of a given system. The second is related to the type of consciousness that a system may have. That is, addressing the fact that different kinds of conscious experiences are associated to different parts of the brain and how damage to one of these areas can affect one type of sensory experience, but leave others unaffected (e.g. certain lesions only affect one's capability to perceive colours).
@@ -182,7 +174,11 @@ We will focus on the former of these concerns. Tononi proposed that a good measu
 \label{Measures}
 In this section we provide an overview of the different information-theoretic measure that we will use to analyse the neural populations and networks of oscillators used in this study.
 
+% -------
+% Entropy
+% -------
 \subsubsection{Entropy}
+\label{sec:bg:entropy}
 
 Entropy $H$ is a measure of uncertainty and for a discrete random variable $X$ that takes values in the space $\Omega_X$, can be calculated as shown below.
 
@@ -190,13 +186,23 @@ Entropy $H$ is a measure of uncertainty and for a discrete random variable $X$ t
 H(X) = - \sum_{x \in \Omega_X}P_X(x) \log_2 P_X(x)\\[2.5mm]
 \end{equation}
 
+% -------------------
+% Conditional Entropy
+% -------------------
+\subsubsection{Conditional Entropy}
+\label{sec:bg:cond-entropy}
+
 The expected conditional entropy of $X$ given $Y$, where $Y$ is a discrete random variable that takes values in the space $\Omega_Y$, is denoted $H(X|Y)$ and calculated as shown below.
 
 \begin{equation} \label{eq:cond-entropy}
 H(X|Y) = \sum_{y \in \Omega_Y}H(X|Y=y)P_Y(y)
 \end{equation}
 
+% ------------------
+% Mutual Information
+% ------------------
 \subsubsection{Mutual Information}
+\label{sec:bg:mi}
 
 The mutual information $I(X,Y)$ between $X$ and $Y$ is the reduction in entropy of $X$ given that we know $Y$.
 
@@ -204,9 +210,15 @@ The mutual information $I(X,Y)$ between $X$ and $Y$ is the reduction in entropy 
 I(X,Y) = H(X) - H(X|Y)
 \end{equation}
 
+% ---------------------------
+% Kullback-Leibler Divergence
+% ---------------------------
 \subsubsection{Kullback-Leibler Divergence}
+\label{sec:bg:cond-kld}
 
-
+% ---------
+% Synchrony
+% ---------
 \subsubsection{Synchrony}
 \label{sec:bg:sync}
 
@@ -216,12 +228,15 @@ In order to quantify how synchronised the oscillators within a given community a
 \psi_c(t) = |\langle e^{i\theta_k(t)}\rangle_{k \in c}|
 \end{equation}
 
-Here, $e^{i\theta_k(t)}$, which raises $e$ to the power of $i = \sqrt{-1}$ times $\theta_k(t)$, the phase of oscillator $k$ at time step $t$, is averaged over all oscillators in community $c$. This produces a value that ranges from 0 when all the oscillators are completely desynchronised to 1, when they are all in synchrony.
+Here, $e^{i\theta_k(t)}$, which raises $e$ to the power of $i = \sqrt{-1}$ and multiplies that by $\theta_k(t)$, the phase of oscillator $k$ at time step $t$, is averaged over all oscillators in community $c$. This produces a value that ranges from zero when all the oscillators are completely desynchronised to one, when they are all in synchrony \cite{Shanahan2010}.
 
+% ----------------
+% Global Synchrony
+% ----------------
 \subsubsection{Global Synchrony}
 \label{sec:bg:global-sync}
 
-Once you have calculated the synchrony of a community of oscillators $c$ for each time step $t$, you can average for all of the time steps in a given simulation $T$ to obtain an aggregate measure of synchrony for that community ($\widehat{\psi}$), as shown in Equation \ref{eq:comm-sync}.  To obtain the global synchrony ($\Psi$), as given by Equation \ref{eq:global-sync}, you simply average $\widehat{\psi}$ over all the communities $c$ in a given population $C$.
+Once you have calculated the synchrony of a community of oscillators $c$ for each time step $t$, you can average this for all of the time steps in a given simulation $T$ to obtain an aggregate measure of synchrony for that community ($\widehat{\psi}$), as shown in Equation \ref{eq:comm-sync}.  To obtain the global synchrony ($\Psi$), as given by Equation \ref{eq:global-sync}, you simply average $\widehat{\psi}$ over all the communities $c$ in a given population $C$ \cite{Shanahan2010}.
 
 \begin{equation} \label{eq:comm-sync}
 \widehat{\psi}_c = \frac{1}{|T|} \sum_{t \in T} \psi_c(t)
@@ -234,10 +249,10 @@ Once you have calculated the synchrony of a community of oscillators $c$ for eac
 % -------------------
 % Metastability Index
 % -------------------
-\subsubsection{Metastability Index}
+\subsubsection{Metastability Index ($\lambda$)}
 \label{sec:bg:lambda}
 
-In \cite{Shanahan2010}, Shanahan proposes an index for metastability that builds on the synchrony measure described in Section \ref{sec:bg:sync}. We take $\psi_t$ for a given community $c$ over all time step $t \in T$, where $T$ is the total number of time steps in the simulation, and then measure the variance over $T$, as denoted in Equation \ref{eq:sigma-met}. This measure can then be averaged over all communities $c$ in the system $C$ to produce an index of how metastable the population is overall. We call this measure $\lambda$ following \cite{Shanahan2010} as presented in Equation \ref{eq:lambda}.
+In \cite{Shanahan2010}, Shanahan proposes an index for metastability that builds on the synchrony measure described in Section \ref{sec:bg:sync}. We take $\psi_t$ for a given community $c$ over all time step $t \in T$, where $T$ is the total number of time steps in the simulation, and then measure the variance over $T$, as denoted in Equation \ref{eq:sigma-met}. This measure can then be averaged over all communities $c$ in the system $C$ to produce an index of how metastable the population is overall. We call this measure $\lambda$ following the nomenclature established in \cite{Shanahan2010} as presented in Equation \ref{eq:lambda}.
 
 \begin{equation} \label{eq:sigma-met}
 \sigma_{\psi}(c) = \frac{1}{T - 1} \sum_{t \leq T }(\psi_{c}(t) - \langle \psi_{c}\rangle_T)^2
@@ -246,6 +261,23 @@ In \cite{Shanahan2010}, Shanahan proposes an index for metastability that builds
 \begin{equation} \label{eq:lambda}
 \lambda = \langle \sigma_{\psi} \rangle_C
 \end{equation}
+
+% -------------
+% Chimera Index
+% -------------
+\subsubsection{Chimera Index ($\chi$)}
+\label{sec:bg:chi}
+
+In order to calculate how chimera-like a system is at a given time step, we follow \cite{Shanahan2010, Bhowmik2013}, fix time and calculate the variance across communities. This indicates ``the level of spontaneous partitioning into synchronized and desynchronized subsets'' \cite{Bhowmik2013} and can be averaged as in \cite{Shanahan2010} to calculate $\chi$ shown below, where $C$ is the set of $M$ number of communities and $\psi_c(t)$ is the synchrony of community $c$ at time $t$ as described in Section \ref{sec:bg:sync}.
+
+\begin{equation} \label{eq:var-sync}
+\sigma_{chi}(t) = \frac{1}{M - 1}\sum_{c \in C}(\psi_c(t) - \langle \psi(t) \rangle_C)^2
+\end{equation}
+
+\begin{equation} \label{eq:chi}
+\chi = \langle \sigma_{chi} \rangle_T
+\end{equation}
+
 
 % -----------------
 % Coalition Entropy
@@ -332,15 +364,16 @@ K(\mathcal{B} = \lbrace P^1, P^2 \rbrace) = \min[H(P^1), H(P^2)]\\[2.5mm]
 
 
 \subsection{Related Experimental Work}
-Information Measure -> Consciousness
-Metastability -> Consciousness
-Information Measure -> Metastability ?
+\begin{enumerate}
+\item{We know that information measures are related to consciousness.}
+\item{We know that metastability is related to consciousness}
+\item{What we want to see is if information measures are related to metastability.}
+\end{enumerate}
 
 \begin{enumerate}
 \item{Return to consciousness.}
 \item{Information Sharing in the Brain Indexes Conscious in Noncommunicative Patients}
 \item{Symbolic Analysis - Allow this to work.}
-\item{}
 \end{enumerate}
 
 \subsection{Shanahan, Deco, Bhowmik}
@@ -654,7 +687,7 @@ Based on work by Shanahan \cite{Shanahan2010}, we will use Kuramoto oscillators 
 \subsubsection{The Model}
 \label{sec:osc:mod}
 
-In Shanahan \cite{Shanahan2010}, the model consists of eight communities of 32 Kuramoto oscillators each fully connected within their own communities and randomly connected to 32 other oscillators in the population. The phase of each oscillator is determined by equation \ref{eq:shanahan:kuramoto}, which follows from the generalised Kuramoto model shown in equation \ref{eq:kuramoto}. 
+In Shanahan \cite{Shanahan2010}, the model consists of eight communities of 32 Kuramoto oscillators each fully connected within their own communities and randomly connected to 32 other oscillators in the population. The phase of each oscillator is determined by equation \ref{eq:shanahan:kuramoto}, which follows from the generalised Kuramoto model shown in Equation \ref{eq:kuramoto}. 
 
 \begin{equation} \label{eq:shanahan:kuramoto}
 \frac{d\theta_i}{dt} = \omega + \frac{1}{N + 1} \sum_{j=1}^{N} K_{ij} \sin(\theta_j - \theta_i - \alpha)
@@ -668,7 +701,7 @@ We preserved the parameters as used by Shanahan in \cite{Shanahan2010}, where $\
 \subsubsection{The Simulations}
 \label{sec:osc:sims}
 
-In order to generate the data required to apply our implementation of $\Phi$ to the populations of Kuramoto oscillators described in Section \ref{sec:osc:mod} we carried out our own simulations using the Matlab code from \cite{Shanahan2010} as a base. Each of our 7500 trials ran for 25 seconds with a value of $\beta$ assigned from $0$ to $2\pi$. Every 5ms, the internal synchrony, as defined in Equation \ref{eq:sync} was calculated and inserted into an $8 \times 8$ matrix representing the level of synchrony between all of the communities. Thus the output for each trial was a series of 5000 matrices each of the form shown in Table \ref{tab:mat}.
+In order to generate the data required to apply our implementation of $\Phi$ to the populations of Kuramoto oscillators described in Section \ref{sec:osc:mod} we carried out our own simulations using the Matlab code from \cite{Shanahan2010} as a base. Each of our 7500 trials ran for 25 seconds with a value of $\beta$ assigned randomly from $0$ to $2\pi$. Every 5ms, the internal synchrony, as defined in Equation \ref{eq:sync}, was calculated and inserted into an $8 \times 8$ matrix representing the level of synchrony between all of the communities. Thus the output for every trial was a series of 5000 matrices, each of the form shown in Table \ref{tab:mat}.
 
 
 % Synchrony Matrix
@@ -747,7 +780,7 @@ Each simulation we ran was given a unique ID and stored as a document in our dat
 \noindent The synchrony of a given community $c$ at time $t$, $\psi_c(t)$, is given by the aforementioned Equation \ref{eq:sync}. As explained in Section \ref{sec:bg:global-sync}, this measure can then be averaged over all communities and time steps in order to calculate global synchrony, $\Psi$ \cite{Shanahan2010}. We calculated $\Psi$ for each trial by extracting the continuous synchrony values from each matrix as presented in Table \ref{tab:arr} and inputting them to implementations of Equations \ref{eq:comm-sync} and \ref{eq:global-sync} inside the Python data importer described in Section \ref{sec:utils}.\\
 
 \noindent \textbf{Measure for Chimera States}\\
-\noindent As explained in Section \ref{sec:bg:chi}, chimera states describe the situation where a group of communities are synchronised while the rest are desynchronised. A measure for this is proposed by Shanahan in \cite{Shanahan2010}. We calculated $\chi$ by extracting the continuous synchrony values from each matrix as presented in Table \ref{tab:arr} and inputting them to implementations of Equations \ref{eq:var-sync} and \ref{eq:chi} inside the Python data importer described in Section \ref{sec:utils}.\\
+\noindent As explained in Section \ref{sec:bg:chimera}, chimera states describe the situation where a group of communities are synchronised while the rest are desynchronised. A measure for this is proposed by Shanahan in \cite{Shanahan2010}. We calculated $\chi$ by extracting the continuous synchrony values from each matrix as presented in Table \ref{tab:arr} and inputting them to implementations of Equations \ref{eq:var-sync} and \ref{eq:chi} inside the Python data importer described in Section \ref{sec:utils}.\\
 
 \noindent \textbf{Measure for Metastability}\\
 \noindent We applied the metastability index proposed by Shanahan as $\lambda$ in \cite{Shanahan2010}. This measure measures the average variance in synchrony ($\psi_c(t)$) over time across each community $c$ in the system. We calculated $\lambda$ by extracting the continuous synchrony values from each matrix as presented in Table \ref{tab:arr} and inputting them to implementations of Equations \ref{eq:sigma-met} and \ref{eq:lambda} inside the Python data importer described in Section \ref{sec:utils}.\\
@@ -786,7 +819,7 @@ The first correlation we tested was the one between Shanahan's $\lambda$ measure
 }
 \end{figure}
 
-In order to gain a better picture of how $\beta$ and $\lambda$ interacted, we extended our $\beta$ range to cover the whole $0$ to $2\pi$ period. What we encountered was a second peak with an almost symmetrical shape as the peak in the original plot, centred around $\beta = 3.1$. The rest of the range remained flat, with $\lambda$ values close to zero, as depicted in Figure \ref{fig:lambda-vs-beta-ext}.
+In order to gain a better picture of how $\beta$ and $\lambda$ interacted, we extended our $\beta$ range to cover the complete $0$ to $2\pi$ period. What we encountered was a second peak with an almost symmetrical shape as the peak in the original plot, centred around $\beta = 3.1$. The rest of the range remained flat, with $\lambda$ values close to zero, as depicted in Figure \ref{fig:lambda-vs-beta-ext}.
 
 \begin{figure}[H]
 \begin{center}
@@ -804,7 +837,7 @@ In order to gain a better picture of how $\beta$ and $\lambda$ interacted, we ex
 \subsubsection{Chimera Index ($\chi$) vs $\beta$}
 \label{sec:app:osc:res:chi-v-beta}
 
-The second correlation we examined corresponded again to a measure presented by Shanahan in \cite{Shanahan2010}. We plotted Shanahan's chimera index $\chi$, as presented in Section \ref{sec:bg:chi}, versus $\beta$. Once again we started with $\beta$ ranging from $0$ to $\frac{\pi}{4}$, obtaining a result consistent with \cite{Shanahan2010}. As shown in Figure \ref{fig:chi-vs-beta-orig}, $\chi$ peaks at approximately $\beta = 0.08$, which falls in the range of $0.05 < \beta < 0.15$ found by Shanahan.
+The second correlation we examined corresponded again to a measure presented by Shanahan in \cite{Shanahan2010}. We plotted Shanahan's chimera index ($\chi$), as presented in Section \ref{sec:bg:chi}, versus $\beta$. Once again we started with $\beta$ ranging from $0$ to $\frac{\pi}{4}$, obtaining a result consistent with \cite{Shanahan2010}. As shown in Figure \ref{fig:chi-vs-beta-orig}, $\chi$ peaks at approximately $\beta = 0.08$, which falls in the range of $0.05 < \beta < 0.15$ found by Shanahan.
 
 \begin{figure}[H]
 \begin{center}
@@ -816,7 +849,7 @@ The second correlation we examined corresponded again to a measure presented by 
 }
 \end{figure}
 
-As with the metastability index, we extended our $\beta$ range to cover the whole $0$ to $2\pi$ period. Again we encountered a second peak with an almost symmetrical shape as the one in the original plot. The new apex was also centred around $\beta = 3.1$, with the rest of the range remaining at $\chi$ values close to zero. This is depicted in Figure \ref{fig:chi-vs-beta-ext}.
+As with the metastability index, we extended our $\beta$ range to cover $0 \leq \beta \leq 2\pi$. Again we encountered a second peak with an almost symmetrical shape as the one in the original plot. The new apex was also centred around $\beta = 3.1$, with the rest of the range remaining at $\chi$ values close to zero. This is depicted in Figure \ref{fig:chi-vs-beta-ext}.
 
 \begin{figure}[H]
 \begin{center}
@@ -932,11 +965,12 @@ When we extended our $\beta$ range to $0 \leq \beta \leq 2\pi$, we observed the 
 % -----------
 % Phi vs Beta
 % -----------
-\subsection{Empirical Integrated Information ($\Phi_{E}$) vs $\beta$}
+\subsubsection{Empirical Integrated Information ($\Phi_{E}$) vs $\beta$}
+\label{sec:app:osc:res:phi-v-beta}
 
-Having completed an analysis of the relationships considered by Shanahan in \cite{Shanahan2010}, we started analysing comparable correlations using our measures of integrated information. To begin with, we considered empirical integrated information ($\Phi_{E}$), as defined in Section \ref{II}, and $\beta$.
+Having completed an analysis of the relationships considered by Shanahan in \cite{Shanahan2010}, we started analysing comparable correlations using our measures of integrated information. To begin with, we considered empirical integrated information ($\Phi_{E}$), as defined in Section \ref{II}, and plotted it against $\beta$.
 
-Figure \ref{fig:phi-vs-beta-orig} plots $\Phi_{E}$ versus $\beta$ for a range of $0 \leq \beta \leq \frac{\pi}{4}$. We observe that the peak reaches its apex at $\beta \approx 0.16$. This closely follows what we found for $H_C$ when plotted against $\beta$, where $H_C$ reached a maximum at $\beta \approx 0.15$. It is worth noting, however, that the peak for $\Phi_{E}$ versus $\beta$ is narrower than that of $H_C$ versus $\beta$, and that the former, before it starts rising at $\beta \approx 0.07$, presents a dip, where $\Phi_{E}$ reaches values of down to approximately $-0.06$. From $\beta \approx 0.27$, the value for $\Phi_{E}$ stabilises at close to zero. 
+Figure \ref{fig:phi-vs-beta-orig} shows the correlation between $\Phi_{E}$ and $\beta$ for a range of $0 \leq \beta \leq \frac{\pi}{4}$. We observe that the peak reaches its apex at $\beta \approx 0.16$. This closely follows what we found for $H_C$ when plotted against $\beta$, where $H_C$ reached a maximum at $\beta \approx 0.15$. It is worth noting, however, that the peak for $\Phi_{E}$ versus $\beta$ is narrower than that of $H_C$ versus $\beta$, and that the former, before it starts rising at $\beta \approx 0.07$, presents a dip, where $\Phi_{E}$ reaches values of down to approximately $-0.06$. For $H_C$, this is not possible, given that by definition it cannot take negative values. Additionally, we can see that from $\beta \approx 0.27$ onwards, the value for $\Phi_{E}$ stabilises at close to zero. 
 
 \begin{figure}[H]
 \begin{center}
@@ -948,7 +982,20 @@ Figure \ref{fig:phi-vs-beta-orig} plots $\Phi_{E}$ versus $\beta$ for a range of
 \end{center}
 \end{figure}
 
-When considering multiple thresholds ($\gamma$), we observed a behaviour similar to the one for coalition entropy described in Section \ref{sec:app:osc:res:hc-v-beta}. As $\gamma$ increases, the value of $\beta$ corresponding to the maximum value of $\Phi_E$ also increases. However, the maximum value of $\Phi_E$ doesn't necessarily decrease. It deacreases from $\gamma = 0.5$ to $\gamma = 0.7$, but then increases from $\gamma = 0.7$ to $\gamma = 0.9$. This is summarised in Table \ref{tab:max-phi-beta}.
+As we the previous measures plotted against $\beta$, we extended the range to $0 \leq \beta \leq 2\pi$. Once more we found a symmetrical peak centred around $\beta \approx 3.1$, with $\Phi_E$ stabilising at around zero for values greater than $\beta \approx 3.17$. This depicted in Figure \ref{fig:phi-vs-beta-ext}.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 0.35]{figures/phi_vs_beta_ext}
+\caption{
+	Phi E vs Beta
+	\label{fig:phi-vs-beta-ext}
+}
+\end{center}
+\end{figure}
+
+
+When considering multiple thresholds ($\gamma$), we observed a behaviour similar to the one for coalition entropy described in Section \ref{sec:app:osc:res:hc-v-beta}. As $\gamma$ increases, the value of $\beta$ corresponding to the maximum value of $\Phi_E$ also increases. However, the maximum value of $\Phi_E$ doesn't necessarily decrease. It decreases from $\gamma = 0.5$ to $\gamma = 0.7$, but then increases from $\gamma = 0.7$ to $\gamma = 0.9$. This shift and change in maximum $\Phi_E$ can be observed in Figure \ref{fig:phi-vs-beta-orig-multi} and is summarised in Table \ref{tab:max-phi-beta}.
 
 \begin{table}[ht]
 \centering
@@ -968,9 +1015,6 @@ $\gamma$ & $\beta$ & $\Phi_E$\\
 }
 \end{table}
 
-This is the reference Figure \ref{fig:phi-vs-beta-orig-multi}.
-
-
 \begin{figure}[H]
 \begin{center}
 \includegraphics[scale = 0.35]{figures/phi_vs_beta_orig_multi}
@@ -981,19 +1025,7 @@ This is the reference Figure \ref{fig:phi-vs-beta-orig-multi}.
 \end{center}
 \end{figure}
 
-This is the reference Figure \ref{fig:phi-vs-beta-ext}.
-
-\begin{figure}[H]
-\begin{center}
-\includegraphics[scale = 0.35]{figures/phi_vs_beta_ext}
-\caption{
-	Phi E vs Beta
-	\label{fig:phi-vs-beta-ext}
-}
-\end{center}
-\end{figure}
-
-This is the reference Figure \ref{fig:phi-vs-beta-ext-multi}.
+With an extended $\beta$ range, all the multiple thresholds exhibit the same behaviour, with a symmetrical peak appearing at $\beta \approx 3.1$. This can be observed in Figure \ref{fig:phi-vs-beta-ext-multi}.
 
 \begin{figure}[H]
 \begin{center}
@@ -1009,62 +1041,63 @@ This is the reference Figure \ref{fig:phi-vs-beta-ext-multi}.
 % -----------------
 % Phi Tilde vs Beta
 % -----------------
+\subsubsection{Empirical Integrated Information Tilde ($\widetilde{\Phi}_{E}$) vs $\beta$}
+\label{sec:app:osc:res:phi-tilde-v-beta}
 
-This is the reference Figure \ref{fig:phi-tilde-vs-beta-orig}.
+We observed comparable results when analysing the relationship between the alternative measure for empirical integrated information, $\widetilde{\Phi}_{E}$, as defined in Section \ref{II}, and $\beta$. When plotting only $\gamma = 0.8$ in Figures \ref{fig:phi-tilde-vs-beta-orig} and \ref{fig:phi-tilde-vs-beta-ext}, we can clearly observe the same peak centred around $\beta \approx 0.15$, with its symmetrical peak on $\beta \approx 3.1$. When plotting multiple thresholds in Figures \ref{fig:phi-tilde-vs-beta-orig-multi} and \ref{fig:phi-tilde-vs-beta-ext-multi}, we observe the same shift and change in maximum $\widetilde{\Phi}_{E}$ values observed in section \ref{sec:app:osc:res:phi-v-beta}.
 
-\begin{figure}[H]
-\begin{center}
-\includegraphics[scale = 0.35]{figures/phi_tilde_vs_beta_orig}
-\caption{
-	Phi E Tilde vs Beta
-	\label{fig:phi-tilde-vs-beta-orig}
-}
-\end{center}
+\begin{figure}[H] 
+	\label{fig:phi-tilde-vs-beta-all} 
+	\begin{minipage}[b]{0.5\linewidth}
+		\begin{center}
+		\includegraphics[scale = 0.2]{figures/phi_tilde_vs_beta_orig}
+		\caption{
+			Phi E Tilde vs Beta
+			\label{fig:phi-tilde-vs-beta-orig}
+		}
+		\end{center}
+		\vspace{4ex}
+	\end{minipage}
+	\begin{minipage}[b]{0.5\linewidth}
+		\begin{center}
+		\includegraphics[scale = 0.2]{figures/phi_tilde_vs_beta_ext}
+		\caption{
+			Phi E Tilde vs Beta
+			\label{fig:phi-tilde-vs-beta-ext}
+		}
+		\end{center}
+		\vspace{4ex}
+	\end{minipage}
+	\begin{minipage}[b]{0.5\linewidth}
+		\begin{center}
+		\includegraphics[scale = 0.2]{figures/phi_tilde_vs_beta_orig_multi}
+		\caption{
+			Phi E Tilde vs Beta
+			\label{fig:phi-tilde-vs-beta-orig-multi}
+		}
+		\end{center}
+		\vspace{4ex}
+	\end{minipage}
+	\begin{minipage}[b]{0.5\linewidth}
+		\begin{center}
+		\includegraphics[scale = 0.2]{figures/phi_tilde_vs_beta_ext_multi}
+		\caption{
+			Phi E Tilde vs Beta
+			\label{fig:phi-tilde-vs-beta-ext-multi}
+		}
+		\end{center}
+		\vspace{4ex}
+	\end{minipage}
+
 \end{figure}
-
-This is the reference Figure \ref{fig:phi-tilde-vs-beta-ext}.
-
-\begin{figure}[H]
-\begin{center}
-\includegraphics[scale = 0.35]{figures/phi_tilde_vs_beta_ext}
-\caption{
-	Phi E Tilde vs Beta
-	\label{fig:phi-tilde-vs-beta-ext}
-}
-\end{center}
-\end{figure}
-
-This is the reference Figure \ref{fig:phi-tilde-vs-beta-orig-multi}.
-
-\begin{figure}[H]
-\begin{center}
-\includegraphics[scale = 0.35]{figures/phi_tilde_vs_beta_orig_multi}
-\caption{
-	Phi E Tilde vs Beta
-	\label{fig:phi-tilde-vs-beta-orig-multi}
-}
-\end{center}
-\end{figure}
-
-This is the reference Figure \ref{fig:phi-tilde-vs-beta-ext-multi}.
-
-\begin{figure}[H]
-\begin{center}
-\includegraphics[scale = 0.35]{figures/phi_tilde_vs_beta_ext_multi}
-\caption{
-	Phi E Tilde vs Beta
-	\label{fig:phi-tilde-vs-beta-ext-multi}
-}
-\end{center}
-\end{figure}
-
 
 % ----------
 % Phi vs Psi
 % ----------
-\subsection{Empirical Integrated Information ($\Phi_{E}$) vs Global Synchrony ($\Psi$)}
+\subsubsection{Empirical Integrated Information ($\Phi_{E}$) vs Global Synchrony ($\Psi$)}
+\label{sec:app:osc:res:phi-v-psi}
 
-This is the reference Figure \ref{fig:phi-vs-psi-multi}.
+We also considered the relationship between our measures for integrated information and global synchrony ($\Psi$) for multiple thresholds ($\gamma$). For all values of $\gamma$ considered, we observed a parabolic peak with a maximum $\Psi$ ranging from $\Psi \approx 0.44$ to $\Psi \approx 0.81$ increasing with $\gamma$. As with $\Phi_{E}$ versus $\beta$, the value of $\Phi_E$ decreases from $\gamma = 0.5$ to $\gamma = 0.7$, but then increases from $\gamma = 0.7$ to $\gamma = 0.9$. This is depicted in Figure \ref{fig:phi-vs-psi-multi}. It is also worth noting that for $\gamma = 0.6$, $\gamma = 0.7$ and $\gamma = 0.8$, the value of $\Phi_E$ drops below zero before increasing. However, this dip is not symmetrical, as it does not reappear when $\Phi_E$ decreases on the right end of the peak. Finally, as $\gamma$ increases, it is possible to see a shift from a right skew towards a left skew, with $\gamma = 0.8$ showing the most symmetrical peak. 
 
 \begin{figure}[H]
 \begin{center}
@@ -1079,9 +1112,10 @@ This is the reference Figure \ref{fig:phi-vs-psi-multi}.
 % ----------------
 % Phi Tilde vs Psi
 % ----------------
-\subsection{Empirical Integrated Information Tilde ($\widetilde{\Phi}_{E}$) vs Global Synchrony ($\Psi$)}
+\subsubsection{Empirical Integrated Information Tilde ($\widetilde{\Phi}_{E}$) vs Global Synchrony ($\Psi$)}
+\label{sec:app:osc:res:phi-tilde-v-psi}
 
-This is the reference Figure \ref{fig:phi-tilde-vs-psi-multi}.
+As can be seen in Figure \ref{fig:phi-tilde-vs-psi-multi}, the relationship between $\widetilde{\Phi}_{E}$ and $\Psi$ is comparable to the one between $\Phi_E$ and $\Psi$ as described in Section \ref{sec:app:osc:res:phi-v-psi}. The key difference is that since $\widetilde{\Phi}_{E}$ cannot take negative values, there is no dip in $\widetilde{\Phi}_{E}$ preceding the occurrence of the peak for any threshold.
 
 \begin{figure}[H]
 \begin{center}
@@ -1096,9 +1130,10 @@ This is the reference Figure \ref{fig:phi-tilde-vs-psi-multi}.
 % --------------------------
 % Phi vs Metastability Index
 % --------------------------
-\subsection{Empirical Integrated Information ($\Phi_{E}$) vs Metastability Index ($\lambda$)}
+\subsubsection{Empirical Integrated Information ($\Phi_{E}$) vs Metastability Index ($\lambda$)}
+\label{sec:app:osc:res:phi-v-lambda}
 
-This is the reference Figure \ref{fig:phi-vs-lambda-multi}.
+An important relationship that we were looking to examine was the correlation between our measures of integrated information and measures that indicated the level of metastability exhibited by a given system. We first considered $\Phi_{E}$ and Shanahan's metastability index $\lambda$, as defined in Section \ref{sec:bg:lambda}.
 
 \begin{figure}[H]
 \begin{center}
@@ -1110,19 +1145,132 @@ This is the reference Figure \ref{fig:phi-vs-lambda-multi}.
 \end{center}
 \end{figure}
 
-% --------------------------------
-% Phi Tilde vs Metastability Index
-% --------------------------------
-\subsection{Empirical Integrated Information Tilde ($\widetilde{\Phi}_{E}$) vs Metastability Index ($\lambda$)}
+Initially we plotted the results for all of our values of $\gamma$, as shown in Figure \ref{fig:phi-vs-lambda-multi}. We noticed that the for the highest threshold, $\gamma = 0.9$, the shape of the plot was considerably different than for the rest of the thresholds. Instead of a peak between $\lambda \approx 0.037$ and $\lambda \approx 0.046$, with a  heavy left skew, the peak for $\gamma = 0.9$ was relatively symmetrical, centred around $\lambda \approx 0.023$. At the other end of the spectrum, when $\gamma = 0.5$, the plot did not show a complete peak, but rather a exponential-like curve. These plots are shown in Figures \ref{fig:phi_vs_lambda_5} and \ref{fig:phi_vs_lambda_9}.
 
-This is the reference Figure \ref{fig:phi-tilde-vs-lambda-multi}.
+\begin{figure}[H] 
+	\label{fig:phi-vs-lambda-extremes} 
+	\begin{minipage}[b]{0.5\linewidth}
+		\begin{center}
+		\includegraphics[scale = 0.2]{figures/phi_vs_lambda_5}
+		\caption{
+			Phi vs Lambda
+			\label{fig:phi_vs_lambda_5}
+		}
+		\end{center}
+		\vspace{2ex}
+	\end{minipage}
+	\begin{minipage}[b]{0.5\linewidth}
+		\begin{center}
+		\includegraphics[scale = 0.2]{figures/phi_vs_lambda_9}
+		\caption{
+			Phi vs Lambda
+			\label{fig:phi_vs_lambda_9}
+		}
+		\end{center}
+		\vspace{2ex}
+	\end{minipage}
+\end{figure}
+
+We then considered thresholds 0.6, 0.7 and 0.8 to better examine the relationship between these two measures without accounting for the \textit{extreme} values of $\gamma$. We observe a heavily left skewed peak that shifts left as the threshold increases, reaching a maximum of $\Phi_E \approx 0.5$. It is also important to note that there is a considerable amount of noise in the range of $0.025 < \lambda < 0.045$. In this region, values for $\lambda$ that produce relatively high values of $\Phi$ also lead to negative values.
 
 \begin{figure}[H]
 \begin{center}
-\includegraphics[scale = 0.35]{figures/phi_tilde_vs_lambda_multi}
+\includegraphics[scale = 0.35]{figures/phi_vs_lambda_mid}
+\caption{
+	Phi E vs Metastability Index
+	\label{fig:phi-vs-lambda-mid}
+}
+\end{center}
+\end{figure}
+
+% --------------------------------
+% Phi Tilde vs Metastability Index
+% --------------------------------
+\subsubsection{Empirical Integrated Information Tilde ($\widetilde{\Phi}_{E}$) vs Metastability Index ($\lambda$)}
+\label{sec:app:osc:res:phi-tilde-v-lambda}
+
+We proceeded to extend our analysis between integrated information and Shanahan's metastability index to our implementation of $\widetilde{\Phi}_{E}$. We found the same discrepancies at \textit{extreme} thresholds described in Section \ref{sec:app:osc:res:phi-v-lambda} so we focused on plotting the correlation given $\gamma$ values of 0.6, 0.7 and 0.8. We can see in Figure \ref{fig:phi-tilde-vs-lambda-mid} that the correlation is comparable to the one using $\Phi_E$, with slightly less noise occurring in the range $0.025 < \lambda < 0.045$ and specifically for $\gamma = 0.6$
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 0.35]{figures/phi_tilde_vs_lambda_mid}
 \caption{
 	Phi E Tilde vs Metastability Index
-	\label{fig:phi-tilde-vs-lambda-multi}
+	\label{fig:phi-tilde-vs-lambda-mid}
+}
+\end{center}
+\end{figure}
+
+% --------------------
+% Phi vs Chimera Index
+% --------------------
+\subsubsection{Empirical Integrated Information ($\Phi_{E}$) vs Chimera Index ($\chi$)}
+\label{sec:app:osc:res:phi-v-chi}
+
+A second measure related to the metastability of a system is Shanahan's chimera index as defined in Section \ref{sec:bg:chi}. We considered the relationship between $\chi$ and $\Phi_{E}$ and confirmed a nearly identical behaviour as that between $\Phi_E$ and $\lambda$. These findings are consistent with the close relationship between $\chi$ and $\lambda$ presented in \cite{Shanahan2010} and in our results in Sections \label{sec:app:osc:res:meta-v-beta} and \label{sec:app:osc:res:chi-v-beta}.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 0.35]{figures/phi_vs_chi_multi}
+\caption{
+	Phi E vs Chimera Index
+	\label{fig:phi-vs-chi-multi}
+}
+\end{center}
+\end{figure}
+
+Once more, we first created a plot for results encompassing all of the values of $\gamma$ used in our simulations, as shown in Figure \ref{fig:phi-vs-chi-multi}. As with $\lambda$ the \textit{extreme} values of $\gamma = 0.5$ and $\gamma = 0.9$ were not particularly in line with the rest of the values of $\gamma$. These plots are shown in Figures \ref{fig:phi_vs_chi_5} and \ref{fig:phi_vs_chi_9}.
+
+\begin{figure}[H] 
+	\label{fig:phi-vs-chi-extremes} 
+	\begin{minipage}[b]{0.5\linewidth}
+		\begin{center}
+		\includegraphics[scale = 0.2]{figures/phi_vs_chi_5}
+		\caption{
+			Phi vs Chi
+			\label{fig:phi_vs_chi_5}
+		}
+		\end{center}
+		\vspace{2ex}
+	\end{minipage}
+	\begin{minipage}[b]{0.5\linewidth}
+		\begin{center}
+		\includegraphics[scale = 0.2]{figures/phi_vs_chi_9}
+		\caption{
+			Phi vs Chi
+			\label{fig:phi_vs_chi_9}
+		}
+		\end{center}
+		\vspace{2ex}
+	\end{minipage}
+\end{figure}
+
+We thus plotted thresholds 0.6, 0.7 and 0.8 separately, obtaining the same results as in Section \ref{sec:app:osc:res:phi-v-lambda}. Once more, the plots showed a heavily left skewed peak, shifting towards the left as $\gamma$ increases and reaching a maximum of $\Phi_E \approx 0.5$. The noise in the range of $0.025 < \lambda 0.045$ was also present, with $\chi$ values producing both relatively high $\Phi$ as well as negative values.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 0.35]{figures/phi_vs_chi_mid}
+\caption{
+	Phi E vs Chimera Index
+	\label{fig:phi-vs-chi-mid}
+}
+\end{center}
+\end{figure}
+
+% --------------------------
+% Phi Tilde vs Chimera Index
+% --------------------------
+\subsubsection{Empirical Integrated Information Tilde ($\widetilde{\Phi}_{E}$) vs Chimera Index ($\chi$)}
+\label{sec:app:osc:res:phi-tilde-v-chi}
+
+As with all our analyses involving integrated information, we then plotted the same relationship, but using our implementation of $\widetilde{\Phi}_{E}$. The same discrepancies at \textit{extreme} thresholds reappeared and so we once more plotted the correlation for $\gamma$ values of 0.6, 0.7 and 0.8 only. Figure \ref{fig:phi-tilde-vs-lambda-mid} shows that the correlation closely resembles the one using $\Phi_E$, with the same reduction of noise within the range $0.025 < \lambda 0.045$ for $\gamma = 0.6$ as observed for $\Phi_E$.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 0.35]{figures/phi_tilde_vs_chi_mid}
+\caption{
+	Phi E Tilde vs Chimera Index
+	\label{fig:phi-tilde-vs-chi-mid}
 }
 \end{center}
 \end{figure}
@@ -1130,9 +1278,12 @@ This is the reference Figure \ref{fig:phi-tilde-vs-lambda-multi}.
 % ------------------------
 % Phi vs Coalition Entropy
 % ------------------------
-\subsection{Empirical Integrated Information ($\Phi_{E}$) vs Coalition Entropy ($H_C$)}
+\subsubsection{Empirical Integrated Information ($\Phi_{E}$) vs Coalition Entropy ($H_C$)}
+\label{sec:app:osc:res:phi-v-hc}
 
-This is the reference Figure \ref{fig:phi-vs-hc-multi}.
+We continued our analysis by exploring the relationship between integrated information and coalition entropy ($H_C$). As defined in Section \ref{sec:bg:hc}, coalition entropy measures the occurrence of the various states entered by a system given the space of all possible states it can enter. Nevertheless, coalition entropy does not take into account any past state given a current state, and so it is agnostic to the order in which the states actually occur. This is implied in its definition in Equation \ref{eq:hc}. As integrated information does take into consideration the order in which states occur, it is of particular interest to analyse its relationship with $H_C$.
+
+We first plotted $\Phi_E$ against $H_C$, as shown in Figure \ref{fig:phi-vs-hc-multi}. We can see that for all thresholds, the plots from an exponential-like pattern. Obviating $\gamma = 0.9$, we observe that there is a heavy overlap between the various thresholds, with all of them reaching a maximum of $\Phi_E \approx 0.5$ as $H_C$ approaches one.
 
 \begin{figure}[H]
 \begin{center}
@@ -1147,9 +1298,10 @@ This is the reference Figure \ref{fig:phi-vs-hc-multi}.
 % ------------------------------
 % Phi Tilde vs Coalition Entropy
 % ------------------------------
-\subsection{Empirical Integrated Information Tilde ($\widetilde{\Phi}_{E}$) vs Coalition Entropy ($H_C$)}
+\subsubsection{Empirical Integrated Information Tilde ($\widetilde{\Phi}_{E}$) vs Coalition Entropy ($H_C$)}
+\label{sec:app:osc:res:phi-tilde-v-hc}
 
-This is the reference Figure \ref{fig:phi-tilde-vs-hc-multi}.
+We then examined $\widetilde{\Phi}_{E}$ against $H_C$, as shown in Figure \ref{fig:phi-tilde-vs-hc-multi}. The result is similar to the one for $\Phi_E$ in Section \ref{sec:app:osc:res:phi-v-hc}, with data from all thresholds forming an exponential-like pattern. Once more, if we ignore $\gamma = 0.9$, there is a consistent overlap between all other values of $\gamma$. Additionally, aside from $\gamma = 0.9$, there is considerably less noise, with only a few outliers at $H_C \approx 0.6$.
 
 \begin{figure}[H]
 \begin{center}
@@ -1167,7 +1319,7 @@ This is the reference Figure \ref{fig:phi-tilde-vs-hc-multi}.
 % ----------------
 \subsubsection{Empirical Integrated Information Tilde ($\widetilde{\Phi}_{E}$) vs Empirical Integrated Information ($\Phi_{E}$)}
 
-This is the reference Figure \ref{fig:phi-tilde-vs-phi}.
+We were also interested in investigating the relationship between $\Phi_{E}$ and $\widetilde{\Phi}_{E}$. Thus, for each simulation, we plotted the value we obtained for $\widetilde{\Phi}_{E}$ against the one for $\Phi_E$, as shown in Figure \ref{fig:phi-tilde-vs-phi}. We observed a general positive correlation, with $\widetilde{\Phi}_{E}$ being higher than its respective $\Phi_E$ value, as can be observed by the fact that the plotted points are consistently above the $\widetilde{\Phi}_{E} = \Phi_E$ line in the dashed black line. Additionally, we can see that for values of $\Phi_E \approx 0$, there was more inconsistency with regards to the corresponding value $\widetilde{\Phi}_{E}$.
 
 \begin{figure}[H]
 \begin{center}
@@ -1179,6 +1331,10 @@ This is the reference Figure \ref{fig:phi-tilde-vs-phi}.
 \end{center}
 \end{figure}
 
+\subsection{Discussion}
+
+
+\clearpage
 \section{Application on Populations of Spiking Neurons}
 \label{MSUSNN}
 
