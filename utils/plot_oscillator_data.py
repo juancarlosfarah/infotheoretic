@@ -7,6 +7,7 @@ import scipy.interpolate as spi
 import math
 from matplotlib import cm
 from copy import deepcopy
+import matplotlib.lines as mlines
 from mpl_toolkits.mplot3d import Axes3D
 
 
@@ -37,11 +38,12 @@ class DataPlotter:
              thresholds=None):
 
         # Custom sizes for text in plots.
-        plt.rcParams.update({'axes.labelsize': 'x-large'})
-        plt.rcParams.update({'xtick.labelsize': 'medium'})
-        plt.rcParams.update({'ytick.labelsize': 'medium'})
-        plt.rcParams.update({'axes.titlesize': 'x-large'})
-        plt.rcParams.update({'figure.titlesize': 'x-large'})
+        plt.rcParams.update({'axes.labelsize': 'xx-large'})
+        plt.rcParams.update({'xtick.labelsize': 'x-large'})
+        plt.rcParams.update({'ytick.labelsize': 'x-large'})
+        plt.rcParams.update({'axes.titlesize': 'xx-large'})
+        plt.rcParams.update({'figure.titlesize': 'xx-large'})
+        plt.rcParams.update({'legend.fontsize': 'x-large'})
         plt.rcParams.update({'font.family': 'serif'})
 
 
@@ -57,8 +59,12 @@ class DataPlotter:
 
         cursors = dict()
         colors = dict()
-        available_colors = ["orange", "red", "blue", "green", "purple",
-                            "yellow", "brown", "pink", "magenta", "black"]
+        available_colors = ["red"]
+        if len(thresholds) == 3:
+            available_colors = ["green", "blue", "red"]
+        elif len(thresholds) > 3:
+            available_colors = ["orange", "red", "blue", "green", "purple",
+                                "yellow", "brown", "pink", "magenta", "black"]
         count = 0
 
         for threshold in thresholds:
@@ -130,7 +136,10 @@ class DataPlotter:
             #     labels.append(key)
             #     plt.xlabel(r"Global Synchrony ($\Psi$)")
             #     plt.ylabel(phi_label)
-            #     plt.ylim(ymin=-0.01, ymax=0.8)
+            #     if run == 0:
+            #         plt.ylim(ymin=-0.15, ymax=0.7)
+            #     else:
+            #         plt.ylim(ymin=-0.01, ymax=0.8)
             #     plt.xlim(xmin=0, xmax=1)
             #     #  plt.title(phi_label + " vs Global Synchrony\n"
             #     #                        "Tau = " + str(tau))
@@ -138,12 +147,11 @@ class DataPlotter:
             #                                phi[key],
             #                                color=colors[key],
             #                                label=key))
-            #     avg_phi_e = np.average(phi[key])
-            #     print "Average Phi E at " + str(key)\
-            #           + " threshold is " + str(avg_phi_e)
             # labels, handles = zip(*sorted(zip(labels, handles),
             #                               key=lambda x: x[0]))
-            # plt.legend(handles, labels, loc=2, title=r"Threshold ($\gamma$)")
+            # legend = plt.legend(handles, labels, loc=2,
+            #                     title=r"Threshold ($\gamma$)")
+            # plt.setp(legend.get_title(), fontsize='xx-large')
             #
             # if save:
             #     fig.savefig(path + "1." + ext)
@@ -159,7 +167,16 @@ class DataPlotter:
             #     labels.append(key)
             #     plt.xlabel(r"Metastability Index ($\lambda$)")
             #     plt.ylabel(phi_label)
-            #     plt.ylim(ymin=-0.01, ymax=0.8)
+            #     if run == 0:
+            #         if len(thresholds) == 3:
+            #             plt.ylim(ymin=-0.15, ymax=0.6)
+            #         else:
+            #             plt.ylim(ymin=-0.15, ymax=0.7)
+            #     else:
+            #         if len(thresholds) == 3:
+            #             plt.ylim(ymin=-0.01, ymax=0.7)
+            #         else:
+            #             plt.ylim(ymin=-0.01, ymax=0.8)
             #     plt.xlim(xmin=0, xmax=0.05)
             #     # plt.title(phi_label + " vs Lambda\nTau = " + str(tau))
             #     handles.append(plt.scatter(lamda[key],
@@ -168,7 +185,9 @@ class DataPlotter:
             #                                label=key))
             # labels, handles = zip(*sorted(zip(labels, handles),
             #                               key=lambda x: x[0]))
-            # plt.legend(handles, labels, loc=2, title=r"Threshold ($\gamma$)")
+            # legend = plt.legend(handles, labels, loc=2,
+            #                     title=r"Threshold ($\gamma$)")
+            # plt.setp(legend.get_title(), fontsize='xx-large')
             # if save:
             #     fig.savefig(path + "6." + ext)
             # else:
@@ -183,7 +202,10 @@ class DataPlotter:
             #     labels.append(key)
             #     plt.xlabel(r"Coalition Entropy ($H_C$)")
             #     plt.ylabel(phi_label)
-            #     plt.ylim(ymin=-0.15, ymax=0.8)
+            #     if run == 0:
+            #         plt.ylim(ymin=-0.15, ymax=0.7)
+            #     else:
+            #         plt.ylim(ymin=-0.01, ymax=0.8)
             #     plt.xlim(xmin=0, xmax=1)
             #     # plt.title(phi_label + " vs Coalition Entropy\n"
             #     #           "Tau = " + str(tau))
@@ -193,7 +215,9 @@ class DataPlotter:
             #                                label=key))
             # labels, handles = zip(*sorted(zip(labels, handles),
             #                               key=lambda x: x[0]))
-            # plt.legend(handles, labels, loc=2, title=r"Threshold ($\gamma$)")
+            # legend = plt.legend(handles, labels, loc=2,
+            #                     title=r"Threshold ($\gamma$)")
+            # plt.setp(legend.get_title(), fontsize='xx-large')
             #
             # if save:
             #     fig.savefig(path + "8." + ext)
@@ -264,8 +288,16 @@ class DataPlotter:
                     #     labels.append(key)
                     #     plt.xlabel(r"$\beta$")
                     #     plt.ylabel(r"Coalition Entropy ($H_C$)")
-                    #     plt.ylim(ymin=0, ymax=1.1)
-                    #     plt.xlim(xmin=0, xmax=6.3)
+                    #     if len(thresholds) == 1:
+                    #         plt.ylim(ymin=-0.01, ymax=1)
+                    #     else:
+                    #         plt.ylim(ymin=-0.01, ymax=1)
+                    #
+                    #     if 'beta' in query:
+                    #         plt.xlim(xmin=0, xmax=0.8)
+                    #     else:
+                    #         plt.xlim(xmin=0, xmax=6.3)
+                    #     # plt.xlim(xmin=0, xmax=6.3)
                     #     # plt.title("Coalition Entropy vs Beta\nTau = " +
                     #     #           str(tau))
                     #     handles.append(plt.scatter(beta[key],
@@ -274,12 +306,14 @@ class DataPlotter:
                     #                                label=key))
                     # labels, handles = zip(*sorted(zip(labels, handles),
                     #                               key=lambda x: x[0]))
-                    # plt.legend(handles, labels, title=r"Threshold $\gamma$")
-                    #
-                    # if save:
-                    #     fig.savefig(path + "7." + ext)
-                    # else:
-                    #     plt.show(fig)
+                    # legend = plt.legend(handles, labels,
+                    #                     title=r"Threshold ($\gamma$)")
+                    # plt.setp(legend.get_title(), fontsize='xx-large')
+
+                    if save:
+                        fig.savefig(path + "7." + ext)
+                    else:
+                        plt.show(fig)
 
                     # Global Synchrony vs Beta
                     # ------------------------
@@ -291,15 +325,20 @@ class DataPlotter:
                     #     plt.xlabel(r"$\beta$")
                     #     plt.ylabel(r"Global Synchrony ($\Psi$)")
                     #     plt.ylim(ymin=0, ymax=1.1)
-                    #     plt.xlim(xmin=0, xmax=0.8)
+                    #     if 'beta' in query:
+                    #         plt.xlim(xmin=0, xmax=0.8)
+                    #     else:
+                    #         plt.xlim(xmin=0, xmax=6.3)
                     #     # plt.title("Global Synchrony vs Beta\nTau = " +
                     #     #           str(tau))
                     #     handles.append(plt.scatter(beta[key],
                     #                                global_sync[key],
                     #                                color=colors[key],
                     #                                label=key))
-                    # plt.legend(handles, labels, loc=2,
-                    #            title=r"Threshold $\gamma$")
+                    # location = 2 if 'beta' in query else 1
+                    # legend = plt.legend(handles, labels, loc=location,
+                    #                     title=r"Threshold ($\gamma$)")
+                    # plt.setp(legend.get_title(), fontsize='xx-large')
                     #
                     # if save:
                     #     fig.savefig(path + "7." + ext)
@@ -316,13 +355,18 @@ class DataPlotter:
                     #     plt.xlabel(r"$\beta$")
                     #     plt.ylabel(r"Chimera Index ($\chi$)")
                     #     plt.ylim(ymin=0, ymax=0.05)
-                    #     plt.xlim(xmin=0, xmax=0.8)
+                    #     if 'beta' in query:
+                    #         plt.xlim(xmin=0, xmax=0.8)
+                    #     else:
+                    #         plt.xlim(xmin=0, xmax=6.3)
                     #     # plt.title("Chi vs Beta\nTau = 1")
                     #     handles.append(plt.scatter(beta[key],
                     #                                chi[key],
                     #                                color=colors[key],
                     #                                label=key))
-                    # plt.legend(handles, labels, title=r"Threshold $\gamma$")
+                    # legend = plt.legend(handles, labels, loc=1,
+                    #                     title=r"Threshold ($\gamma$)")
+                    # plt.setp(legend.get_title(), fontsize='xx-large')
                     #
                     # if save:
                     #     fig.savefig(path + "3." + ext)
@@ -339,13 +383,18 @@ class DataPlotter:
                     #     plt.xlabel(r"$\beta$")
                     #     plt.ylabel(r"Metastability Index ($\lambda$)")
                     #     plt.ylim(ymin=0, ymax=0.05)
-                    #     plt.xlim(xmin=0, xmax=0.8)
+                    #     if 'beta' in query:
+                    #         plt.xlim(xmin=0, xmax=0.8)
+                    #     else:
+                    #         plt.xlim(xmin=0, xmax=6.3)
                     #     # plt.title("Lambda vs Beta\nTau = 1")
                     #     handles.append(plt.scatter(beta[key],
                     #                                lamda[key],
                     #                                color=colors[key],
                     #                                label=key))
-                    # plt.legend(handles, labels, title=r"Threshold $\gamma$")
+                    # legend = plt.legend(handles, labels, loc=1,
+                    #                     title=r"Threshold ($\gamma$)")
+                    # plt.setp(legend.get_title(), fontsize='xx-large')
                     #
                     # if save:
                     #     fig.savefig(path + "4." + ext)
@@ -361,28 +410,40 @@ class DataPlotter:
 
                 # Phi vs Beta
                 # -----------
-                fig = plt.figure()
-                handles = []
-                labels = []
-                for key in cursors:
-                    labels.append(key)
-                    plt.xlabel("Beta")
-                    plt.ylabel(phi_label)
-                    plt.ylim(ymin=0, ymax=0.05)
-                    plt.xlim(xmin=0, xmax=0.8)
-                    plt.title(phi_label + " vs Beta\nTau = " + str(tau))
-                    handles.append(plt.scatter(beta[key],
-                                               phi[key],
-                                               color=colors[key],
-                                               label=key))
-                labels, handles = zip(*sorted(zip(labels, handles),
-                                              key=lambda x: x[0]))
-                plt.legend(handles, labels, title=r"Threshold ($\gamma$)")
-
-                if save:
-                    fig.savefig(path + "2." + ext)
-                else:
-                    plt.show(fig)
+                # fig = plt.figure()
+                # handles = []
+                # labels = []
+                # for key in cursors:
+                #     labels.append(key)
+                #     plt.xlabel(r"$\beta$")
+                #     plt.ylabel(phi_label)
+                #     if run == 0:
+                #         if len(thresholds) == 1:
+                #             plt.ylim(ymin=-0.1, ymax=0.5)
+                #         else:
+                #             plt.ylim(ymin=-0.15, ymax=0.7)
+                #     else:
+                #         plt.ylim(ymin=-0.01, ymax=0.7)
+                #
+                #     if 'beta' in query:
+                #         plt.xlim(xmin=0, xmax=0.8)
+                #     else:
+                #         plt.xlim(xmin=0, xmax=6.3)
+                #     # plt.title(phi_label + " vs Beta\nTau = " + str(tau))
+                #     handles.append(plt.scatter(beta[key],
+                #                                phi[key],
+                #                                color=colors[key],
+                #                                label=key))
+                # labels, handles = zip(*sorted(zip(labels, handles),
+                #                               key=lambda x: x[0]))
+                # legend = plt.legend(handles, labels,
+                #                     title=r"Threshold ($\gamma$)")
+                # plt.setp(legend.get_title(), fontsize='xx-large')
+                #
+                # if save:
+                #     fig.savefig(path + "2." + ext)
+                # else:
+                #     plt.show(fig)
 
                 # Phi vs Chi
                 # ----------
@@ -391,12 +452,48 @@ class DataPlotter:
                 # labels = []
                 # for key in cursors:
                 #     labels.append(key)
-                #     plt.xlabel("Chi")
+                #     plt.xlabel(r"Chimera Index ($\chi$)")
                 #     plt.ylabel(phi_label)
-                #     plt.ylim(ymin=0, ymax=0.05)
-                #     plt.xlim(xmin=0, xmax=0.8)
+                #     if run == 0:
+                #         if len(thresholds) == 3:
+                #             plt.ylim(ymin=-0.15, ymax=0.6)
+                #         else:
+                #             plt.ylim(ymin=-0.15, ymax=0.7)
+                #     else:
+                #         if len(thresholds) == 3:
+                #             plt.ylim(ymin=-0.01, ymax=0.7)
+                #         else:
+                #             plt.ylim(ymin=-0.01, ymax=0.8)
+                #     plt.xlim(xmin=0, xmax=0.05)
                 #     # plt.title(phi_label + " vs Chi\nTau = 1")
                 #     handles.append(plt.scatter(chi[key],
+                #                                phi[key],
+                #                                color=colors[key],
+                #                                label=key))
+                # labels, handles = zip(*sorted(zip(labels, handles),
+                #                               key=lambda x: x[0]))
+                # legend = plt.legend(handles, labels, loc=2,
+                #                     title=r"Threshold ($\gamma$)")
+                # plt.setp(legend.get_title(), fontsize='xx-large')
+                # if save:
+                #     fig.savefig(path + "5." + ext)
+                # else:
+                #     plt.show(fig)
+
+                # Allow disabling all plots under this block.
+                pass
+
+            elif self.community_type == 'snn':
+
+                # fig = plt.figure()
+                # handles = []
+                # labels = []
+                # for key in cursors:
+                #     labels.append(key)
+                #     plt.xlabel("Weight")
+                #     plt.ylabel(phi_label)
+                #     plt.title(phi_label + " vs Weight\nTau = " + str(tau))
+                #     handles.append(plt.scatter(weight[key],
                 #                                phi[key],
                 #                                color=colors[key],
                 #                                label=key))
@@ -409,142 +506,122 @@ class DataPlotter:
                 # else:
                 #     plt.show(fig)
 
-            elif self.community_type == 'snn':
+                # fig = plt.figure()
+                # handles = []
+                # labels = []
+                # for key in cursors:
+                #     labels.append(key)
+                #     plt.xlabel("Synaptic Connection Probability")
+                #     plt.ylabel(phi_label)
+                #     plt.title(phi_label + " vs "
+                #               "Synaptic Connection Probability\n"
+                #               "Tau = " + str(tau))
+                #     handles.append(plt.scatter(scp[key],
+                #                                phi[key],
+                #                                color=colors[key],
+                #                                label=key))
+                # labels, handles = zip(*sorted(zip(labels, handles),
+                #                               key=lambda x: x[0]))
+                # plt.legend(handles, labels, title="Threshold")
+                #
+                # if save:
+                #     fig.savefig(path + "5." + ext)
+                # else:
+                #     plt.show(fig)
 
-                fig = plt.figure()
-                handles = []
-                labels = []
-                for key in cursors:
-                    labels.append(key)
-                    plt.xlabel("Weight")
-                    plt.ylabel(phi_label)
-                    plt.title(phi_label + " vs Weight\nTau = " + str(tau))
-                    handles.append(plt.scatter(weight[key],
-                                               phi[key],
-                                               color=colors[key],
-                                               label=key))
-                labels, handles = zip(*sorted(zip(labels, handles),
-                                              key=lambda x: x[0]))
-                plt.legend(handles, labels, title="Threshold")
-
-                if save:
-                    fig.savefig(path + "5." + ext)
-                else:
-                    plt.show(fig)
-
-                fig = plt.figure()
-                handles = []
-                labels = []
-                for key in cursors:
-                    labels.append(key)
-                    plt.xlabel("Synaptic Connection Probability")
-                    plt.ylabel(phi_label)
-                    plt.title(phi_label + " vs "
-                              "Synaptic Connection Probability\n"
-                              "Tau = " + str(tau))
-                    handles.append(plt.scatter(scp[key],
-                                               phi[key],
-                                               color=colors[key],
-                                               label=key))
-                labels, handles = zip(*sorted(zip(labels, handles),
-                                              key=lambda x: x[0]))
-                plt.legend(handles, labels, title="Threshold")
-
-                if save:
-                    fig.savefig(path + "5." + ext)
-                else:
-                    plt.show(fig)
-
-                fig = plt.figure()
-                ax = fig.add_subplot(111, projection='3d')
-                handles = []
-                labels = []
-                for key in cursors:
-                    labels.append(key)
-                    plt.title(phi_label + " vs "
-                              "Synaptic Connection Probability and Weight\n"
-                              "Tau = " + str(tau))
-                    handles.append(ax.scatter(scp[key],
-                                              weight[key],
-                                              phi[key],
-                                              color=colors[key],
-                                              label=key))
-                plt.legend(handles, labels, title="Threshold")
-                ax.set_xlabel("Synaptic Connection Probability")
-                ax.set_ylabel("Weight")
-                ax.set_zlabel(phi_label)
-
-                if save:
-                    fig.savefig(path + "5." + ext)
-                else:
-                    plt.show(fig)
+                # fig = plt.figure()
+                # ax = fig.add_subplot(111, projection='3d')
+                # handles = []
+                # labels = []
+                # for key in cursors:
+                #     labels.append(key)
+                #     plt.title(phi_label + " vs "
+                #               "Synaptic Connection Probability and Weight\n"
+                #               "Tau = " + str(tau))
+                #     handles.append(ax.scatter(scp[key],
+                #                               weight[key],
+                #                               phi[key],
+                #                               color=colors[key],
+                #                               label=key))
+                # plt.legend(handles, labels, title="Threshold")
+                # ax.set_xlabel("Synaptic Connection Probability")
+                # ax.set_ylabel("Weight")
+                # ax.set_zlabel(phi_label)
+                #
+                # if save:
+                #     fig.savefig(path + "5." + ext)
+                # else:
+                #     plt.show(fig)
 
                 # Triangular 3D surface plots.
-                for key in cursors:
-                    fig = plt.figure()
-                    ax = fig.gca(projection='3d')
-                    plt.title("Coalition Entropy vs "
-                              "Synaptic Connection Probability and Weight\n"
-                              "Tau = " + str(tau) + ", Threshold = " + str(key))
-                    ax.plot_trisurf(scp[key],
-                                    weight[key],
-                                    coalition_entropy[key],
-                                    linewidth=0.2,
-                                    cmap=cm.jet)
-                    ax.set_xlabel("Synaptic Connection Probability")
-                    ax.set_ylabel("Weight")
-                    ax.set_zlabel("Coalition Entropy")
+                # for key in cursors:
+                #     fig = plt.figure()
+                #     ax = fig.gca(projection='3d')
+                #     plt.title("Coalition Entropy vs "
+                #               "Synaptic Connection Probability and Weight\n"
+                #               "Tau = " + str(tau) + ", Threshold = " + str(key))
+                #     ax.plot_trisurf(scp[key],
+                #                     weight[key],
+                #                     coalition_entropy[key],
+                #                     linewidth=0.2,
+                #                     cmap=cm.jet)
+                #     ax.set_xlabel("Synaptic Connection Probability")
+                #     ax.set_ylabel("Weight")
+                #     ax.set_zlabel("Coalition Entropy")
+                #
+                #     if save:
+                #         fig.savefig(path + "5." + ext)
+                #     else:
+                #         plt.show(fig)
 
-                    if save:
-                        fig.savefig(path + "5." + ext)
-                    else:
-                        plt.show(fig)
+                # for key in cursors:
+                #     fig = plt.figure()
+                #     ax = fig.gca(projection='3d')
+                #     plt.title("Lambda vs "
+                #               "Synaptic Connection Probability and Weight\n"
+                #               "Tau = " + str(tau) + ", Threshold = " + str(key))
+                #     ax.plot_trisurf(scp[key],
+                #                     weight[key],
+                #                     lamda[key],
+                #                     linewidth=0.2,
+                #                     cmap=cm.jet)
+                #     ax.set_xlabel("Synaptic Connection Probability")
+                #     ax.set_ylabel("Weight")
+                #     ax.set_zlabel("Lambda")
+                #
+                #     if save:
+                #         fig.savefig(path + "5." + ext)
+                #     else:
+                #         plt.show(fig)
 
-                for key in cursors:
-                    fig = plt.figure()
-                    ax = fig.gca(projection='3d')
-                    plt.title("Lambda vs "
-                              "Synaptic Connection Probability and Weight\n"
-                              "Tau = " + str(tau) + ", Threshold = " + str(key))
-                    ax.plot_trisurf(scp[key],
-                                    weight[key],
-                                    lamda[key],
-                                    linewidth=0.2,
-                                    cmap=cm.jet)
-                    ax.set_xlabel("Synaptic Connection Probability")
-                    ax.set_ylabel("Weight")
-                    ax.set_zlabel("Lambda")
+                # for key in cursors:
+                #     fig = plt.figure()
+                #     ax = fig.gca(projection='3d')
+                #     plt.title(phi_label + " vs "
+                #               "Synaptic Connection Probability and Weight\n"
+                #               "Tau = " + str(tau) + ", Threshold = " + str(key))
+                #     ax.plot_trisurf(scp[key],
+                #                     weight[key],
+                #                     phi[key],
+                #                     linewidth=0.2,
+                #                     cmap=cm.jet)
+                #     ax.set_xlabel("Synaptic Connection Probability")
+                #     ax.set_ylabel("Weight")
+                #     ax.set_zlabel(phi_label)
+                #
+                #     if save:
+                #         fig.savefig(path + "5." + ext)
+                #     else:
+                #         plt.show(fig)
 
-                    if save:
-                        fig.savefig(path + "5." + ext)
-                    else:
-                        plt.show(fig)
-
-                for key in cursors:
-                    fig = plt.figure()
-                    ax = fig.gca(projection='3d')
-                    plt.title(phi_label + " vs "
-                              "Synaptic Connection Probability and Weight\n"
-                              "Tau = " + str(tau) + ", Threshold = " + str(key))
-                    ax.plot_trisurf(scp[key],
-                                    weight[key],
-                                    phi[key],
-                                    linewidth=0.2,
-                                    cmap=cm.jet)
-                    ax.set_xlabel("Synaptic Connection Probability")
-                    ax.set_ylabel("Weight")
-                    ax.set_zlabel(phi_label)
-
-                    if save:
-                        fig.savefig(path + "5." + ext)
-                    else:
-                        plt.show(fig)
+                # Allow disabling all plots under this block.
+                pass
 
             run += 1
 
         # Phi Empirical vs Phi Empirical Tilde
         # ------------------------------------
-        # fig = plt.figure()
+        # fig, ax = plt.subplots()
         # handles = []
         # labels = []
         # for key in cursors:
@@ -557,20 +634,35 @@ class DataPlotter:
         #     # plt.title("Empirical Integrated Information vs "
         #     #           "Empirical Integrated Information Tilde\n"
         #     #           "Tau = " + str(tau))
-        #     handles.append(plt.scatter(phi_e[key],
-        #                                phi_e_tilde[key],
-        #                                color=colors[key],
-        #                                label=key))
+        #     handles.append(ax.scatter(phi_e[key],
+        #                               phi_e_tilde[key],
+        #                               color=colors[key],
+        #                               label=key))
+        #
+        # # Add whitespace.
+        # space = mlines.Line2D([], [], color='white', label='')
+        # handles.append(space)
+        # labels.append('')
+        #
+        # # Add Phi = Phi Tilde line.
+        # x = np.linspace(*ax.get_xlim())
+        # ax.plot(x, x, color='black', ls='dashed', lw=2)
+        # line = mlines.Line2D([], [], color='black', ls='dashed',
+        #                      label=r'$\widetilde{\Phi}_{E} = \Phi_{E}$')
+        # handles.append(line)
+        # labels.append(r'$\widetilde{\Phi}_{E} = \Phi_{E}$')
         # labels, handles = zip(*sorted(zip(labels, handles),
-        #                               key=lambda x: x[0]))
-        # plt.legend(handles, labels, title=r"Threshold $\gamma$")
+        #                               key=lambda l: l[0]))
+        # legend = ax.legend(handles, labels, loc=2,
+        #                    title=r"Threshold ($\gamma$)")
+        # plt.setp(legend.get_title(), fontsize='xx-large')
         #
         # if save:
         #     fig.savefig(path + "9." + ext)
         # else:
         #     plt.show(fig)
-
-        plt.close()
+        #
+        # plt.close()
 
         return
 
@@ -1516,6 +1608,12 @@ if __name__ == "__main__":
         'is_surrogate': False,
         # 'beta': {'$lte': (math.pi / 4)}
     }
+    # osc_thresholds = [0.5]
+    # osc_thresholds = [0.6]
+    # osc_thresholds = [0.7]
+    # osc_thresholds = [0.8]
+    # osc_thresholds = [0.9]
+    # osc_thresholds = [0.6, 0.7, 0.8]
     osc_thresholds = [0.9, 0.8, 0.7, 0.6, 0.5]
     dp = DataPlotter(community_type='oscillator', database='infotheoretic')
     dp.plot(save=False,
