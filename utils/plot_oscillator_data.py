@@ -86,9 +86,12 @@ class DataPlotter:
 
         global_sync = dict()
         phi_e_tilde = dict()
+        phi_e_tilde_original = dict()
         coalition_entropy = dict()
+        hc_original = dict()
         lamda = dict()
         phi_e = dict()
+        phi_e_original = dict()
         mi = dict()
 
         for key in cursors:
@@ -102,8 +105,11 @@ class DataPlotter:
             global_sync[key] = []
             lamda[key] = []
             coalition_entropy[key] = []
+            hc_original[key] = []
+            phi_e_original[key] = []
             phi_e_tilde[key] = []
             phi_e[key] = []
+            phi_e_tilde_original[key] = []
             mi[key] = []
 
             for doc in cursors[key]:
@@ -122,7 +128,9 @@ class DataPlotter:
 
                 global_sync[key].append(doc['global_sync'])
                 lamda[key].append(doc['lambda'])
-                mi[key].append(doc['mi'])
+                hc_original[key].append(doc['coalition_entropy'])
+                phi_e_original[key].append(doc['phi_e'])
+                phi_e_tilde_original[key].append(doc['phi_e_tilde'])
 
                 # Tau and surrogate dependent measures.
                 phi_e_tilde[key].append(subdoc['phi_e_tilde'])
@@ -139,9 +147,15 @@ class DataPlotter:
         run = 0
         for phi in [phi_e, phi_e_tilde]:
             phi_label = r"Empirical Integrated Information ($\Phi_{E}$)"
+            phi_original = phi_e_original
+            phi_sorted_label = r"Empirical Integrated Information " \
+                               r"Sorted ($\Phi'_{E}$)"
             if run == 1:
                 phi_label = r"Empirical Integrated Information Tilde (" \
                             r"$\widetilde{\Phi}_{E}$)"
+                phi_original = phi_e_tilde_original
+                phi_sorted_label = r"Empirical Integrated Information Tilde " \
+                                   r"Sorted ($\widetilde{\Phi}'_{E}$)"
 
             # Phi vs Global Synchrony
             # -----------------------
@@ -218,6 +232,8 @@ class DataPlotter:
                 labels.append(key)
                 plt.xlabel(r"Coalition Entropy ($H_C$)")
                 plt.ylabel(phi_label)
+                if is_sorted:
+                    plt.ylabel(phi_sorted_label)
                 if run == 0:
                     plt.ylim(ymin=-0.15, ymax=0.7)
 
@@ -507,6 +523,42 @@ class DataPlotter:
                 # else:
                 #     plt.show(fig)
 
+                # Surrogate data plots.
+                # =====================
+                if is_sorted or is_shuffled:
+
+                    # Phi Surrogate vs Phi
+                    # --------------------
+                    fig = plt.figure()
+                    handles = []
+                    labels = []
+                    for key in cursors:
+                        labels.append(key)
+                        plt.xlabel(phi_label)
+                        plt.ylabel(phi_sorted_label)
+                        if run == 0:
+                            if is_sorted:
+                                plt.ylim(ymin=-0.5, ymax=0.1)
+                                plt.xlim(xmin=-0.15, xmax=0.6)
+                        else:
+                            if is_sorted:
+                                plt.ylim(ymin=-0.25, ymax=0.1)
+                                plt.xlim(xmin=-0.01, xmax=0.7)
+                        handles.append(plt.scatter(phi_original[key],
+                                                   phi[key],
+                                                   color=colors[key],
+                                                   label=key))
+                    labels, handles = zip(*sorted(zip(labels, handles),
+                                                  key=lambda x: x[0]))
+                    legend = plt.legend(handles, labels,
+                                        title=r"Threshold ($\gamma$)")
+                    plt.setp(legend.get_title(), fontsize='xx-large')
+
+                    if save:
+                        fig.savefig(path + "2." + ext)
+                    else:
+                        plt.show(fig)
+
                 # Allow disabling all plots under this block.
                 pass
 
@@ -688,8 +740,53 @@ class DataPlotter:
         #     fig.savefig(path + "9." + ext)
         # else:
         #     plt.show(fig)
-        #
-        # plt.close()
+
+        # Surrogate data plots.
+        # =====================
+        if is_sorted or is_shuffled:
+
+            # Coalition Entropy Surrogate vs Coalition Entropy
+            # ------------------------------------------------
+            # fig, ax = plt.subplots()
+            # handles = []
+            # labels = []
+            # for key in cursors:
+            #     labels.append(key)
+            #     plt.xlabel(r"Coalition Entropy ($H_C$)")
+            #     plt.ylabel(r"Coalition Entropy Sorted ($H'_C$)")
+            #     plt.ylim(ymin=-0.01, ymax=1)
+            #     plt.xlim(xmin=0, xmax=1)
+            #     handles.append(ax.scatter(hc_original[key],
+            #                               coalition_entropy[key],
+            #                               color=colors[key],
+            #                               label=key))
+            # # Add whitespace.
+            # space = mlines.Line2D([], [], color='white', label='')
+            # handles.append(space)
+            # labels.append('')
+            #
+            # # Add H_C = H'_C line.
+            # x = np.linspace(*ax.get_xlim())
+            # ax.plot(x, x, color='black', ls='dashed', lw=2)
+            # line = mlines.Line2D([], [], color='black', ls='dashed',
+            #                      label=r"$H_C = H'_C$")
+            # handles.append(line)
+            # labels.append(r"$H_C = H'_C$")
+            # labels, handles = zip(*sorted(zip(labels, handles),
+            #                               key=lambda x: x[0]))
+            # legend = ax.legend(handles, labels, loc=2,
+            #                    title=r"Threshold ($\gamma$)")
+            # plt.setp(legend.get_title(), fontsize='xx-large')
+            # if save:
+            #     fig.savefig(path + "7." + ext)
+            # else:
+            #     plt.show(fig)
+
+
+            pass
+
+        # Close all plots.
+        plt.close()
 
         return
 
