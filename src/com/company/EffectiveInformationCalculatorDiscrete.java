@@ -11,7 +11,7 @@ public class EffectiveInformationCalculatorDiscrete {
     int[][] data;
     int base;
     int tau;
-    double system;
+    double systemMutualInformation;
 
     public EffectiveInformationCalculatorDiscrete(int base, int tau) {
         this.base = base;
@@ -22,7 +22,7 @@ public class EffectiveInformationCalculatorDiscrete {
         data = states;
     }
 
-    public double computeForSystem() {
+    public double computeMutualInformationForSystem() {
 
         try {
             MutualInformationCalculatorDiscrete micd;
@@ -34,13 +34,13 @@ public class EffectiveInformationCalculatorDiscrete {
             micd = new MutualInformationCalculatorDiscrete(sysBase, 0);
             micd.initialise();
             micd.addObservations(sysPaired[0], sysPaired[1]);
-            system = micd.computeAverageLocalOfObservations();
+            systemMutualInformation = micd.computeAverageLocalOfObservations();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return system;
+        return systemMutualInformation;
     }
 
     public double computeForBipartition(int[] p1) {
@@ -75,7 +75,7 @@ public class EffectiveInformationCalculatorDiscrete {
             sum += p2Ei;
 
             // Subtract sum of MI of partitions from the MI of system.
-            rvalue = system - sum;
+            rvalue = systemMutualInformation - sum;
 
         } catch (Exception e) {
             e.printStackTrace();

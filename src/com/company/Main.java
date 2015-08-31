@@ -224,7 +224,7 @@ public class Main {
         eicd = new EffectiveInformationCalculatorDiscrete(2, tau);
         eicd.addObservations(states0);
         System.out.println("Computing EI for original generative model:");
-        double s = eicd.computeForSystem();
+        double s = eicd.computeMutualInformationForSystem();
         System.out.println("System:\t\t\t" + s);
         int[] p0 = {0};
         double o0 = eicd.computeForBipartition(p0);
@@ -250,7 +250,7 @@ public class Main {
 
         // Compute EI for shuffled generative model.
         System.out.println("Computing EI for shuffled generative model:");
-        double ss = eicd.computeForSystem();
+        double ss = eicd.computeMutualInformationForSystem();
         System.out.println("System:\t\t\t" + ss);
         int[] p0s = {0};
         double o0s = eicd.computeForBipartition(p0s);
@@ -762,9 +762,11 @@ public class Main {
             Document tilde = computePhiETilde(obs);
 
             double hc = computeHc(obs);
+            double phi_e_tilde = tilde.getDouble("phi_e_tilde");
             values.put("coalition_entropy", hc);
             values.put("mib_tilde", tilde.get("mib_tilde"));
-            values.put("phi_e_tilde", tilde.get("phi_e_tilde"));
+            values.put("phi_e_tilde", phi_e_tilde);
+            System.out.println(phi_e_tilde);
 
             if (save)  {
                 Document sorted = new Document();

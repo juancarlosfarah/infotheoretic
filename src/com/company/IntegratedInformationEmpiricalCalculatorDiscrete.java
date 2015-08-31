@@ -54,7 +54,7 @@ public class IntegratedInformationEmpiricalCalculatorDiscrete {
         EffectiveInformationCalculatorDiscrete eicd;
         eicd = new EffectiveInformationCalculatorDiscrete(base, tau);
         eicd.addObservations(data);
-        mutualInformation = eicd.computeForSystem();
+        mutualInformation = eicd.computeMutualInformationForSystem();
 
         for (int[] partition : partitions) {
 
