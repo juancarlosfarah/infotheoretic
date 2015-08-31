@@ -180,7 +180,7 @@ In this section we provide an overview of the different information-theoretic me
 \subsubsection{Entropy}
 \label{sec:bg:entropy}
 
-Entropy $H$ is a measure of uncertainty and for a discrete random variable $X$ that takes values in the space $\Omega_X$, can be calculated as shown below.
+Entropy $H$ is a measure of uncertainty and for a discrete random variable $X$ that takes values in the space $\Omega_X$, can be calculated as shown in Equation \ref{eq:entropy}.
 
 \begin{equation} \label{eq:entropy}
 H(X) = - \sum_{x \in \Omega_X}P_X(x) \log_2 P_X(x)\\[2.5mm]
@@ -192,9 +192,10 @@ H(X) = - \sum_{x \in \Omega_X}P_X(x) \log_2 P_X(x)\\[2.5mm]
 \subsubsection{Conditional Entropy}
 \label{sec:bg:cond-entropy}
 
-The expected conditional entropy of $X$ given $Y$, where $Y$ is a discrete random variable that takes values in the space $\Omega_Y$, is denoted $H(X|Y)$ and calculated as shown below.
+The expected conditional entropy of $X$ given $Y$, where $Y$ is a discrete random variable that takes values in the space $\Omega_Y$, is denoted $H(X|Y)$ and calculated as shown in Equation \ref{eq:cond-entropy}.
 
-\begin{equation} \label{eq:cond-entropy}
+\begin{equation}
+\label{eq:cond-entropy}
 H(X|Y) = \sum_{y \in \Omega_Y}H(X|Y=y)P_Y(y)
 \end{equation}
 
@@ -204,9 +205,10 @@ H(X|Y) = \sum_{y \in \Omega_Y}H(X|Y=y)P_Y(y)
 \subsubsection{Mutual Information}
 \label{sec:bg:mi}
 
-The mutual information $I(X,Y)$ between $X$ and $Y$ is the reduction in entropy of $X$ given that we know $Y$.
+The mutual information $I(X,Y)$ between $X$ and $Y$ is the reduction in entropy of $X$ given that we know $Y$. It is calculated as shown in Equation \ref{eq:mi}.
 
-\begin{equation} \label{eq:mi}
+\begin{equation}
+\label{eq:mi}
 I(X,Y) = H(X) - H(X|Y)
 \end{equation}
 
@@ -214,7 +216,14 @@ I(X,Y) = H(X) - H(X|Y)
 % Kullback-Leibler Divergence
 % ---------------------------
 \subsubsection{Kullback-Leibler Divergence}
-\label{sec:bg:cond-kld}
+\label{sec:bg:kld}
+
+The Kullback-Leibler divergence $D_{KL}(P || Q)$ quantifies the difference between two probability distributions $P$ and $Q$. It is a non-symmetric, non-negative measure that computes the information lost when Q is used to approximate P \cite{Burnham2002}. It is calculated as shown in equation \ref{eq:kld}.
+
+\begin{equation}
+\label{eq:kld}
+D_{KL}(P || Q) = \sum_{i} P(i) ln \frac{P(i)}{Q(i)}
+\end{equation}
 
 % ---------
 % Synchrony
@@ -321,7 +330,7 @@ The effective information, $\phi$ of a system given a bipartition $\mathcal{B} =
 A slight variation of effective information known as stochastic interaction ($\tilde{\phi}$), which is also known as expected effective information \cite{Barrett2011}. It is defined as the average Kullback-Leibler divergence between the past state given the present state of system as a whole and the product of this for each subsystem given a set of partitions \cite{Ay2015}. For our purposes, as we will only be considering bipartitions, we can use the form presented by Barrett and Seth in \cite{Barrett2011}, as shown in Equation \ref{eq:stochastic}.
 
 \begin{equation} \label{eq:stochastic}
-\tilde{\phi} [X, \tau, \{M^1, M^2\}] = \sum_{k=1}^{2} H(M_{t-\tau}^k, M_{t}^k)  - H(X_{t-\tau} | X_t)
+\tilde{\phi} [X, \tau, \{M^1, M^2\}] = \sum_{k=1}^{2} H(M_{t-\tau}^k | M_{t}^k)  - H(X_{t-\tau} | X_t)
 \end{equation}
 
 % ----------------------
@@ -382,7 +391,7 @@ K(\mathcal{B} = \lbrace P^1, P^2 \rbrace) = \min[H(P^1), H(P^2)]\\[2.5mm]
 % IMPLEMENTATION
 % =======================================================================================
 \clearpage
-\section{Implementation of $\Phi$}
+\section{Implementation of Integrated Information ($\Phi$)}
 \label{sec:impl}
 
 In order to calculate the values of $\Phi$ for our sample populations, we implemented functions that compute Empirical Integrated Information ($\Phi_{E}$) and Empirical Integrated Information Tilde ($\widetilde{\Phi}_{E}$), as described in Section \ref{II}. We decided that it would be best that these functions be available as part of the Java Information Dynamics Toolkit (JIDT) developed by Lizier and widely used to study the dynamics of complex systems \cite{Lizier2014}. Written completely in Java, our implementation follows the syntax, semantics and structure of other features in the JIDT, which is geared towards facilitating its adoption by its current users.
@@ -393,9 +402,19 @@ The structure put forth by the JIDT consists of defining a Java class that can c
 
 Another feature of the JIDT is that for most measures it supports, it defines a calculator both for the discrete and continuous versions of the measures, if applicable. For instance, it has a class to calculate entropy from continuous data called \texttt{EntropyCalculator} and its corresponding version for discrete data called \texttt{EntropyCalculatorDiscrete}. In some cases, it even defines a third version for mixed data, such as is the case for multivariate conditional mutual information. For our purposes, we are only interested in calculating the integrated information from discrete time series data and thus we have focused our efforts to implement a robust calculator for discrete data. Nevertheless, extending the implementation for continuous data would be useful in order to increment the breadth of the JIDT and is suggested as a possible extension to the project.
 
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 0.5]{figures/architecture}
+\caption{
+	Architecture for the software included in this project.
+	\label{fig:architecture}
+}
+\end{center}
+\end{figure}
+
 \subsection{Architecture}
 
-In addition to our implementation of $\Phi$ in Java for the JIDT, our project required a suite of tools and a supporting stack to facilitate the import, export and storage of data as well as a rigorous source version control system in order to facilitate integration with the JIDT. We thus decided to develop the utilities in Python and JavaScript, and use MongoDB as the database layer for the data inputted to and outputted from our simulations. We used Git as our version control system, hosting our remote repository on \href{http://github.com}{GitHub}, which will allow us to easily integrate with the future GitHub JIDT repository.
+In addition to our implementation of $\Phi$ in Java for the JIDT, our project required a suite of tools and a supporting stack to facilitate the import, export and storage of data as well as a rigorous source version control system in order to facilitate integration with the JIDT. We thus decided to develop the utilities in Python and JavaScript, and use MongoDB \cite{MongoDB} as the database layer for the data inputted to and outputted from our simulations. The Python utilities also allowed us to import the Matlab data files outputted by third party codebases adapted from \cite{Shanahan2010} and \cite{Bhowmik2013}, which we ran in our simulations. Additionally, the Python utilities were used to fetch stored data, plot and export them as graphics for our analysis. This gave us the flexibility to be able to study the data generated by our simulations without having to run them every time. We used Git as our version control system, hosting our remote repository on \href{http://github.com}{GitHub} \cite{GitHub}, which will allow us to easily integrate with the future GitHub JIDT repository. The high level architecture of our implementation is depicted in Figure \ref{fig:architecture}.
 
 \subsection{Empirical Integrated Information}
 \label{sec:impl:phi-e}
@@ -412,13 +431,13 @@ eicd = new EffectiveInformationCalculatorDiscrete(base, tau);
 eicd.addObservations(input);
 \end{minted}
 
-As explained in Section \ref{EI} the effective information of a system given a bipartition $\mathcal{B}$ for a given time step $\tau$ represents the difference between the mutual information of the whole system given the current state $X_t$ regarding a previous state $X_{t-\tau}$ and the sum of the respective mutual information for each member of $\mathcal{B}$. In order to avoid calculating the mutual information of the system for each partition that is passed to the calculator, the \texttt{EffectiveInformationCalculatorDiscrete} class has a method \texttt{computeForSystem}, which only needs to run once for a given data set, as it stores the result in the system property of the class.
+As explained in Section \ref{EI} the effective information of a system given a bipartition $\mathcal{B}$ for a given time step $\tau$ represents the difference between the mutual information of the whole system given the current state $X_t$ regarding a previous state $X_{t-\tau}$ and the sum of the respective mutual information for each member of $\mathcal{B}$. In order to avoid calculating the mutual information of the system for each partition that is passed to the calculator, the \texttt{EffectiveInformationCalculatorDiscrete} class has a method \texttt{computeMutualInformationForSystem}, which only needs to run once for a given data set, as it stores the result in the system property of the class.
 
 At this point you are able to compute the effective information for a given bipartition with the method \texttt{computeForBipartition}. The latter takes a partition as an argument in the form of an integer array specifying which variables to consider as one of the partitions of the system.
 
 \begin{minted}{java}
 // Calculate mutual information for the system.
-double output = eicd.computeForSystem();
+double output = eicd.computeMutualInformationForSystem();
 
 // Calculate effective information given a partition.
 int[] partition = {0, 1, 2};
@@ -435,7 +454,7 @@ double output = eicd.computeForBipartition(partition);
 \item{To pair the input value at time step $t$ with that at $t-\tau$.}
 \end{enumerate}
 
-We achieve the first by taking advantage of JIDT's \texttt{MatrixUtils}. \texttt{MatrixUtils} exposes a method called \texttt{computeCombinedValues} which effectively reduces a two-dimensional array to a one-dimensional. Because computeCombinedValues performs the reduction in a row-wise fashion and our time-series input requires a column-wise reduction, we also take advantage of \texttt{MatrixUtils}' transpose method. We also track the change in base, which will equal the original base to the power of the number of variables, as it is needed to calculate the effective information. All this functionality is exposed in \texttt{Input}'s reduce method.
+We achieve the first by taking advantage of JIDT's \texttt{MatrixUtils}. \texttt{MatrixUtils} exposes a method called \texttt{computeCombinedValues} which effectively reduces a two-dimensional array to a one-dimensional. Because computeCombinedValues performs the reduction in a row-wise fashion and our time-series input requires a column-wise reduction, we also take advantage of \texttt{MatrixUtils}' transpose method. We also track the change in base, which will equal the original base to the power of the number of variables, as it is needed to calculate the effective information. All this functionality is exposed in \texttt{Input}'s \texttt{reduce} method.
 
 Once the \texttt{Input} object has been reduced, you can pair the inputs using the pair method. For this we simply take the reduced array $R$ of length $n$ and the time step $\tau$, and output an $n \times 2$ matrix $P$ where the first array contains the first $n - \tau$ elements of $R$ and the second array contains the last $n - \tau$ elements. Thus each column in $P$ contains the paired values required to calculate the mutual information and each row is passed onto the \texttt{MutualInformationCalculatorDiscrete} as shown below.
 
@@ -516,7 +535,7 @@ sicd = new StochasticInteractionCalculatorDiscrete(base, tau);
 sicd.addObservations(data);
 \end{minted}
 
-As noted in Section \ref{SI}, the stochastic interaction of a system given a bipartition $\mathcal{B}$ for a given time step $\tau$ represents the difference between the sum of the conditional entropy of each member of $B$ at state $X_{t-\tau}$ given state $X_t$ and the respective conditional entropy for system as a whole. We followed the same structure used for the \texttt{EffectiveInformationCalculatorDiscrete} class, so in order to avoid calculating the conditional entropy of the system for each partition that is passed to the calculator, the \texttt{StochasticInteractionCalculatorDiscrete} class has a method \texttt{computeForSystem}, which only needs to run once for a given data set, as it stores the result in the system property of the class. As with the effective information calculator, we use the Input class in order to transform the input to the required form for our computations.
+As noted in Section \ref{SI}, the stochastic interaction of a system given a bipartition $\mathcal{B}$ for a given time step $\tau$ represents the difference between the sum of the conditional entropy of each member of $B$ at state $X_{t-\tau}$ given state $X_t$ and the respective conditional entropy for system as a whole. We followed the same structure used for the \texttt{EffectiveInformationCalculatorDiscrete} class, so in order to avoid calculating the conditional entropy of the system for each partition that is passed to the calculator, the \texttt{StochasticInteractionCalculatorDiscrete} class has a method \texttt{computeConditionalEntropyForSystem}, which only needs to run once for a given data set, as it stores the result in the system property of the class. As with the effective information calculator, we use the Input class in order to transform the input to the required form for our computations.
 
 \subsubsection{Discrete Conditional Entropy Calculator}
 
@@ -630,9 +649,9 @@ public static int[][] shuffle(int[][] matrix)
 
 \subsection{Data Sources and Data Store}
 
-Given the computationally expensive nature of our modules' simulations, a persistent store had to be used to save the output and results of each run. For our data store we chose MongoDB, a documented-oriented database, as a data store as it provides a fast, scalable solution that does not require strict design decisions in advance. As we developed our product, MongoDB's dynamic schemas allowed us to modify our objects without having to spend considerable time fixing compatibility issues. Additionally, MongoDB documents follow a JavaScript Object Notation (JSON)-like structure, which mirrors the structure of our Python objects.
+Given the computationally expensive nature of our modules' simulations, a persistent store had to be used to save the output and results of each run. For our data store we chose MongoDB, a documented-oriented database, as a data store as it provides a fast, scalable solution that does not require strict design decisions in advance. As we developed our product, MongoDB's dynamic schemas allowed us to modify our objects without having to spend considerable time fixing compatibility issues. Additionally, MongoDB documents follow a JavaScript Object Notation (JSON)-like structure, which mirrors the structure of our Python objects \cite{MongoDB}.
 
-Additionally, the output from the populations of oscillators and spiking neurons (???), which we used as input to our integrated information calculator, were saved as Matlab files and stored directly on the filesystem. Using Python we were able to manipulate these and insert them as documents in our MongoDB instance. 
+Additionally, the output from the populations of oscillators and spiking neurons (???), which we used as input to our integrated information calculator, were saved as Matlab files and stored directly on the filesystem. Using the Oct2Py Python Package \cite{Silvester}, which provides a Python interface to GNU Octave, an open source alternative to Matlab \cite{Eaton}, we were able to manipulate these and insert them as documents in our MongoDB instance.
 
 \subsection{Utilities}
 \label{sec:utils}
@@ -1344,6 +1363,82 @@ In order to provide insight into the robustness of our results concerning integr
 
 \subsubsection{Sorted Time Series}
 
+In order to sort the time series by state, we took advantage of the \texttt{reduce} function in our \texttt{Input} class. As described in Section \ref{sec:impl:ei}, \texttt{reduce} takes the two-dimensional time series matrix and assigns a unique state integer for each possible vector value. The output is a one-dimensional array of states, which we could then sort using Java's inbuilt `Arrays.sort` method. We then computed coalition entropy, empirical integrated information and empirical integrated information tilde for each of the 7500 simulations and stored the results for comparison with the original values.
+
+As expected, coalition entropy was not affected by the sorting operation, given that it is agnostic to the order in which each coalition appears, as discussed in Section \ref{sec:app:osc:res:phi-v-hc}. This is shown in Figure \ref{fig:hc_sorted_vs_hc}.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale = 0.35]{figures/hc_sorted_vs_hc}
+\caption{
+	Coalition Entropy Sorted ($H'_C$) vs Coalition Entropy ($H_C$).
+	\label{fig:hc_sorted_vs_hc}
+}
+\end{center}
+\end{figure}
+
+However, given the nature of empirical integrated information, we expected that $\Phi_E$... . Figure \ref{fig:phi_sorted_vs_phi} shows how as the original value for $\Phi_E$ increases, the value for the sorted run, $\Phi'_E$ decreases. In fact, the vast majority of value for $\Phi'_E$ are negative. A similar phenomenon can be seen for $\widetilde{\Phi}$ as shown in Figure \ref{fig:phi_sorted_vs_phi}. 
+
+\begin{figure}[H] 
+	\label{fig:phi-vs-phi-sorted} 
+	\begin{minipage}[b]{0.5\linewidth}
+		\begin{figure}[H]
+		\begin{center}
+		\includegraphics[scale = 0.2]{figures/phi_sorted_vs_phi}
+		\caption{
+			$\Phi'_E$ vs $\Phi_E$.
+			\label{fig:phi_sorted_vs_phi}
+		}
+		\end{center}
+		\end{figure}
+		\vspace{2ex}
+	\end{minipage}
+	\begin{minipage}[b]{0.5\linewidth}
+		\begin{figure}[H]
+		\begin{center}
+		\includegraphics[scale = 0.2]{figures/phi_tilde_sorted_vs_phi_tilde}
+		\caption{
+			$\widetilde{\Phi}'_E$ vs $\widetilde{\Phi}_E$.
+			\label{fig:phi_tilde_sorted_vs_phi_tilde}
+		}
+		\end{center}
+		\end{figure}
+		\vspace{2ex}
+	\end{minipage}
+\end{figure}
+
+
+We can also see in Figure \ref{fig:phi_sorted_vs_hc}, how $\Phi'_E$, decreases as coalition entropy increases. For $\widetilde{\Phi}'_E$, this relationship is even more demarcated and consistent across all thresholds, as shown in Figure \ref{fig:phi_tilde_sorted_vs_hc}.
+
+\begin{figure}[H] 
+	\label{fig:phi-vs-hc-sorted} 
+	\begin{minipage}[b]{0.5\linewidth}
+		\begin{figure}[H]
+		\begin{center}
+		\includegraphics[scale = 0.2]{figures/phi_sorted_vs_hc}
+		\caption{
+			$\Phi'_E$ vs $H_C$.
+			\label{fig:phi_sorted_vs_hc}
+		}
+		\end{center}
+		\end{figure}
+		\vspace{2ex}
+	\end{minipage}
+	\begin{minipage}[b]{0.5\linewidth}
+		\begin{figure}[H]
+		\begin{center}
+		\includegraphics[scale = 0.2]{figures/phi_tilde_sorted_vs_hc}
+		\caption{
+			$\widetilde{\Phi}'_E$ vs $H_C$.
+			\label{fig:phi_tilde_sorted_vs_hc}
+		}
+		\end{center}
+		\end{figure}
+		\vspace{2ex}
+	\end{minipage}
+\end{figure}
+
+
 \subsubsection{Shuffled Time Series}
 
 \subsubsection{Synthetic Data}
@@ -1385,9 +1480,12 @@ The second model will follow that used by Bhowmik and Shanahan and is depicted i
 
 \section{Future Work} \label{sec:fw}
 
-\subsection{Ensure Robustness of $\Phi$ Implementation for JIDT} \label{sec:fw:jidt}
+\subsection{Ensure Robustness of $\Phi$ Implementation for JIDT}
+\label{sec:fw:jidt}
 
 One of the objectives of this project is to make the implementation of $\Phi$ for JIDT robust enough that it is included in the official distribution. In order to do this, once an initial working version of the implementation is finalised, we will send it to Lizier, who maintains the toolkit. By collaborating with Lizier, we aim to make conducting studies into integrated information using time series data more easily accessible for other researchers.
+
+\subsubsection{Common Interface for $\Phi_E$ and $\widetilde{\Phi}_E$}
 
 \subsubsection{Other Versions of $\Phi$}
 Currently we have a working implementation of $\Phi_{E}$. In order to provide the user with flexibility, we aim to extend our contribution to JIDT to include other versions of $\Phi$ such as $\Phi_{DM}$ and $\Phi_{AR}$. This will allow the user to easily test the discrepancies between the different measures.
@@ -1403,8 +1501,8 @@ In order to ensure that our implementation follows good software engineering pra
 % References
 % ==========
 \clearpage
-\bibliography{report}{}
 \bibliographystyle{plain}
+\bibliography{report}{}
 \clearpage
 
 \end{document}
