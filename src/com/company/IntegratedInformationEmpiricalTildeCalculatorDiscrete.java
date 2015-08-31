@@ -54,17 +54,17 @@ public class IntegratedInformationEmpiricalTildeCalculatorDiscrete {
         StochasticInteractionCalculatorDiscrete sicd;
         sicd = new StochasticInteractionCalculatorDiscrete(base, tau);
         sicd.addObservations(data);
-        sicd.computeForSystem();
+        sicd.computeConditionalEntropyForSystem();
 
         for (int[] partition : partitions) {
 
             double k = computeNormalizationFactor(partition);
-            double ei = sicd.computeForBipartition(partition);
+            double si = sicd.computeForBipartition(partition);
 
             // If k = 0, it means that one of the partitions has an entropy
             // of 0, which means that it doesn't tell us anything about the
-            // rest of the system. Return 0 otherwise return normalised EI.
-            double mipScore = (k == 0) ? 0 : ei / k;
+            // rest of the system. Return 0 otherwise return normalised SI.
+            double mipScore = (k == 0) ? 0 : si / k;
 
             if (mipScore < minimumInformationPartitionValue) {
                 minimumInformationPartition[0] = partition;
@@ -78,7 +78,7 @@ public class IntegratedInformationEmpiricalTildeCalculatorDiscrete {
                 }
                 minimumInformationPartition[1] = partition2;
                 minimumInformationPartitionValue = mipScore;
-                integratedInformation = ei;
+                integratedInformation = si;
             }
 
         }

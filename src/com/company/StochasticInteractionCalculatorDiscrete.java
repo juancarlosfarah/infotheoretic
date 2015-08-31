@@ -10,7 +10,7 @@ public class StochasticInteractionCalculatorDiscrete {
     int[][] data;
     int base;
     int tau;
-    double system;
+    double systemConditionalEntropy;
 
     public StochasticInteractionCalculatorDiscrete(int base, int tau) {
         this.base = base;
@@ -21,7 +21,7 @@ public class StochasticInteractionCalculatorDiscrete {
         data = states;
     }
 
-    public double computeForSystem() {
+    public double computeConditionalEntropyForSystem() {
 
         try {
             ConditionalEntropyCalculatorDiscrete cecd;
@@ -32,13 +32,13 @@ public class StochasticInteractionCalculatorDiscrete {
             int[][] sysPaired = sys.pair(tau);
             cecd = new ConditionalEntropyCalculatorDiscrete(sysBase);
             cecd.addObservations(sysPaired[0], sysPaired[1]);
-            system = cecd.compute();
+            systemConditionalEntropy = cecd.compute();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return system;
+        return systemConditionalEntropy;
     }
 
     public double computeForBipartition(int[] p1) {
@@ -71,7 +71,7 @@ public class StochasticInteractionCalculatorDiscrete {
             sum += p2Ei;
 
             // Subtract sum of MI of partitions from the MI of system.
-            rvalue = sum - system;
+            rvalue = sum - systemConditionalEntropy;
 
         } catch (Exception e) {
             e.printStackTrace();
