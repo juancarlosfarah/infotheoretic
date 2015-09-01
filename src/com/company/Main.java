@@ -212,11 +212,12 @@ public class Main {
 
         // Generate model.
         RandomGenerator rg = new RandomGenerator();
-        int[] var0a = rg.generateRandomInts(1000000, 2);
+        int duration = 1000000;
+        int[] var0a = rg.generateRandomInts(duration, 2);
         var0a[0] = 0;
-        int[] var1a = new int[1000000];
+        int[] var1a = new int[duration];
         var1a[0] = 0;
-        System.arraycopy(var0a, 0, var1a, 1, 999999);
+        System.arraycopy(var0a, 0, var1a, 1, duration - 1);
         int[][] states0 = {var0a, var1a};
 
         // Compute EI for original generative model.
@@ -777,6 +778,54 @@ public class Main {
 
     }
 
+    public static void computeShuffledSurrogateDataAnalysis(boolean save) {
+
+        // Collection Names.
+        String simCollection = "oscillator_simulation";
+        String dataCollection = "oscillator_data";
+
+        // Query.
+        Document query = new Document();
+        Document ne = new Document("$exists", false);
+        query.put("shuffled", ne);
+        query.put("is_surrogate", false);
+        query.put("duration", 5000);
+        query.put("num_oscillators", 8);
+
+        MongoDatabase db = connect();
+        MongoCollection<Document> sims = db.getCollection(simCollection);
+        MongoCollection<Document> data = db.getCollection(dataCollection);
+        FindIterable<Document> results = sims.find(query);
+
+        for (Document doc : results) {
+
+            // Get ObjectId for simulation.
+            ObjectId _id = doc.getObjectId("_id");
+            int numVars = doc.getInteger("num_oscillators");
+            int duration = doc.getInteger("duration");
+            int[][] obs = new int[numVars][duration];
+            getSimulationData(data, _id, obs);
+
+            // Compute shuffled.
+            obs = MatrixUtils.shuffle(obs);
+            Document values = computePhiE(obs);
+            Document tilde = computePhiETilde(obs);
+            double hc = computeHc(obs);
+            double phi_e_tilde = tilde.getDouble("phi_e_tilde");
+            values.put("coalition_entropy", hc);
+            values.put("mib_tilde", tilde.get("mib_tilde"));
+            values.put("phi_e_tilde", phi_e_tilde);
+
+            if (save)  {
+                Document shuffled = new Document();
+                shuffled.put("shuffled", values);
+                save(sims, _id, shuffled);
+            }
+
+        }
+
+    }
+
     public static void main(String[] args) {
 
 //        System.out.println("Start tests.");
@@ -793,7 +842,7 @@ public class Main {
 //        computeIntegratedInformation("snn", 5, false, false, true);
 //        computeIntegratedInformationEmpiricalTilde("snn", 5, false, false);
 //        computeSortedSurrogateDataAnalysis(false);
-
+//        computeShuffledSurrogateDataAnalysis(true);
     }
 
 }
