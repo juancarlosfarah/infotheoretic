@@ -150,12 +150,16 @@ class DataPlotter:
             phi_original = phi_e_original
             phi_sorted_label = r"Empirical Integrated Information " \
                                r"Sorted ($\Phi'_{E}$)"
+            phi_shuffled_label = r"Empirical Integrated Information " \
+                                 r"Shuffled ($\Phi''_{E}$)"
             if run == 1:
                 phi_label = r"Empirical Integrated Information Tilde (" \
                             r"$\widetilde{\Phi}_{E}$)"
                 phi_original = phi_e_tilde_original
                 phi_sorted_label = r"Empirical Integrated Information Tilde " \
                                    r"Sorted ($\widetilde{\Phi}'_{E}$)"
+                phi_shuffled_label = r"Empirical Integrated Information Tilde" \
+                                     r" Shuffled ($\widetilde{\Phi}''_{E}$)"
 
             # Phi vs Global Synchrony
             # -----------------------
@@ -231,18 +235,25 @@ class DataPlotter:
             for key in cursors:
                 labels.append(key)
                 plt.xlabel(r"Coalition Entropy ($H_C$)")
-                plt.ylabel(phi_label)
                 if is_sorted:
                     plt.ylabel(phi_sorted_label)
+                elif is_shuffled:
+                    plt.ylabel(phi_shuffled_label)
+                else:
+                    plt.ylabel(phi_label)
                 if run == 0:
                     plt.ylim(ymin=-0.15, ymax=0.7)
 
                     if is_sorted:
                         plt.ylim(ymin=-0.55, ymax=0.15)
+                    if is_shuffled:
+                        plt.ylim(ymin=-0.05, ymax=1.8)
                 else:
                     plt.ylim(ymin=-0.01, ymax=0.8)
                     if is_sorted:
                         plt.ylim(ymin=-0.3, ymax=0.15)
+                    if is_shuffled:
+                        plt.ylim(ymin=-0.05, ymax=1.8)
                 plt.xlim(xmin=0, xmax=1)
                 # plt.title(phi_label + " vs Coalition Entropy\n"
                 #           "Tau = " + str(tau))
@@ -532,25 +543,45 @@ class DataPlotter:
                     fig = plt.figure()
                     handles = []
                     labels = []
+                    location = 1
                     for key in cursors:
+
+                        # Legend labels.
                         labels.append(key)
+
+                        # Axes labels.
                         plt.xlabel(phi_label)
-                        plt.ylabel(phi_sorted_label)
+                        if is_sorted:
+                            plt.ylabel(phi_sorted_label)
+                        elif is_shuffled:
+                            plt.ylabel(phi_shuffled_label)
+
+                        # Axes ranges.
                         if run == 0:
+                            plt.xlim(xmin=-0.15, xmax=0.7)
                             if is_sorted:
                                 plt.ylim(ymin=-0.5, ymax=0.1)
-                                plt.xlim(xmin=-0.15, xmax=0.6)
+                            if is_shuffled:
+                                plt.ylim(ymin=-0.05, ymax=1.8)
+                                location = 2
                         else:
+                            plt.xlim(xmin=-0.01, xmax=0.8)
                             if is_sorted:
                                 plt.ylim(ymin=-0.25, ymax=0.1)
-                                plt.xlim(xmin=-0.01, xmax=0.7)
+                            if is_shuffled:
+                                plt.ylim(ymin=-0.05, ymax=1.8)
+                                location = 2
+
+                        # Plot and assign to handles for legend.
                         handles.append(plt.scatter(phi_original[key],
                                                    phi[key],
                                                    color=colors[key],
                                                    label=key))
+
+                    # Sort and draw legend.
                     labels, handles = zip(*sorted(zip(labels, handles),
                                                   key=lambda x: x[0]))
-                    legend = plt.legend(handles, labels,
+                    legend = plt.legend(handles, labels, loc=location,
                                         title=r"Threshold ($\gamma$)")
                     plt.setp(legend.get_title(), fontsize='xx-large')
 
@@ -1594,9 +1625,11 @@ class DataPlotter:
 
         # Mutual Information Analysis
         fig = plt.figure()
-        plt.xlabel("Original")
-        plt.ylabel("Shuffled")
-        plt.title("Mutual Information Analysis in Random Surrogate Data")
+        plt.xlabel(r"Mutual Information for Original Data")
+        plt.ylabel(r"Mutual Information for Shuffled Data")
+        plt.xlim(xmin=0.002, xmax=0.012)
+        plt.ylim(ymin=0.002, ymax=0.012)
+        # plt.title("Mutual Information Analysis in Random Surrogate Data")
         plt.scatter(mi, mi_shuffled)
         if save:
             fig.savefig(path + "surrogate-random-mi-analysis." + ext)
@@ -1605,9 +1638,9 @@ class DataPlotter:
 
         # Coalition Entropy Analysis
         fig = plt.figure()
-        plt.xlabel("Original")
-        plt.ylabel("Shuffled")
-        plt.title("Coalition Entropy Analysis in Random Surrogate Data")
+        plt.xlabel(r"$H_C$ for Original Data")
+        plt.ylabel(r"$H_C$ for Shuffled Data")
+        # plt.title("Coalition Entropy Analysis in Random Surrogate Data")
         plt.scatter(hc, hc_shuffled)
         if save:
             fig.savefig(path + "surrogate-random-hc-analysis." + ext)
@@ -1616,9 +1649,13 @@ class DataPlotter:
 
         # Integrated Information Empirical Analysis
         fig = plt.figure()
-        plt.xlabel("Original")
-        plt.ylabel("Shuffled")
-        plt.title("Integrated Information Analysis in Random Surrogate Data")
+        plt.xlabel(r"Empirical Integrated Information ($\Phi_E$)"
+                   r" for Original Data")
+        plt.ylabel(r"Empirical Integrated Information ($\Phi_E$)"
+                   r" for Shuffled Data")
+        plt.xlim(xmin=0.002, xmax=0.012)
+        plt.ylim(ymin=0.002, ymax=0.012)
+        # plt.title("Integrated Information Analysis in Random Surrogate Data")
         plt.scatter(phi, phi_shuffled)
         if save:
             fig.savefig(path + "surrogate-random-phi_e-analysis." + ext)
@@ -1652,7 +1689,7 @@ class DataPlotter:
         measures = {
             "Coalition Entropy": hc_diff,
             "Mutual Information": mi_diff,
-            "Integrated Information": phi_diff
+            "Empirical Integrated Information": phi_diff
         }
 
         fig = plt.figure()
@@ -1662,14 +1699,15 @@ class DataPlotter:
         for key in measures:
             labels.append(key)
             plt.xlabel("Length of Pattern")
-            plt.ylabel("Difference between Original and Shuffled Data")
-            plt.title("Surrogate Analysis with Repeating Patterns")
+            plt.ylabel("Difference Between Original and Shuffled Data")
+            # plt.title("Surrogate Analysis with Repeating Patterns")
             handles.append(plt.scatter(pattern_len,
                                        measures[key],
                                        color=self.colors[color],
                                        label=key))
             color += 1
-        plt.legend(handles, labels, title="Measure")
+        legend = plt.legend(handles, labels, loc=2, title="Measure")
+        plt.setp(legend.get_title(), fontsize='xx-large')
 
         if save:
             fig.savefig(path + "surrogate-pattern-analysis." + ext)
@@ -1774,20 +1812,25 @@ if __name__ == "__main__":
     # Surrogate Data
     # --------------
     dp = DataPlotter('oscillator', database='infotheoretic')
-    # dp.plot_surrogate_analysis()
+    # q = {
+    #     'shuffled': {'$exists': True},
+    #     'is_surrogate': False,
+    #     'is_surrogate': False,
+    #     'duration': 5000,
+    #     'num_oscillators': 8,
+    #     # 'beta': {'$lte': (math.pi / 4)}
+    # }
+    # osc_thresholds = [0.9, 0.8, 0.7, 0.6, 0.5]
+    # dp.plot(save=False,
+    #         path="/Users/juancarlosfarah/Git/infotheoretic/docs/phi_e_tilde/",
+    #         ext="svg",
+    #         tau=1,
+    #         query=q,
+    #         is_sorted=False,
+    #         is_shuffled=True,
+    #         thresholds=osc_thresholds)
+    dp.plot_surrogate_analysis()
     # dp.plot_normalised_surrogate()
-    q = {
-        'sorted': {'$exists': True},
-        'beta': {'$lte': (math.pi / 4)}
-    }
-    osc_thresholds = [0.9, 0.8, 0.7, 0.6, 0.5]
-    dp.plot(save=False,
-            path="/Users/juancarlosfarah/Git/infotheoretic/docs/phi_e_tilde/",
-            ext="svg",
-            tau=1,
-            query=q,
-            is_sorted=True,
-            thresholds=osc_thresholds)
 
     # Results for Kuramoto Oscillators
     # --------------------------------
