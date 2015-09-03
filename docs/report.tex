@@ -5,6 +5,8 @@
 \usepackage[nodayofweek]{datetime}
 \usepackage{cite}
 \usepackage{graphicx}
+
+% Date format.
 \longdate
 
 \usepackage{paralist}
@@ -36,7 +38,9 @@
 
 \begin{document}
 
-% load title page
+% =======================================================================================
+% TITLE PAGE
+% =======================================================================================
 \newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
 
 %----------------------------------------------------------------------------------------
@@ -80,7 +84,6 @@
 \end{flushright}
 \end{minipage}\\[4cm]
 
-
 %----------------------------------------------------------------------------------------
 %	FOOTER & DATE SECTION
 %----------------------------------------------------------------------------------------
@@ -93,11 +96,36 @@ Submitted in partial fulfillment of the requirements for the MSc degree in
 \makeatother
 
 \end{center}
-
 \clearpage
 
-\tableofcontents
+% =======================================================================================
+% INTENTIONAL BLANK PAGE
+% =======================================================================================
+\null
+\clearpage
 
+% =======================================================================================
+% ABSTRACT
+% =======================================================================================
+\section{Abstract}
+
+% =======================================================================================
+% ACKNOWLEDGEMENTS
+% =======================================================================================
+\section{Acknowledgements}
+I would like to thank my family, friends and fellow students for their ongoing support throughout this project. Many thanks to Dr David Bhowmik for taking the time to provide us with and explain in detail the source code used in \cite{Bhowmik2013}. I would also like to extend my regards to Professor Murray Shanahan for his guidance and supervision this summer. Finally, I would like to express my deepest gratitude to Pedro Mediano for his constant counsel and patience, his ongoing assistance with all aspects of this study, and for providing me with an excellent atmosphere for doing research. This project has been a team effort and I feel lucky to have such support from my colleagues at Imperial College. Thank you all for your help.
+\clearpage
+
+% =======================================================================================
+% TABLE OF CONTENTS
+% =======================================================================================
+\tableofcontents
+\clearpage
+
+% =======================================================================================
+% INTENTIONAL BLANK PAGE
+% =======================================================================================
+\null
 \clearpage
 
 % =======================================================================================
@@ -111,10 +139,13 @@ Over the past ten years, the Integrated Information Theory of Consciousness (IIT
 
 By modelling synchronisation using spiking neural networks and large-scale approximations such as oscillators following the Kuramoto model explained in Section \ref{KuramotoModel}, this project aims to investigate the properties of metastability and consciousness from an information-theoretic point of view. Specifically, we will conduct a series of simulations to study the correspondence between several properties of these networks, some of which are highlighted in Section \ref{Measures}, with a particular focus on how they relate to integrated information. Our goal is to shed light on the dynamics and properties of information transmission and processing between populations of neurons as they oscillate in and out of transient coupled states.
 
-Two Parts:\\
-1. Software Engineer
-2. Scientific Application
-3. Both can be expanded in the future as explained in Section \ref{sec:fw}.
+This project had two clearly defined parts. The first is concerned with engineering an implementation of integrated information $\Phi$, the measure proposed by the IIT as an appropriate way to measure consciousness in a system. The aim of this implementation was that it (1) was available to researchers and other (2) was easily maintainable and modular and (3) followed design principles set forth by other available toolkits for information theoretic analyses. Our particular implementation also had to be suitable for discrete time series data, as the systems to which we would apply it would output data in that format.
+
+The second part of this project concerned the application of this implementation of $\Phi$ to models of metastable neural populations. The two models we addressed were (1) populations of communities of Kuramoto oscillators as presented in \cite{Shanahan2010} and (2) populations of spiking neural networks following a pyramidal inter-neuronal gamma (PING) architecture as presented in \cite{Bhowmik2013}. Both of these models had been included in publications and documented as exhibiting metastable states as further described in Section \ref{sec:bg:meta}. Our aim was to (1) study the performance of our implementation on these models and (2) study the relationship between our measure for integrated information and other information theoretic measures computed for those systems. 
+
+We structured this study in a way that could promote the future development of both parts separately and simultaneously. As explained in Section \ref{sec:impl}, our implementation is open source, readily available for all user and designed to contributors. We aim to make it available as a part of the widely used Java Information Dynamics Toolkit (JIDT) \cite{Lizier2014} as further discussed in Section \ref{sec:fw:jidt}. On the other hand, our application of this implementation of integrated information on metastable neural populations is a strong proof of concept. It highlights various areas where further research could help us better understand the behaviour of $\Phi$ in different contexts and vis-\`{a}-vis other measures related to metastability in neural networks. Its application on other types of neuron and oscillator models as well as more rigorous analysis using surrogate data are only two of many extensions for which this project has laid the groundwork. These are considered in more detail in Section \ref{sec:fw}.
+
+\clearpage
 
 % =======================================================================================
 % BACKGROUND
@@ -1664,7 +1695,14 @@ Shuffled & 0.0011835995533143967 & 4.486560050455113E-6\\
 
 \subsection{Discussion}
 
-Correlation between Phi and Beta with peaks where HC peaks vs beta..\\
+As can be evidenced by the correlations explained in Section \ref{sec:app:osc:res} and the surrogate data analysis in Section \ref{sec:app:osc:surrogate}, there are a number of conclusions that we can derive from our results. Similarly, there are certain areas where further analysis could provide more insight into the behaviour of empirical integrated information in populations of Kuramoto oscillator communities.
+
+To begin with, it is important to note that we were able to closely replicate all of the correlations presented in \cite{Shanahan2010} as depicted in Figures \ref{fig:lambda-vs-beta-orig}, \ref{fig:chi-vs-beta-orig}, \ref{fig:psi-vs-beta-orig} and \ref{fig:hc-vs-beta-orig}. This allows us to verify that our simulations behaved analogously to those used in the original study, which provides a stronger base for our conclusions about the behaviour of $\Phi_E$ and $\widetilde{\Phi}_E$. 
+
+When we then extended our analysis of the original measures to cover a wider range of $\beta$ and thresholds $\gamma$, we discovered certain unexpected behaviour that is worth investigating in further studies. When extending the $\beta$ range from the original $0 \leq \beta \leq \frac{\pi}{4}$ to $0 \leq \beta \leq 2\pi$, we noticed that the measures for metastability index, chimera index, global synchrony and coalition entropy all exhibited a symmetric shape between $0 \leq \beta \leq \pi$ about $\frac{\pi}{2}$, followed by a consistent value close to $0$ from $\pi$ to $2\pi$. This can be seen in Figures \ref{fig:lambda-vs-beta-ext}, \ref{fig:chi-vs-beta-ext}, \ref{fig:psi-vs-beta-ext} and \ref{fig:hc-vs-beta-ext}. Although not directly related to the present study, the occurrence of this phenomenon deserves further attention in possible future work. In parallel, we also extended the number of synchronisation thresholds  $\gamma$ and investigated their impact on the correlation between coalition entropy and $\beta$ presented in \cite{Shanahan2010}. As shown in Figure \ref{fig:hc-vs-beta-orig-multi}, as $\gamma$ increased, the peak for the curve shifted right and slightly downward, becoming less right skewed. Once more, this is not directly related to our analysis, but deserves further attention to fully understand the relationship between $H_C$ and $\beta$ at different levels of $\gamma$.
+
+The key part of our analysis was inspecting the correlations between our implementations of empirical integrated information and the other measures included in \cite{Shanahan2010}. We found certain consistencies that are worth noting. First of all, we noticed that $\Phi_E$, at $\gamma = 0.8$ when plotted agains $\beta$ peaks at $\beta \approx 0.16$, which coincides with $\beta \approx 0.15$, where $H_C$ peaks. This relationship is consistent, with minor shifts, across all tested values of $\gamma$. A close look at Figure \ref{fig:phi-vs-hc-multi} shows how there is a positive correlation between $H_C$ and $\Phi_E$ with a close to an exponential shape. We can thus infer that higher levels of coalition entropy, where the system visits more states with more equal probability provide a better environment for higher values of $\Phi$ to occur.
+
 Correlation between Phi and Global Synchrony with peaks shifting to the right.\\
 Correlation between Phi and Lambda Peak at around 0.35 to 0.45 for gamma .6 to .8.\\
 Correlation between Phi and Chi Peak at around 0.35 to 0.45 for gamma .6 to .8.\\
@@ -1709,7 +1747,7 @@ For the simulations in \cite{Bhowmik2013}, ten PING oscillators were used, each 
 % ---------------
 \subsubsection{The Simulations}
 \label{sec:snn:sims}
-In order to generate the time series that were needed to apply our implementation of $\Phi$ to the populations of spiking neural networks, we performed our own simulations using the Matlab code from \cite{Bhowmik2013} as a base. We kept the default parameters and structure explained in Section \ref{sec:snn:mod}, running 636 simulations each lasting 5000 time steps.
+In order to generate the time series that were needed to apply our implementation of $\Phi$ to the populations of spiking neural networks, we performed our own simulations using the Matlab code from \cite{Bhowmik2013} as a base. We kept the default parameters and structure explained in Section \ref{sec:snn:mod}, running 1003 simulations each lasting 5000 time steps.
 
 Each simulation outputted a Matlab file containing information about the coalition entropy ($H_C$), global synchrony ($\Psi$), metastability index ($\lambda$), synaptic connection weight ($W$) and probability ($P$) of the system, amongst other measures. Alongside these measures, the output contained an array containing the coalitions formed at each time step, which designated as subarrays. A sample format of this output is shown in Table \ref{tab:snn:output}.
 
@@ -1763,10 +1801,13 @@ As in our simulations using Kuramoto oscillators, each simulation was given a un
 \item{Empirical Integrated Information Tilde (Equation \ref{eq:ii-tilde})}
 \end{enumerate}
 
+% =======
+% RESULTS
+% =======
 \subsection{Results}
 \label{sec:snn:res}
 
-Our 636 simulations were divided into two groups. The first was given a synchronisation threshold ($\gamma$) of $0.8$ and for the second $\gamma = 0.95$. The synchronisation threshold, as in our application to Kuramoto oscillators, was used to discretise whether or not two communities or more when in synchrony. That is, only communities having a level of synchronisation equal to or higher than $\gamma$ would be considered to be synchronised. Having run the simulations and computing the measures detailed in Section \ref{sec:app:snn:measures}, we proceeded to analyse the various relationships that were of interest to us. First, we aimed to confirm the consistency of our spiking neural network simulations with those conducted by Bhowmik and Shanahan. We thus replicated a selection of the correlations presented in \cite{Bhowmik2013}. We then extended our analysis by examining the the correlations between the original measures considered and our implementations of integrated information. For our calculations involving empirical integrated information we used a time step offset ($\tau$) value of both $1$ and $5$.
+Our 1003 simulations were divided into two groups. The first, consisting of 472 simulations was given a synchronisation threshold ($\gamma$) of $0.8$, while for the second, comprising the other 531 simulations, $\gamma$ was equal to $0.95$. The synchronisation threshold, as in our application to Kuramoto oscillators, was used to discretise whether or not two communities or more when in synchrony. That is, only communities having a level of synchronisation equal to or higher than $\gamma$ would be considered to be synchronised. Having run the simulations and computing the measures detailed in Section \ref{sec:app:snn:measures}, we proceeded to analyse the various relationships that were of interest to us. First, we aimed to confirm the consistency of our spiking neural network simulations with those conducted by Bhowmik and Shanahan. We thus replicated a selection of the correlations presented in \cite{Bhowmik2013}. We then extended our analysis by examining the the correlations between the original measures considered and our implementations of integrated information. For our calculations involving empirical integrated information we used a time step offset ($\tau$) value of both $1$ and $5$.
 
 \subsubsection{Global Synchrony ($\Psi$) vs Synaptic Connection Probability $(P)$ and Weight ($W$)}
 \label{sec:app:snn:res:sync}
@@ -1840,7 +1881,7 @@ A second correlation we examined was that between coalition entropy ($H_C$), syn
 
 \subsubsection{Empirical Integrated Information ($\Phi_E$) vs Synaptic Connection Probability $(P)$ and Weight ($W$)}
 \label{sec:app:snn:res:phi-p-w}
-Having examined correlations concerning global synchrony, metastability index and coalition entropy, we proceeded to examine how our implementations of empirical integrated information ($\Phi_E$) behaved vis-\`{a}-vis these measures and the model's parameters controlling weight ($W$) and synaptic connection probability ($P$). We first plotted $\Phi_E$ against $W$ and $P$ for both $\gamma = 0.8$ and $\gamma = 0.95$, as well as $\tau = 1$ and $\tau = 5$. The resulting surface plots are depicted in Figures \ref{fig:p_w_phi_1} and \ref{fig:p_w_phi_5}. We observe that there are no clear correlations between the parameters and $\Phi_E$, as peaks and troughs occur throughout. It is worth underlining that for $\tau = 1$, the values of $\Phi_E$ are all negative, whereas the plots for $\tau = 5$ contain both negative and positive values.
+Having examined correlations concerning global synchrony, metastability index and coalition entropy, we proceeded to examine how our implementations of empirical integrated information ($\Phi_E$) behaved vis-\`{a}-vis these measures and the model's parameters controlling weight ($W$) and synaptic connection probability ($P$). We first plotted $\Phi_E$ against $W$ and $P$ for both $\gamma = 0.8$ and $\gamma = 0.95$, as well as $\tau = 1$ and $\tau = 5$. The resulting surface plots are depicted in Figure \ref{fig:p_w_phi_all}. We observe that there are no clear correlations between the parameters and $\Phi_E$, as peaks and troughs occur throughout. It is worth underlining that for $\tau = 1$, the values of $\Phi_E$ are all negative, whereas the plots for $\tau = 5$ contain both negative and positive values.
 
 \begin{figure}[H] 
 	\begin{minipage}[b]{0.5\linewidth}
@@ -1855,12 +1896,6 @@ Having examined correlations concerning global synchrony, metastability index an
 		\end{center}
 		\vspace{4ex}
 	\end{minipage}
-	\caption{
-		$\Phi_E$ vs Connection Probability ($P$) and Weight ($W$) at $\tau = 1.$
-		\label{fig:p_w_phi_1}
-	}
-\end{figure}
-\begin{figure}[H] 
 	\begin{minipage}[b]{0.5\linewidth}
 		\begin{center}
 		\includegraphics[scale = 0.2]{figures/snn/p_w_phi_8_5}
@@ -1874,8 +1909,8 @@ Having examined correlations concerning global synchrony, metastability index an
 		\vspace{4ex}
 	\end{minipage}
 	\caption{
-		$\Phi_E$ vs Connection Probability ($P$) and Weight ($W$) at $\tau = 5.$
-		\label{fig:p_w_phi_5}
+		Empirical Integrated Information ($\Phi_E$) vs Connection Probability ($P$) and Weight ($W$).
+		\label{fig:p_w_phi_1}
 	}
 \end{figure}
 
@@ -1950,7 +1985,7 @@ The analysis of empirical integrated information ($\Phi_E$) and $H_C$ showed a m
 
 \subsubsection{Empirical Integrated Information Tilde ($\widetilde{\Phi}_E$) Analysis}
 \label{sec:app:snn:res:phi-tilde}
-Having concluded our analysis using empirical integrated information $\Phi_E$, we examined the same relationships using our alternative implementation, empirical integrated information tilde ($\widetilde{\Phi}_E$). As can be seen in Figures \ref{fig:p_w_phi_tilde_1} through \ref{fig:phi_tilde_vs_hc}, we observed the same results as using $\Phi_E$, with the clear the difference that $\widetilde{\Phi}_E$ does not take on negative values. Furthermore, although there appears to be a positive correlation between $\widetilde{\Phi}_E$ and coalition entropy ($H_C$) as shown in Figure \ref{fig:phi_tilde_vs_hc}, it is not as demarcated as the one between $\Phi_E$ and $H_C$ depicted in Figure \ref{fig:phi_vs_hc}.
+Having concluded our analysis using empirical integrated information $\Phi_E$, we examined the same relationships using our alternative implementation, empirical integrated information tilde ($\widetilde{\Phi}_E$). As can be seen in Figures \ref{fig:p_w_phi_tilde_all} through \ref{fig:phi_tilde_vs_hc}, we observed the same results as using $\Phi_E$, with the clear the difference that $\widetilde{\Phi}_E$ does not take on negative values. Furthermore, although there appears to be a positive correlation between $\widetilde{\Phi}_E$ and coalition entropy ($H_C$) as shown in Figure \ref{fig:phi_tilde_vs_hc}, it is not as demarcated as the one between $\Phi_E$ and $H_C$ depicted in Figure \ref{fig:phi_vs_hc}.
 
 %\subsubsection{Empirical Integrated Information Tilde ($\widetilde{\Phi}_E$) vs Synaptic Connection Probability $(P)$ and Weight ($W$)}
 
@@ -1967,12 +2002,6 @@ Having concluded our analysis using empirical integrated information $\Phi_E$, w
 		\end{center}
 		\vspace{4ex}
 	\end{minipage}
-	\caption{
-		$\widetilde{\Phi}_E$ vs Connection Probability ($P$) and Weight ($W$) at $\tau = 1.$
-		\label{fig:p_w_phi_tilde_1}
-	}
-\end{figure}
-\begin{figure}[H] 
 	\begin{minipage}[b]{0.5\linewidth}
 		\begin{center}
 		\includegraphics[scale = 0.2]{figures/snn/p_w_phi_tilde_8_5}
@@ -1986,8 +2015,8 @@ Having concluded our analysis using empirical integrated information $\Phi_E$, w
 		\vspace{4ex}
 	\end{minipage}
 	\caption{
-		$\widetilde{\Phi}_E$ vs Connection Probability ($P$) and Weight ($W$) at $\tau = 5.$
-		\label{fig:p_w_phi_tilde_5}
+		$\widetilde{\Phi}_E$ vs Connection Probability ($P$) and Weight ($W$).
+		\label{fig:p_w_phi_tilde_all}
 	}
 \end{figure}
 
@@ -2080,6 +2109,10 @@ Finally, we investigated the behaviour of $\widetilde{\Phi}_{E}$ against $\Phi_{
 \subsection{Discussion}
 \label{sec:snn:disc}
 
+As evidenced in Section \ref{sec:snn:res}, our results did not provide conclusive insight into the behaviour of empirical integrated information in this system of spiking neural networks. We can first draw our attention to the behaviour of global synchrony ($\Psi$) and coalition entropy ($H_C$) against variations in weight ($W$) and synaptic connection probability ($P$) in our simulations compared to those in \cite{Bhowmik2013}. Although we observed a clear increase in $\Psi$ as $P$ increased, the positive correlation between $\Psi$ and $W$ seen in the original study was not present in our simulations. Similar results occur for coalition entropy $H_C$, where the negative correlation between $H_C$ and $P$ is visible, but that between $H_C$ and $W$, present in \cite{Bhowmik2013} is not replicated in our study.
+ 
+
+ 
 Inconclusive results.\\
 El número total de posibles configuraciones de coaliciones es muy alto (creo que he deducido la fórmula, pero basta decir que es muy alto); lo que combinado con las muchas bipartitions que hay que considerar hace que el cálculo exacto sea impractical. We tried a heuristic approximation and it was a mess, we don't know if the approximation is bad, or if phi itself is a mess. Future work will involve trying out more approximations.\\
 
@@ -2129,26 +2162,11 @@ While performing the surrogate data analysis we conducted for our implementation
 \item{Consider other normalisation factors other than Equations \ref{eq:norm} and \ref{eq:norm-tilde} for $\Phi_E$ and $\widetilde{\Phi}_E$ respectively, and analyse its impact on surrogate data.}
 \end{enumerate}
 
-\subsection{Expand Application on Populations of Spiking Neural Networks}
+\subsection{Application to Other Spiking Neural Network Architectures}
 \label{sec:fw:snn}
-We can also extend the application of our implementation of $\Phi$ to other models of spiking neural network, namely the one defined by Buehlmann and Deco in \cite{Buehlmann2010}. This would allow us to further investigate the relationship between $\Phi$ and other more specific properties of these systems, such as their spectral complexity, given that various frequencies can be present in an oscillating population at any given point in time \cite{Bhowmik2013}.
+We can also extend the application of our implementation of $\Phi$ to other models of spiking neural networks. A possible candidate is the one defined by Buehlmann and Deco in \cite{Buehlmann2010}. This would allow us to further investigate the relationship between integrated information $\Phi$ and the specific properties of these architectures, aiding us in understanding whether $\Phi$ performs differently under different architectures or if it performs consistently.
 
-In contrast to the Bhowmik and Shanahan's model, which we presented in Sections \ref{sec:bg:meta} and \ref{sec:snn:methods}, the model followed by Buehlmann and Deco is depicted in Figure \ref{fig:buehlmann-schema}. Their simulations consisted of 100 trials with each lasting six seconds, structured in the following manner, which could be replicated for further analysis with our implementation of empirical integrated information.
-
-\begin{enumerate}
-\item{No stimulus (400ms).}
-\item{Presentation of the stimulus (5500ms).}
-\item{No stimulus (100ms)}.
-\end{enumerate}
-
-\begin{figure}[H]
-\centering
-\includegraphics[scale = 0.75]{Buehlmann2010_Schema}
-\caption{
-	Schematic representation of the network used by Buehlmann and Deco. ``The network consists of two parts. In each part, there are excitatory (S, NS) and inhibitory (I) neurons.'' \cite{Buehlmann2010}
-	\label{fig:buehlmann-schema}
-}
-\end{figure}
+\clearpage
 
 % =======================================================================================
 % CONCLUSION
