@@ -1787,7 +1787,7 @@ As in our simulations using Kuramoto oscillators, each simulation was given a un
 \item{Mutual Information (Equation \ref{eq:mi})}
 \item{Global Synchrony (Equation \ref{eq:sync})}
 \item{Metastability Index (Equation \ref{eq:lambda})}.
-\item{Coalition Entropy (Equation \ref{eq:hc})}
+\item{Coalition Entropy (For consistency in the comparison with the original results, we used the equation for coalition entropy as defined in \cite{Bhowmik2013}, which differs from our implementation in Equation \ref{eq:hc}.)}
 \item{Empirical Integrated Information (Equation \ref{eq:ii})}
 \item{Empirical Integrated Information Tilde (Equation \ref{eq:ii-tilde})}
 \end{enumerate}
@@ -2171,7 +2171,15 @@ We can also extend the application of our implementation of $\Phi$ to other mode
 \section{Conclusion}
 \label{sec:conclusion}
 
-We found that in the application to populations of Kuramoto oscillators, $\Phi_E$ and $\widetilde{\Phi}_E$ behaved consistently and exhibited correlations with other information theoretic measures presented in \cite{Shanahan2010}. Our application to communities of PING oscillators gave inconclusive results, which we hypothesise could be related to heuristic approximation methods used to overcome the complexity of calculating subsystem partitions and coalitions in such networks. This inconclusiveness and evidence of unexpected results in our surrogate data analysis provide us with extensions for this study as we integrate our implementation of $\Phi$ with the public repository of the JIDT. 
+In completing this project, we achieved a number of our initial goals and found areas in which future studies could complement and further the rigour of the results found and the application of tools developed as part of our investigation.
+
+Firstly, we were able to successfully implement a working version of empirical integrated information ($\Phi_E$) and its variation $\widetilde{\Phi}_E$ that is suitable for incorporation with the JIDT. As we make these tools available through the central repository for the JIDT or through a specific fork, we will allow the continued development of tested code that can be used to continue the study the behaviour of integrated information. It will also be readily available for other researchers to use in their studies of $\Phi$ and its application to time series data.
+
+Secondly we found that in the application of our implementation to populations of Kuramoto oscillators, $\Phi_E$ and $\widetilde{\Phi}_E$ behaved consistently and exhibited correlations with other information theoretic measures presented in \cite{Shanahan2010}. The relationships between $\Phi_E$ and measures related to metastability, such as the metastability index ($\lambda$) and the chimera index ($\chi$) provide evidence of a possible link between these that is worth considering for future investigation.
+
+Thirdly, although our application to communities of PING oscillators gave inconclusive results, we propose that these could be related to the heuristic approximation methods we used to overcome the complexity of calculating subsystem partitions and coalitions. A more in-depth analysis of such methodology could provide useful intuition regarding the pros and cons of these heuristic approximations and lead to a rigorous method that could generate more conclusive results. Similarly, it is worth exploring the effect of the different parameters used in \cite{Bhowmik2013} on the nature of the networks generated, as we were unable to replicate certain of the correlations found in the original study.
+
+Finally, unexpected results in our surrogate data analysis suggests that $\Phi_E$ could behave in unconventional ways under certain contexts, as evidenced in its increase when applied to shuffled time series data outputted by the populations of Kuramoto oscillators. A close analysis of this phenomena could also help solidify our results in Section \ref{sec:app:osc:res} and by extension the findings put forth in \cite{Shanahan2010} and \cite{Bhowmik2013}.
 
 \clearpage
 
