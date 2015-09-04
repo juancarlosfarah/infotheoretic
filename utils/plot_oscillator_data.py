@@ -248,103 +248,103 @@ class DataPlotter:
 
             # Phi vs Coalition Entropy
             # ------------------------
-            # fig = plt.figure()
-            # handles = []
-            # labels = []
-            # for key in cursors:
-            #     labels.append(key)
-            #     handles.append(plt.scatter(coalition_entropy[key],
-            #                                phi[key],
-            #                                color=colors[key],
-            #                                label=key))
-            # plt.xlabel(r"Coalition Entropy ($H_C$)")
-            #
-            # if self.community_type == 'oscillator':
-            #     if is_sorted:
-            #         plt.ylabel(phi_sorted_label)
-            #     elif is_shuffled:
-            #         plt.ylabel(phi_shuffled_label)
-            #     else:
-            #         plt.ylabel(phi_label)
-            #     if run == 0:
-            #         plt.ylim(ymin=-0.15, ymax=0.7)
-            #
-            #         if is_sorted:
-            #             plt.ylim(ymin=-0.55, ymax=0.15)
-            #         if is_shuffled:
-            #             plt.ylim(ymin=-0.05, ymax=1.8)
-            #     else:
-            #         plt.ylim(ymin=-0.01, ymax=0.8)
-            #         if is_sorted:
-            #             plt.ylim(ymin=-0.3, ymax=0.15)
-            #         if is_shuffled:
-            #             plt.ylim(ymin=-0.05, ymax=1.8)
-            #     plt.xlim(xmin=0, xmax=1)
-            # else:
-            #     if run == 0:
-            #         plt.ylim(ymin=-2.5, ymax=0.6)
-            #     else:
-            #         plt.ylim(ymin=0, ymax=1)
-            #     plt.xlim(xmin=0, xmax=2)
-            #     plt.ylabel(phi_label)
-            #     plt.title(r"$\tau$ = " + str(tau))
-            # labels, handles = zip(*sorted(zip(labels, handles),
-            #                               key=lambda x: x[0]))
-            # location = 3 if is_sorted else 2
-            # legend = plt.legend(handles, labels, loc=location,
-            #                     title=r"Threshold ($\gamma$)")
-            # plt.setp(legend.get_title(), fontsize='xx-large')
-            #
-            # if save:
-            #     fig.savefig(path + "8." + ext)
-            # else:
-            #     plt.show(fig)
+            fig = plt.figure()
+            handles = []
+            labels = []
+            for key in cursors:
+                labels.append(key)
+                handles.append(plt.scatter(coalition_entropy[key],
+                                           phi[key],
+                                           color=colors[key],
+                                           label=key))
+            plt.xlabel(r"Coalition Entropy ($H_C$)")
+
+            if self.community_type == 'oscillator':
+                if is_sorted:
+                    plt.ylabel(phi_sorted_label)
+                elif is_shuffled:
+                    plt.ylabel(phi_shuffled_label)
+                else:
+                    plt.ylabel(phi_label)
+                if run == 0:
+                    plt.ylim(ymin=-0.15, ymax=0.7)
+
+                    if is_sorted:
+                        plt.ylim(ymin=-0.55, ymax=0.15)
+                    if is_shuffled:
+                        plt.ylim(ymin=-0.05, ymax=1.8)
+                else:
+                    plt.ylim(ymin=-0.01, ymax=0.8)
+                    if is_sorted:
+                        plt.ylim(ymin=-0.3, ymax=0.15)
+                    if is_shuffled:
+                        plt.ylim(ymin=-0.05, ymax=1.8)
+                plt.xlim(xmin=0, xmax=1)
+            else:
+                if run == 0:
+                    plt.ylim(ymin=-2.5, ymax=0.6)
+                else:
+                    plt.ylim(ymin=0, ymax=1)
+                plt.xlim(xmin=0, xmax=2)
+                plt.ylabel(phi_label)
+                plt.title(r"$\tau$ = " + str(tau))
+            labels, handles = zip(*sorted(zip(labels, handles),
+                                          key=lambda x: x[0]))
+            location = 3 if is_sorted else 2
+            legend = plt.legend(handles, labels, loc=location,
+                                title=r"Threshold ($\gamma$)")
+            plt.setp(legend.get_title(), fontsize='xx-large')
+
+            if save:
+                fig.savefig(path + "8." + ext)
+            else:
+                plt.show(fig)
 
             # Phi Frequency
             # -------------
-            # fig = plt.figure()
-            # handles = []
-            # labels = []
-            # values = []
-            # for key in cursors:
-            #     labels.append(str(key))
-            #     values.append(phi[key])
-            #
-            # plt.xlabel(phi_label)
-            # plt.ylabel("Frequency")
-            # plt.title(phi_label + "\n"
-            #           "Duration = " + str(duration) + ", Tau = " + str(tau))
-            #
-            # handles.append(plt.hist(values, label=labels, bins=50))
-            # plt.legend(title="Threshold")
-            #
-            # if save:
-            #     fig.savefig(path + "10." + ext)
-            # else:
-            #     plt.show(fig)
+            fig = plt.figure()
+            handles = []
+            labels = []
+            values = []
+            for key in cursors:
+                labels.append(str(key))
+                values.append(phi[key])
+
+            plt.xlabel(phi_label)
+            plt.ylabel("Frequency")
+            plt.title(phi_label + "\n"
+                      "Duration = " + str(duration) + ", Tau = " + str(tau))
+
+            handles.append(plt.hist(values, label=labels, bins=50))
+            plt.legend(title="Threshold")
+
+            if save:
+                fig.savefig(path + "10." + ext)
+            else:
+                plt.show(fig)
 
             # Coalition Entropy Frequency
             # ---------------------------
-            # fig = plt.figure()
-            # handles = []
-            # labels = []
-            # values = []
-            # for key in cursors:
-            #     labels.append(str(key))
-            #     values.append(coalition_entropy[key])
-            #
-            # plt.xlabel("Coalition Entropy")
-            # plt.ylabel("Frequency")
-            # plt.title("Coalition Entropy\n"
-            #           "Duration = " + str(duration) + ", Tau = " + str(tau))
-            #
-            # handles.append(plt.hist(values, label=labels, bins=50))
-            # plt.legend(title="Threshold")
-            #
-            # if save:
-            #     fig.savefig(path + "hc-frequency." + ext)
-            # else:
-            #     plt.show(fig)
+            fig = plt.figure()
+            handles = []
+            labels = []
+            values = []
+            for key in cursors:
+                labels.append(str(key))
+                values.append(coalition_entropy[key])
+
+            plt.xlabel("Coalition Entropy")
+            plt.ylabel("Frequency")
+            plt.title("Coalition Entropy\n"
+                      "Duration = " + str(duration) + ", Tau = " + str(tau))
+
+            handles.append(plt.hist(values, label=labels, bins=50))
+            plt.legend(title="Threshold")
+
+            if save:
+                fig.savefig(path + "hc-frequency." + ext)
+            else:
+                plt.show(fig)
 
             if self.community_type == 'oscillator':
 
@@ -357,177 +357,177 @@ class DataPlotter:
 
                     # Coalition Entropy vs Beta
                     # -------------------------
-                    # fig = plt.figure()
-                    # handles = []
-                    # labels = []
-                    # for key in cursors:
-                    #     labels.append(key)
-                    #     handles.append(plt.scatter(beta[key],
-                    #                                coalition_entropy[key],
-                    #                                color=colors[key],
-                    #                                label=key))
-                    # # plt.title("Coalition Entropy vs Beta\nTau = " + str(tau))
-                    # plt.xlabel(r"$\beta$")
-                    # plt.ylabel(r"Coalition Entropy ($H_C$)")
-                    # if len(thresholds) == 1:
-                    #     plt.ylim(ymin=-0.01, ymax=1)
-                    # else:
-                    #     plt.ylim(ymin=-0.01, ymax=1)
-                    #
-                    # if 'beta' in query:
-                    #     plt.xlim(xmin=0, xmax=0.8)
-                    #     plt.xticks([0, np.pi / 16, np.pi / 8,
-                    #                 3 * np.pi / 16, np.pi / 4],
-                    #                ['$0$',
-                    #                 r'$\frac{\pi}{16}$',
-                    #                 r'$\frac{\pi}{8}$',
-                    #                 r'$\frac{3\pi}{16}$',
-                    #                 r'$\frac{\pi}{4}$'])
-                    # else:
-                    #     plt.xlim(xmin=0, xmax=6.3)
-                    #     plt.xticks([0, np.pi / 2, np.pi,
-                    #                 3 * np.pi / 2, 2 * np.pi],
-                    #                ['$0$',
-                    #                 r'$\frac{\pi}{2}$',
-                    #                 r'$\pi$',
-                    #                 r'$\frac{3\pi}{2}$',
-                    #                 r'$2\pi$'])
-                    # labels, handles = zip(*sorted(zip(labels, handles),
-                    #                               key=lambda x: x[0]))
-                    # legend = plt.legend(handles, labels,
-                    #                     title=r"Threshold ($\gamma$)")
-                    # plt.setp(legend.get_title(), fontsize='xx-large')
-                    # if save:
-                    #     fig.savefig(path + "7." + ext)
-                    # else:
-                    #     plt.show(fig)
+                    fig = plt.figure()
+                    handles = []
+                    labels = []
+                    for key in cursors:
+                        labels.append(key)
+                        handles.append(plt.scatter(beta[key],
+                                                   coalition_entropy[key],
+                                                   color=colors[key],
+                                                   label=key))
+                    # plt.title("Coalition Entropy vs Beta\nTau = " + str(tau))
+                    plt.xlabel(r"$\beta$")
+                    plt.ylabel(r"Coalition Entropy ($H_C$)")
+                    if len(thresholds) == 1:
+                        plt.ylim(ymin=-0.01, ymax=1)
+                    else:
+                        plt.ylim(ymin=-0.01, ymax=1)
+
+                    if 'beta' in query:
+                        plt.xlim(xmin=0, xmax=0.8)
+                        plt.xticks([0, np.pi / 16, np.pi / 8,
+                                    3 * np.pi / 16, np.pi / 4],
+                                   ['$0$',
+                                    r'$\frac{\pi}{16}$',
+                                    r'$\frac{\pi}{8}$',
+                                    r'$\frac{3\pi}{16}$',
+                                    r'$\frac{\pi}{4}$'])
+                    else:
+                        plt.xlim(xmin=0, xmax=6.3)
+                        plt.xticks([0, np.pi / 2, np.pi,
+                                    3 * np.pi / 2, 2 * np.pi],
+                                   ['$0$',
+                                    r'$\frac{\pi}{2}$',
+                                    r'$\pi$',
+                                    r'$\frac{3\pi}{2}$',
+                                    r'$2\pi$'])
+                    labels, handles = zip(*sorted(zip(labels, handles),
+                                                  key=lambda x: x[0]))
+                    legend = plt.legend(handles, labels,
+                                        title=r"Threshold ($\gamma$)")
+                    plt.setp(legend.get_title(), fontsize='xx-large')
+                    if save:
+                        fig.savefig(path + "7." + ext)
+                    else:
+                        plt.show(fig)
 
                     # Global Synchrony vs Beta
                     # ------------------------
-                    # fig = plt.figure()
-                    # handles = []
-                    # labels = []
-                    # for key in cursors:
-                    #     labels.append(key)
-                    #     handles.append(plt.scatter(beta[key],
-                    #                                global_sync[key],
-                    #                                color=colors[key],
-                    #                                label=key))
-                    # # plt.title("Global Synchrony vs Beta\nTau = " + str(tau))
-                    # plt.xlabel(r"$\beta$")
-                    # plt.ylabel(r"Global Synchrony ($\Psi$)")
-                    # plt.ylim(ymin=0, ymax=1.01)
-                    # if 'beta' in query:
-                    #     plt.xlim(xmin=0, xmax=0.8)
-                    #     plt.xticks([0, np.pi / 16, np.pi / 8,
-                    #                 3 * np.pi / 16, np.pi / 4],
-                    #                ['$0$',
-                    #                 r'$\frac{\pi}{16}$',
-                    #                 r'$\frac{\pi}{8}$',
-                    #                 r'$\frac{3\pi}{16}$',
-                    #                 r'$\frac{\pi}{4}$'])
-                    # else:
-                    #     plt.xlim(xmin=0, xmax=6.3)
-                    #     plt.xticks([0, np.pi / 2, np.pi,
-                    #                 3 * np.pi / 2, 2 * np.pi],
-                    #                ['$0$',
-                    #                 r'$\frac{\pi}{2}$',
-                    #                 r'$\pi$',
-                    #                 r'$\frac{3\pi}{2}$',
-                    #                 r'$2\pi$'])
-                    # location = 2 if 'beta' in query else 1
-                    # legend = plt.legend(handles, labels, loc=location,
-                    #                     title=r"Threshold ($\gamma$)")
-                    # plt.setp(legend.get_title(), fontsize='xx-large')
-                    #
-                    # if save:
-                    #     fig.savefig(path + "7." + ext)
-                    # else:
-                    #     plt.show(fig)
+                    fig = plt.figure()
+                    handles = []
+                    labels = []
+                    for key in cursors:
+                        labels.append(key)
+                        handles.append(plt.scatter(beta[key],
+                                                   global_sync[key],
+                                                   color=colors[key],
+                                                   label=key))
+                    # plt.title("Global Synchrony vs Beta\nTau = " + str(tau))
+                    plt.xlabel(r"$\beta$")
+                    plt.ylabel(r"Global Synchrony ($\Psi$)")
+                    plt.ylim(ymin=0, ymax=1.01)
+                    if 'beta' in query:
+                        plt.xlim(xmin=0, xmax=0.8)
+                        plt.xticks([0, np.pi / 16, np.pi / 8,
+                                    3 * np.pi / 16, np.pi / 4],
+                                   ['$0$',
+                                    r'$\frac{\pi}{16}$',
+                                    r'$\frac{\pi}{8}$',
+                                    r'$\frac{3\pi}{16}$',
+                                    r'$\frac{\pi}{4}$'])
+                    else:
+                        plt.xlim(xmin=0, xmax=6.3)
+                        plt.xticks([0, np.pi / 2, np.pi,
+                                    3 * np.pi / 2, 2 * np.pi],
+                                   ['$0$',
+                                    r'$\frac{\pi}{2}$',
+                                    r'$\pi$',
+                                    r'$\frac{3\pi}{2}$',
+                                    r'$2\pi$'])
+                    location = 2 if 'beta' in query else 1
+                    legend = plt.legend(handles, labels, loc=location,
+                                        title=r"Threshold ($\gamma$)")
+                    plt.setp(legend.get_title(), fontsize='xx-large')
+
+                    if save:
+                        fig.savefig(path + "7." + ext)
+                    else:
+                        plt.show(fig)
 
                     # Chimera Index vs Beta
                     # ---------------------
-                    # fig = plt.figure()
-                    # handles = []
-                    # labels = []
-                    # for key in cursors:
-                    #     labels.append(key)
-                    #     handles.append(plt.scatter(beta[key],
-                    #                                chi[key],
-                    #                                color=colors[key],
-                    #                                label=key))
-                    # # plt.title("Chi vs Beta\nTau = 1")
-                    # plt.xlabel(r"$\beta$")
-                    # plt.ylabel(r"Chimera Index ($\chi$)")
-                    # plt.ylim(ymin=-0.001, ymax=0.05)
-                    # if 'beta' in query:
-                    #     plt.xlim(xmin=0, xmax=0.8)
-                    #     plt.xticks([0, np.pi / 16, np.pi / 8,
-                    #                 3 * np.pi / 16, np.pi / 4],
-                    #                ['$0$',
-                    #                 r'$\frac{\pi}{16}$',
-                    #                 r'$\frac{\pi}{8}$',
-                    #                 r'$\frac{3\pi}{16}$',
-                    #                 r'$\frac{\pi}{4}$'])
-                    # else:
-                    #     plt.xlim(xmin=0, xmax=6.3)
-                    #     plt.xticks([0, np.pi / 2, np.pi,
-                    #                 3 * np.pi / 2, 2 * np.pi],
-                    #                ['$0$',
-                    #                 r'$\frac{\pi}{2}$',
-                    #                 r'$\pi$',
-                    #                 r'$\frac{3\pi}{2}$',
-                    #                 r'$2\pi$'])
-                    # legend = plt.legend(handles, labels, loc=1,
-                    #                     title=r"Threshold ($\gamma$)")
-                    # plt.setp(legend.get_title(), fontsize='xx-large')
-                    #
-                    # if save:
-                    #     fig.savefig(path + "3." + ext)
-                    # else:
-                    #     plt.show(fig)
+                    fig = plt.figure()
+                    handles = []
+                    labels = []
+                    for key in cursors:
+                        labels.append(key)
+                        handles.append(plt.scatter(beta[key],
+                                                   chi[key],
+                                                   color=colors[key],
+                                                   label=key))
+                    # plt.title("Chi vs Beta\nTau = 1")
+                    plt.xlabel(r"$\beta$")
+                    plt.ylabel(r"Chimera Index ($\chi$)")
+                    plt.ylim(ymin=-0.001, ymax=0.05)
+                    if 'beta' in query:
+                        plt.xlim(xmin=0, xmax=0.8)
+                        plt.xticks([0, np.pi / 16, np.pi / 8,
+                                    3 * np.pi / 16, np.pi / 4],
+                                   ['$0$',
+                                    r'$\frac{\pi}{16}$',
+                                    r'$\frac{\pi}{8}$',
+                                    r'$\frac{3\pi}{16}$',
+                                    r'$\frac{\pi}{4}$'])
+                    else:
+                        plt.xlim(xmin=0, xmax=6.3)
+                        plt.xticks([0, np.pi / 2, np.pi,
+                                    3 * np.pi / 2, 2 * np.pi],
+                                   ['$0$',
+                                    r'$\frac{\pi}{2}$',
+                                    r'$\pi$',
+                                    r'$\frac{3\pi}{2}$',
+                                    r'$2\pi$'])
+                    legend = plt.legend(handles, labels, loc=1,
+                                        title=r"Threshold ($\gamma$)")
+                    plt.setp(legend.get_title(), fontsize='xx-large')
+
+                    if save:
+                        fig.savefig(path + "3." + ext)
+                    else:
+                        plt.show(fig)
 
                     # Metastability Index vs Beta
                     # ---------------------------
-                    # fig = plt.figure()
-                    # handles = []
-                    # labels = []
-                    # for key in cursors:
-                    #     labels.append(key)
-                    #     handles.append(plt.scatter(beta[key],
-                    #                                lamda[key],
-                    #                                color=colors[key],
-                    #                                label=key))
-                    # # plt.title("Lambda vs Beta\nTau = 1")
-                    # plt.xlabel(r"$\beta$")
-                    # plt.ylabel(r"Metastability Index ($\lambda$)")
-                    # plt.ylim(ymin=-0.001, ymax=0.05)
-                    # if 'beta' in query:
-                    #     plt.xlim(xmin=-0.01, xmax=0.8)
-                    #     plt.xticks([0, np.pi / 16, np.pi / 8,
-                    #                 3 * np.pi / 16, np.pi / 4],
-                    #                ['$0$',
-                    #                 r'$\frac{\pi}{16}$',
-                    #                 r'$\frac{\pi}{8}$',
-                    #                 r'$\frac{3\pi}{16}$',
-                    #                 r'$\frac{\pi}{4}$'])
-                    # else:
-                    #     plt.xlim(xmin=-0.05, xmax=6.3)
-                    #     plt.xticks([0, np.pi / 2, np.pi,
-                    #                 3 * np.pi / 2, 2 * np.pi],
-                    #                ['$0$',
-                    #                 r'$\frac{\pi}{2}$',
-                    #                 r'$\pi$',
-                    #                 r'$\frac{3\pi}{2}$',
-                    #                 r'$2\pi$'])
-                    # legend = plt.legend(handles, labels, loc=1,
-                    #                     title=r"Threshold ($\gamma$)")
-                    # plt.setp(legend.get_title(), fontsize='xx-large')
-                    #
-                    # if save:
-                    #     fig.savefig(path + "4." + ext)
-                    # else:
-                    #     plt.show(fig)
+                    fig = plt.figure()
+                    handles = []
+                    labels = []
+                    for key in cursors:
+                        labels.append(key)
+                        handles.append(plt.scatter(beta[key],
+                                                   lamda[key],
+                                                   color=colors[key],
+                                                   label=key))
+                    # plt.title("Lambda vs Beta\nTau = 1")
+                    plt.xlabel(r"$\beta$")
+                    plt.ylabel(r"Metastability Index ($\lambda$)")
+                    plt.ylim(ymin=-0.001, ymax=0.05)
+                    if 'beta' in query:
+                        plt.xlim(xmin=-0.01, xmax=0.8)
+                        plt.xticks([0, np.pi / 16, np.pi / 8,
+                                    3 * np.pi / 16, np.pi / 4],
+                                   ['$0$',
+                                    r'$\frac{\pi}{16}$',
+                                    r'$\frac{\pi}{8}$',
+                                    r'$\frac{3\pi}{16}$',
+                                    r'$\frac{\pi}{4}$'])
+                    else:
+                        plt.xlim(xmin=-0.05, xmax=6.3)
+                        plt.xticks([0, np.pi / 2, np.pi,
+                                    3 * np.pi / 2, 2 * np.pi],
+                                   ['$0$',
+                                    r'$\frac{\pi}{2}$',
+                                    r'$\pi$',
+                                    r'$\frac{3\pi}{2}$',
+                                    r'$2\pi$'])
+                    legend = plt.legend(handles, labels, loc=1,
+                                        title=r"Threshold ($\gamma$)")
+                    plt.setp(legend.get_title(), fontsize='xx-large')
+
+                    if save:
+                        fig.savefig(path + "4." + ext)
+                    else:
+                        plt.show(fig)
 
                     # Allow disabling all plots under this block.
                     pass
@@ -538,96 +538,96 @@ class DataPlotter:
 
                 # Phi vs Beta
                 # -----------
-                # fig = plt.figure()
-                # handles = []
-                # labels = []
-                # for key in cursors:
-                #     labels.append(key)
-                #     handles.append(plt.scatter(beta[key],
-                #                                phi[key],
-                #                                color=colors[key],
-                #                                label=key))
-                # # plt.title(phi_label + " vs Beta\nTau = " + str(tau))
-                # plt.xlabel(r"$\beta$")
-                # plt.ylabel(phi_label)
-                # if run == 0:
-                #     if len(thresholds) == 1:
-                #         plt.ylim(ymin=-0.1, ymax=0.51)
-                #     else:
-                #         plt.ylim(ymin=-0.15, ymax=0.71)
-                #
-                #     if is_sorted:
-                #         plt.ylim(ymin=-0.5, ymax=0.1)
-                # else:
-                #     plt.ylim(ymin=-0.01, ymax=0.65)
-                #
-                #     if is_sorted:
-                #         plt.ylim(ymin=-0.25, ymax=0.1)
-                #
-                # if 'beta' in query:
-                #     plt.xlim(xmin=-0.01, xmax=0.8)
-                #     plt.xticks([0, np.pi / 16, np.pi / 8,
-                #                 3 * np.pi / 16, np.pi / 4],
-                #                ['$0$',
-                #                 r'$\frac{\pi}{16}$',
-                #                 r'$\frac{\pi}{8}$',
-                #                 r'$\frac{3\pi}{16}$',
-                #                 r'$\frac{\pi}{4}$'])
-                # else:
-                #     plt.xlim(xmin=-0.05, xmax=6.3)
-                #     plt.xticks([0, np.pi / 2, np.pi,
-                #                 3 * np.pi / 2, 2 * np.pi],
-                #                ['$0$',
-                #                 r'$\frac{\pi}{2}$',
-                #                 r'$\pi$',
-                #                 r'$\frac{3\pi}{2}$',
-                #                 r'$2\pi$'])
-                #
-                # labels, handles = zip(*sorted(zip(labels, handles),
-                #                               key=lambda x: x[0]))
-                # legend = plt.legend(handles, labels,
-                #                     title=r"Threshold ($\gamma$)")
-                # plt.setp(legend.get_title(), fontsize='xx-large')
-                #
-                # if save:
-                #     fig.savefig(path + "2." + ext)
-                # else:
-                #     plt.show(fig)
+                fig = plt.figure()
+                handles = []
+                labels = []
+                for key in cursors:
+                    labels.append(key)
+                    handles.append(plt.scatter(beta[key],
+                                               phi[key],
+                                               color=colors[key],
+                                               label=key))
+                # plt.title(phi_label + " vs Beta\nTau = " + str(tau))
+                plt.xlabel(r"$\beta$")
+                plt.ylabel(phi_label)
+                if run == 0:
+                    if len(thresholds) == 1:
+                        plt.ylim(ymin=-0.1, ymax=0.51)
+                    else:
+                        plt.ylim(ymin=-0.15, ymax=0.71)
+
+                    if is_sorted:
+                        plt.ylim(ymin=-0.5, ymax=0.1)
+                else:
+                    plt.ylim(ymin=-0.01, ymax=0.65)
+
+                    if is_sorted:
+                        plt.ylim(ymin=-0.25, ymax=0.1)
+
+                if 'beta' in query:
+                    plt.xlim(xmin=-0.01, xmax=0.8)
+                    plt.xticks([0, np.pi / 16, np.pi / 8,
+                                3 * np.pi / 16, np.pi / 4],
+                               ['$0$',
+                                r'$\frac{\pi}{16}$',
+                                r'$\frac{\pi}{8}$',
+                                r'$\frac{3\pi}{16}$',
+                                r'$\frac{\pi}{4}$'])
+                else:
+                    plt.xlim(xmin=-0.05, xmax=6.3)
+                    plt.xticks([0, np.pi / 2, np.pi,
+                                3 * np.pi / 2, 2 * np.pi],
+                               ['$0$',
+                                r'$\frac{\pi}{2}$',
+                                r'$\pi$',
+                                r'$\frac{3\pi}{2}$',
+                                r'$2\pi$'])
+
+                labels, handles = zip(*sorted(zip(labels, handles),
+                                              key=lambda x: x[0]))
+                legend = plt.legend(handles, labels,
+                                    title=r"Threshold ($\gamma$)")
+                plt.setp(legend.get_title(), fontsize='xx-large')
+
+                if save:
+                    fig.savefig(path + "2." + ext)
+                else:
+                    plt.show(fig)
 
                 # Phi vs Chi
                 # ----------
-                # fig = plt.figure()
-                # handles = []
-                # labels = []
-                # for key in cursors:
-                #     labels.append(key)
-                #     plt.xlabel(r"Chimera Index ($\chi$)")
-                #     plt.ylabel(phi_label)
-                #     if run == 0:
-                #         if len(thresholds) == 3:
-                #             plt.ylim(ymin=-0.15, ymax=0.6)
-                #         else:
-                #             plt.ylim(ymin=-0.15, ymax=0.7)
-                #     else:
-                #         if len(thresholds) == 3:
-                #             plt.ylim(ymin=-0.01, ymax=0.7)
-                #         else:
-                #             plt.ylim(ymin=-0.01, ymax=0.8)
-                #     plt.xlim(xmin=0, xmax=0.05)
-                #     # plt.title(phi_label + " vs Chi\nTau = 1")
-                #     handles.append(plt.scatter(chi[key],
-                #                                phi[key],
-                #                                color=colors[key],
-                #                                label=key))
-                # labels, handles = zip(*sorted(zip(labels, handles),
-                #                               key=lambda x: x[0]))
-                # legend = plt.legend(handles, labels, loc=2,
-                #                     title=r"Threshold ($\gamma$)")
-                # plt.setp(legend.get_title(), fontsize='xx-large')
-                # if save:
-                #     fig.savefig(path + "5." + ext)
-                # else:
-                #     plt.show(fig)
+                fig = plt.figure()
+                handles = []
+                labels = []
+                for key in cursors:
+                    labels.append(key)
+                    plt.xlabel(r"Chimera Index ($\chi$)")
+                    plt.ylabel(phi_label)
+                    if run == 0:
+                        if len(thresholds) == 3:
+                            plt.ylim(ymin=-0.15, ymax=0.6)
+                        else:
+                            plt.ylim(ymin=-0.15, ymax=0.7)
+                    else:
+                        if len(thresholds) == 3:
+                            plt.ylim(ymin=-0.01, ymax=0.7)
+                        else:
+                            plt.ylim(ymin=-0.01, ymax=0.8)
+                    plt.xlim(xmin=0, xmax=0.05)
+                    # plt.title(phi_label + " vs Chi\nTau = 1")
+                    handles.append(plt.scatter(chi[key],
+                                               phi[key],
+                                               color=colors[key],
+                                               label=key))
+                labels, handles = zip(*sorted(zip(labels, handles),
+                                              key=lambda x: x[0]))
+                legend = plt.legend(handles, labels, loc=2,
+                                    title=r"Threshold ($\gamma$)")
+                plt.setp(legend.get_title(), fontsize='xx-large')
+                if save:
+                    fig.savefig(path + "5." + ext)
+                else:
+                    plt.show(fig)
 
                 # Surrogate data plots.
                 # =====================
@@ -635,55 +635,55 @@ class DataPlotter:
 
                     # Phi Surrogate vs Phi
                     # --------------------
-                    # fig = plt.figure()
-                    # handles = []
-                    # labels = []
-                    # location = 1
-                    # for key in cursors:
-                    #
-                    #     # Legend labels.
-                    #     labels.append(key)
-                    #
-                    #     # Axes labels.
-                    #     plt.xlabel(phi_label)
-                    #     if is_sorted:
-                    #         plt.ylabel(phi_sorted_label)
-                    #     elif is_shuffled:
-                    #         plt.ylabel(phi_shuffled_label)
-                    #
-                    #     # Axes ranges.
-                    #     if run == 0:
-                    #         plt.xlim(xmin=-0.15, xmax=0.7)
-                    #         if is_sorted:
-                    #             plt.ylim(ymin=-0.5, ymax=0.1)
-                    #         if is_shuffled:
-                    #             plt.ylim(ymin=-0.05, ymax=1.8)
-                    #             location = 2
-                    #     else:
-                    #         plt.xlim(xmin=-0.01, xmax=0.8)
-                    #         if is_sorted:
-                    #             plt.ylim(ymin=-0.25, ymax=0.1)
-                    #         if is_shuffled:
-                    #             plt.ylim(ymin=-0.05, ymax=1.8)
-                    #             location = 2
-                    #
-                    #     # Plot and assign to handles for legend.
-                    #     handles.append(plt.scatter(phi_original[key],
-                    #                                phi[key],
-                    #                                color=colors[key],
-                    #                                label=key))
-                    #
-                    # # Sort and draw legend.
-                    # labels, handles = zip(*sorted(zip(labels, handles),
-                    #                               key=lambda x: x[0]))
-                    # legend = plt.legend(handles, labels, loc=location,
-                    #                     title=r"Threshold ($\gamma$)")
-                    # plt.setp(legend.get_title(), fontsize='xx-large')
-                    #
-                    # if save:
-                    #     fig.savefig(path + "2." + ext)
-                    # else:
-                    #     plt.show(fig)
+                    fig = plt.figure()
+                    handles = []
+                    labels = []
+                    location = 1
+                    for key in cursors:
+
+                        # Legend labels.
+                        labels.append(key)
+
+                        # Axes labels.
+                        plt.xlabel(phi_label)
+                        if is_sorted:
+                            plt.ylabel(phi_sorted_label)
+                        elif is_shuffled:
+                            plt.ylabel(phi_shuffled_label)
+
+                        # Axes ranges.
+                        if run == 0:
+                            plt.xlim(xmin=-0.15, xmax=0.7)
+                            if is_sorted:
+                                plt.ylim(ymin=-0.5, ymax=0.1)
+                            if is_shuffled:
+                                plt.ylim(ymin=-0.05, ymax=1.8)
+                                location = 2
+                        else:
+                            plt.xlim(xmin=-0.01, xmax=0.8)
+                            if is_sorted:
+                                plt.ylim(ymin=-0.25, ymax=0.1)
+                            if is_shuffled:
+                                plt.ylim(ymin=-0.05, ymax=1.8)
+                                location = 2
+
+                        # Plot and assign to handles for legend.
+                        handles.append(plt.scatter(phi_original[key],
+                                                   phi[key],
+                                                   color=colors[key],
+                                                   label=key))
+
+                    # Sort and draw legend.
+                    labels, handles = zip(*sorted(zip(labels, handles),
+                                                  key=lambda x: x[0]))
+                    legend = plt.legend(handles, labels, loc=location,
+                                        title=r"Threshold ($\gamma$)")
+                    plt.setp(legend.get_title(), fontsize='xx-large')
+
+                    if save:
+                        fig.savefig(path + "2." + ext)
+                    else:
+                        plt.show(fig)
 
                     # Allow disabling all plots under this block.
                     pass
@@ -702,120 +702,120 @@ class DataPlotter:
 
                     # Coalition Entropy vs Weight and SCP
                     # -----------------------------------
-                    # for key in cursors:
-                    #     fig = plt.figure()
-                    #     ax = fig.gca(projection='3d')
-                    #     ax.plot_trisurf(weight[key],
-                    #                     scp[key],
-                    #                     coalition_entropy[key],
-                    #                     linewidth=0.2,
-                    #                     cmap=cm.jet)
-                    #     legend = plt.legend([], [],
-                    #                         title=r"Threshold ($\gamma$) = " +
-                    #                               str(key))
-                    #     plt.setp(legend.get_title(), fontsize='xx-large')
-                    #     ax.set_xlabel(r"Weight ($W$)")
-                    #     ax.set_ylabel(r"Connection Probability ($P$)")
-                    #     ax.set_zlabel(r"Coalition Entropy ($H_C$)")
-                    #     ax.set_xlim3d(0, 1)         # Weight
-                    #     ax.set_ylim3d(0, 1)         # Connection Probability
-                    #     ax.set_zlim3d(0, 2)         # Coalition Entropy
-                    #
-                    #     if save:
-                    #         fig.savefig(path + "5." + ext)
-                    #     else:
-                    #         plt.show(fig)
+                    for key in cursors:
+                        fig = plt.figure()
+                        ax = fig.gca(projection='3d')
+                        ax.plot_trisurf(weight[key],
+                                        scp[key],
+                                        coalition_entropy[key],
+                                        linewidth=0.2,
+                                        cmap=cm.jet)
+                        legend = plt.legend([], [],
+                                            title=r"Threshold ($\gamma$) = " +
+                                                  str(key))
+                        plt.setp(legend.get_title(), fontsize='xx-large')
+                        ax.set_xlabel(r"Weight ($W$)")
+                        ax.set_ylabel(r"Connection Probability ($P$)")
+                        ax.set_zlabel(r"Coalition Entropy ($H_C$)")
+                        ax.set_xlim3d(0, 1)         # Weight
+                        ax.set_ylim3d(0, 1)         # Connection Probability
+                        ax.set_zlim3d(0, 2)         # Coalition Entropy
+
+                        if save:
+                            fig.savefig(path + "5." + ext)
+                        else:
+                            plt.show(fig)
 
                     # Lambda vs Weight and SCP
                     # ------------------------
-                    # for key in cursors:
-                    #     fig = plt.figure()
-                    #     ax = fig.gca(projection='3d')
-                    #     ax.plot_trisurf(weight[key],
-                    #                     scp[key],
-                    #                     lamda[key],
-                    #                     linewidth=0.2,
-                    #                     cmap=cm.jet)
-                    #     legend = plt.legend([], [],
-                    #                         title=r"Threshold ($\gamma$) = " +
-                    #                               str(key))
-                    #     plt.setp(legend.get_title(), fontsize='xx-large')
-                    #     ax.set_ylabel(r"Synaptic Connection Probability ($P$)")
-                    #     ax.set_xlabel(r"Weight ($W$)")
-                    #     ax.set_zlabel(r"Metastability Index ($\lambda$)")
-                    #     ax.set_xlim3d(0, 1)         # Weight
-                    #     ax.set_ylim3d(0, 1)         # Connection Probability
-                    #     ax.set_zlim3d(0, 0.08)      # Metastability Index
-                    #
-                    #     if save:
-                    #         fig.savefig(path + "5." + ext)
-                    #     else:
-                    #         plt.show(fig)
+                    for key in cursors:
+                        fig = plt.figure()
+                        ax = fig.gca(projection='3d')
+                        ax.plot_trisurf(weight[key],
+                                        scp[key],
+                                        lamda[key],
+                                        linewidth=0.2,
+                                        cmap=cm.jet)
+                        legend = plt.legend([], [],
+                                            title=r"Threshold ($\gamma$) = " +
+                                                  str(key))
+                        plt.setp(legend.get_title(), fontsize='xx-large')
+                        ax.set_ylabel(r"Synaptic Connection Probability ($P$)")
+                        ax.set_xlabel(r"Weight ($W$)")
+                        ax.set_zlabel(r"Metastability Index ($\lambda$)")
+                        ax.set_xlim3d(0, 1)         # Weight
+                        ax.set_ylim3d(0, 1)         # Connection Probability
+                        ax.set_zlim3d(0, 0.08)      # Metastability Index
+
+                        if save:
+                            fig.savefig(path + "5." + ext)
+                        else:
+                            plt.show(fig)
 
                     # Global Synchrony vs Weight and SCP
                     # ----------------------------------
-                    # for key in cursors:
-                    #     fig = plt.figure()
-                    #     ax = fig.gca(projection='3d')
-                    #     ax.plot_trisurf(weight[key],
-                    #                     scp[key],
-                    #                     global_sync[key],
-                    #                     linewidth=0.2,
-                    #                     cmap=cm.jet)
-                    #     legend = plt.legend([], [],
-                    #                         title=r"Threshold ($\gamma$) = " +
-                    #                               str(key))
-                    #     plt.setp(legend.get_title(), fontsize='xx-large')
-                    #     ax.set_xlabel(r"Weight ($W$)")
-                    #     ax.set_ylabel(r"Synaptic Connection Probability ($P$)")
-                    #     ax.set_zlabel(r"Global Synchrony ($\Psi$)")
-                    #     ax.set_xlim3d(0, 1)         # Weight
-                    #     ax.set_ylim3d(0, 1)         # Connection Probability
-                    #     ax.set_zlim3d(0, 1)         # Global Synchrony
-                    #
-                    #     if save:
-                    #         fig.savefig(path + "5." + ext)
-                    #     else:
-                    #         plt.show(fig)
+                    for key in cursors:
+                        fig = plt.figure()
+                        ax = fig.gca(projection='3d')
+                        ax.plot_trisurf(weight[key],
+                                        scp[key],
+                                        global_sync[key],
+                                        linewidth=0.2,
+                                        cmap=cm.jet)
+                        legend = plt.legend([], [],
+                                            title=r"Threshold ($\gamma$) = " +
+                                                  str(key))
+                        plt.setp(legend.get_title(), fontsize='xx-large')
+                        ax.set_xlabel(r"Weight ($W$)")
+                        ax.set_ylabel(r"Synaptic Connection Probability ($P$)")
+                        ax.set_zlabel(r"Global Synchrony ($\Psi$)")
+                        ax.set_xlim3d(0, 1)         # Weight
+                        ax.set_ylim3d(0, 1)         # Connection Probability
+                        ax.set_zlim3d(0, 1)         # Global Synchrony
+
+                        if save:
+                            fig.savefig(path + "5." + ext)
+                        else:
+                            plt.show(fig)
 
                     # Allow disabling all plots under this block.
                     pass
 
                 # Phi vs Weight and SCP
                 # ---------------------
-                # for key in cursors:
-                #     fig = plt.figure()
-                #     ax = fig.gca(projection='3d')
-                #     location = 2
-                #     legend = plt.legend([], [], loc=location,
-                #                         title=r"$\gamma$ = " + str(key) + "\n" +
-                #                               r"$\tau$ = " + str(tau))
-                #     plt.setp(legend.get_title(), fontsize='xx-large')
-                #     ax.plot_trisurf(weight[key],
-                #                     scp[key],
-                #                     phi[key],
-                #                     linewidth=0.2,
-                #                     cmap=cm.jet)
-                #     ax.set_xlabel(r"Weight ($W$)")
-                #     ax.set_ylabel(r"Connection Probability ($P$)")
-                #     ax.set_zlabel(phi_label)
-                #     ax.set_xlim3d(0, 1)         # Weight
-                #     ax.set_ylim3d(0, 1)         # Connection Probability
-                #     if run == 0:
-                #         if tau == 1:
-                #             ax.set_zlim3d(-2.5, 0)
-                #         elif tau == 5:
-                #             ax.set_zlim3d(-1.5, 1)
-                #     else:
-                #         if tau == 1:
-                #             ax.set_zlim3d(0, 0.5)
-                #         elif tau == 5:
-                #             ax.set_zlim3d(0, 1.2)
-                #
-                #     if save:
-                #         fig.savefig(path + "5." + ext)
-                #     else:
-                #         plt.show(fig)
+                for key in cursors:
+                    fig = plt.figure()
+                    ax = fig.gca(projection='3d')
+                    location = 2
+                    legend = plt.legend([], [], loc=location,
+                                        title=r"$\gamma$ = " + str(key) + "\n" +
+                                              r"$\tau$ = " + str(tau))
+                    plt.setp(legend.get_title(), fontsize='xx-large')
+                    ax.plot_trisurf(weight[key],
+                                    scp[key],
+                                    phi[key],
+                                    linewidth=0.2,
+                                    cmap=cm.jet)
+                    ax.set_xlabel(r"Weight ($W$)")
+                    ax.set_ylabel(r"Connection Probability ($P$)")
+                    ax.set_zlabel(phi_label)
+                    ax.set_xlim3d(0, 1)         # Weight
+                    ax.set_ylim3d(0, 1)         # Connection Probability
+                    if run == 0:
+                        if tau == 1:
+                            ax.set_zlim3d(-2.5, 0)
+                        elif tau == 5:
+                            ax.set_zlim3d(-1.5, 1)
+                    else:
+                        if tau == 1:
+                            ax.set_zlim3d(0, 0.5)
+                        elif tau == 5:
+                            ax.set_zlim3d(0, 1.2)
+
+                    if save:
+                        fig.savefig(path + "5." + ext)
+                    else:
+                        plt.show(fig)
 
                 # Allow disabling all plots under this block.
                 pass
@@ -875,41 +875,40 @@ class DataPlotter:
 
             # Coalition Entropy Surrogate vs Coalition Entropy
             # ------------------------------------------------
-            # fig, ax = plt.subplots()
-            # handles = []
-            # labels = []
-            # for key in cursors:
-            #     labels.append(key)
-            #     plt.xlabel(r"Coalition Entropy ($H_C$)")
-            #     plt.ylabel(r"Coalition Entropy Sorted ($H'_C$)")
-            #     plt.ylim(ymin=-0.01, ymax=1)
-            #     plt.xlim(xmin=0, xmax=1)
-            #     handles.append(ax.scatter(hc_original[key],
-            #                               coalition_entropy[key],
-            #                               color=colors[key],
-            #                               label=key))
-            # # Add whitespace.
-            # space = mlines.Line2D([], [], color='white', label='')
-            # handles.append(space)
-            # labels.append('')
-            #
-            # # Add H_C = H'_C line.
-            # x = np.linspace(*ax.get_xlim())
-            # ax.plot(x, x, color='black', ls='dashed', lw=2)
-            # line = mlines.Line2D([], [], color='black', ls='dashed',
-            #                      label=r"$H_C = H'_C$")
-            # handles.append(line)
-            # labels.append(r"$H_C = H'_C$")
-            # labels, handles = zip(*sorted(zip(labels, handles),
-            #                               key=lambda x: x[0]))
-            # legend = ax.legend(handles, labels, loc=2,
-            #                    title=r"Threshold ($\gamma$)")
-            # plt.setp(legend.get_title(), fontsize='xx-large')
-            # if save:
-            #     fig.savefig(path + "7." + ext)
-            # else:
-            #     plt.show(fig)
+            fig, ax = plt.subplots()
+            handles = []
+            labels = []
+            for key in cursors:
+                labels.append(key)
+                plt.xlabel(r"Coalition Entropy ($H_C$)")
+                plt.ylabel(r"Coalition Entropy Sorted ($H'_C$)")
+                plt.ylim(ymin=-0.01, ymax=1)
+                plt.xlim(xmin=0, xmax=1)
+                handles.append(ax.scatter(hc_original[key],
+                                          coalition_entropy[key],
+                                          color=colors[key],
+                                          label=key))
+            # Add whitespace.
+            space = mlines.Line2D([], [], color='white', label='')
+            handles.append(space)
+            labels.append('')
 
+            # Add H_C = H'_C line.
+            x = np.linspace(*ax.get_xlim())
+            ax.plot(x, x, color='black', ls='dashed', lw=2)
+            line = mlines.Line2D([], [], color='black', ls='dashed',
+                                 label=r"$H_C = H'_C$")
+            handles.append(line)
+            labels.append(r"$H_C = H'_C$")
+            labels, handles = zip(*sorted(zip(labels, handles),
+                                          key=lambda x: x[0]))
+            legend = ax.legend(handles, labels, loc=2,
+                               title=r"Threshold ($\gamma$)")
+            plt.setp(legend.get_title(), fontsize='xx-large')
+            if save:
+                fig.savefig(path + "7." + ext)
+            else:
+                plt.show(fig)
 
             pass
 
@@ -1860,33 +1859,31 @@ if __name__ == "__main__":
 
     # Results for Kuramoto Oscillators
     # --------------------------------
-    # q = {
-    #     'num_oscillators': 8,
-    #     'is_surrogate': False,
-    #     'beta': {'$lte': (math.pi / 4)}
-    # }
-    # osc_thresholds = [0.5]
-    # osc_thresholds = [0.6]
-    # osc_thresholds = [0.7]
-    # osc_thresholds = [0.8]
-    # osc_thresholds = [0.9]
-    # osc_thresholds = [0.6, 0.7, 0.8]
-    # osc_thresholds = [0.9, 0.8, 0.7, 0.6, 0.5]
-    # dp = DataPlotter(community_type='oscillator', database='infotheoretic')
-    # dp.plot(save=False,
-    #         path="/Users/juancarlosfarah/Git/infotheoretic/docs/phi_e_tilde/",
-    #         ext="svg",
-    #         tau=1,
-    #         query=q,
-    #         thresholds=osc_thresholds)
+    q = {
+        'num_oscillators': 8,
+        'is_surrogate': False,
+        'beta': {'$lte': (math.pi / 4)}
+    }
+    osc_thresholds = [0.9, 0.8, 0.7, 0.6, 0.5]
+    dp = DataPlotter(community_type='oscillator', database='infotheoretic')
+    dp.plot(save=False,
+            path="/Users/juancarlosfarah/Git/infotheoretic/docs/phi_e_tilde/",
+            ext="svg",
+            tau=1,
+            query=q,
+            thresholds=osc_thresholds)
 
     # Results for Spiking Neural Networks
     # -----------------------------------
     dp = DataPlotter(community_type='snn', database='infotheoretic')
     q_snn = {}
-    # snn_thresholds = [0.8]
-    # snn_thresholds = [0.95]
     snn_thresholds = [0.95, 0.8]
+    dp.plot(save=False,
+            path="/Users/juancarlosfarah/Git/infotheoretic/docs/phi_e_tilde/",
+            ext="svg",
+            tau=1,
+            query=q_snn,
+            thresholds=snn_thresholds)
     dp.plot(save=False,
             path="/Users/juancarlosfarah/Git/infotheoretic/docs/phi_e_tilde/",
             ext="svg",
@@ -1894,64 +1891,27 @@ if __name__ == "__main__":
             query=q_snn,
             thresholds=snn_thresholds)
 
-    # plot_surrogate_correlation(phi="phi_e",
-    #                            save=False,
-    #                            path="/Users/juancarlosfarah/Git/infotheoretic/docs/surrogate/",
-    #                            ext="png")
-
-    # plot_mi_results(save=False,
-    #                 path="$HOME",
-    #                 ext="svg",
-    #                 query=q,
-    #                 duration=5000,
-    #                 num_oscillators=8)
-
     # Surrogate Data
     # --------------
-    # dp = DataPlotter('oscillator', database='infotheoretic')
-    # q = {
-    #     'shuffled': {'$exists': True},
-    #     'is_surrogate': False,
-    #     'is_surrogate': False,
-    #     'duration': 5000,
-    #     'num_oscillators': 8,
-    #     # 'beta': {'$lte': (math.pi / 4)}
-    # }
-    # osc_thresholds = [0.9, 0.8, 0.7, 0.6, 0.5]
-    # dp.plot(save=False,
-    #         path="/Users/juancarlosfarah/Git/infotheoretic/docs/phi_e_tilde/",
-    #         ext="svg",
-    #         tau=1,
-    #         query=q,
-    #         is_sorted=False,
-    #         is_shuffled=True,
-    #         thresholds=osc_thresholds)
-    # dp.plot_surrogate_analysis()
-    # dp.plot_normalised_surrogate()
-
-    # Results for Kuramoto Oscillators
-    # --------------------------------
-    # q = {
-    #     'num_oscillators': 8,
-    #     'is_surrogate': False,
-    #     # 'beta': {'$lte': (math.pi / 4)}
-    # }
-    # osc_thresholds = [0.5]
-    # osc_thresholds = [0.6]
-    # osc_thresholds = [0.7]
-    # osc_thresholds = [0.8]
-    # osc_thresholds = [0.9]
-    # osc_thresholds = [0.6, 0.7, 0.8]
-    # osc_thresholds = [0.9, 0.8, 0.7, 0.6, 0.5]
-    # dp = DataPlotter(community_type='oscillator', database='infotheoretic')
-    # dp.plot(save=False,
-    #         path="/Users/juancarlosfarah/Git/infotheoretic/docs/phi_e_tilde/",
-    #         ext="svg",
-    #         tau=1,
-    #         query=q,
-    #         thresholds=osc_thresholds)
-
-    # plot_curves()
+    dp = DataPlotter('oscillator', database='infotheoretic')
+    q = {
+        'shuffled': {'$exists': True},
+        'is_surrogate': False,
+        'duration': 5000,
+        'num_oscillators': 8,
+        # 'beta': {'$lte': (math.pi / 4)}
+    }
+    osc_thresholds = [0.9, 0.8, 0.7, 0.6, 0.5]
+    dp.plot(save=False,
+            path="/Users/juancarlosfarah/Git/infotheoretic/docs/phi_e_tilde/",
+            ext="svg",
+            tau=1,
+            query=q,
+            is_sorted=False,
+            is_shuffled=True,
+            thresholds=osc_thresholds)
+    dp.plot_surrogate_analysis()
+    dp.plot_normalised_surrogate()
 
     # Allow main code to be commented out.
     pass
