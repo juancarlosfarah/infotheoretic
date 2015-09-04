@@ -296,12 +296,6 @@ public class Main {
         iicd.addObservations(states1);
         iicd.computePossiblePartitions();
 
-        // System.out.println("\n");
-        // System.out.println("Printing possible partitions:");
-        // for (int[] set : iicd.partitions) {
-        //    System.out.println(Arrays.toString(set));
-        // }
-
         System.out.println(iicd.compute());
         System.out.println(Arrays.deepToString(iicd.minimumInformationPartition));
 
@@ -362,7 +356,6 @@ public class Main {
 
         Document query = new Document();
         if (!override) {
-//            String subKey = shuffle ? "shuffle" : "original";
             Document ne = new Document("$exists", false);
             query.put(tauKey, ne);
         }
@@ -427,7 +420,6 @@ public class Main {
             // Store results in MongoDB.
             if (save) {
                 Document setDoc = new Document();
-//                Document subDoc = new Document();
                 Document update = new Document();
                 Document tauDoc = new Document();
                 update.put("phi_e", ii);
@@ -436,12 +428,6 @@ public class Main {
                 update.put("phi_e_tilde", ii_tilde);
                 update.put("mib_tilde", mib_tilde);
                 update.put("tau", tau);
-
-//                if (shuffle) {
-//                    subDoc.put("shuffled", update);
-//                } else {
-//                    subDoc.put("original", update);
-//                }
 
                 tauDoc.put(tauKey, update);
                 setDoc.put("$set", tauDoc);
@@ -651,6 +637,7 @@ public class Main {
         FindIterable<Document> results = sims.find(query);
 
         for (Document doc : results) {
+
             // Get ObjectId for simulation.
             ObjectId _id = doc.getObjectId("_id");
             int numVars = doc.getInteger("num_vars");
@@ -828,21 +815,20 @@ public class Main {
 
     public static void main(String[] args) {
 
-//        System.out.println("Start tests.");
-//        testMutualInformation();
-//        testMutualInformationTimeSeries();
-//        testMutualInformationTimeSeriesPairs();
-//        testIntegratedInformation();
-//        testCoalitionEntropy();
-//        System.out.println("Tests completed.");
+        System.out.println("Start tests.");
+        testMutualInformation();
+        testMutualInformationTimeSeries();
+        testMutualInformationTimeSeriesPairs();
+        testIntegratedInformation();
+        testCoalitionEntropy();
+        System.out.println("Tests completed.");
 
-//        computePhiEForGeneratedData(true);
-//        computeNormalisedPhiEShuffled(true);
-//        computeCoalitionEntropy(false);
-//        computeIntegratedInformation("snn", 5, false, false, true);
-//        computeIntegratedInformationEmpiricalTilde("snn", 5, false, false);
-//        computeSortedSurrogateDataAnalysis(false);
-//        computeShuffledSurrogateDataAnalysis(true);
+        computePhiEForGeneratedData(false);
+        computeNormalisedPhiEShuffled(false);
+        computeCoalitionEntropy(false);
+        computeIntegratedInformation("snn", 5, false, false, false);
+        computeSortedSurrogateDataAnalysis(false);
+        computeShuffledSurrogateDataAnalysis(false);
     }
 
 }
