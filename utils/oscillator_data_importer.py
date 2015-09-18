@@ -4,6 +4,7 @@ import oct2py
 import os
 import pymongo
 import numpy as np
+import scipy.stats as st
 import sys
 import matrix_utils as mu
 from bson.objectid import ObjectId
@@ -84,8 +85,14 @@ class OscillatorDataImporter:
 
                 # Compute variance for lambda.
                 sync_vars = []
+                skews = []
+                sync_vars_skew = []
                 for i in range(num_oscillators):
                     sync_vars.append(np.var(syncs[i]))
+                    skews.append(st.skew(syncs[i]))
+                    skw_factor = 1.0 - abs(skews[i])/2.0
+                    if skw_factor < 0: skw_factor = 0
+                    sync_vars_skew.append(sync_vars[i] * skw_factor)
 
                 # Compute variance for chi.
                 chi_vars = []
@@ -93,6 +100,7 @@ class OscillatorDataImporter:
                     chi_vars.append(np.var(syncs[:, i]))
 
                 lamda = np.average(sync_vars)
+                lamda_skew = np.average(sync_vars_skew)
                 chi = np.average(chi_vars)
                 avg_sync = np.average(avg_syncs)
 
@@ -102,6 +110,7 @@ class OscillatorDataImporter:
                     "global_sync": avg_sync,
                     "beta": beta,
                     "lambda": lamda,
+                    "lambda_skew": lamda_skew,
                     "chi": chi,
                     "num_oscillators": num_oscillators,
                     "duration": duration,
