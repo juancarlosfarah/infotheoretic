@@ -6,22 +6,14 @@ import pymongo
 import numpy as np
 import scipy.stats as st
 import sys
-import matrix_utils as mu
 from bson.objectid import ObjectId
 from threading import Thread
 
 
-class OscillatorDataImporter:
+class KuramotoDataImporter:
 
-    def __init__(self,
-                 database=None,
-                 is_surrogate=False,
-                 is_shuffled=False,
-                 is_sorted=False):
+    def __init__(self, database=None):
         self.db = database
-        self.is_shuffled = is_shuffled
-        self.is_sorted = is_sorted
-        self.is_surrogate = is_surrogate or is_shuffled or is_sorted
         self.base = 2
 
     def connect(self, database):
@@ -38,6 +30,8 @@ class OscillatorDataImporter:
 
     # noinspection PyUnresolvedReferences
     def load_folder(self, folder, threshold):
+        print "Loading folder..."
+
         if not os.path.isdir(folder):
             raise NameError(folder)
 
@@ -49,11 +43,16 @@ class OscillatorDataImporter:
         file_count = 0
         num_files = len(files)
 
+        # Length of transient period (200 time steps equals 1s).
+        transient = 200
+
+        print "Preparing to load " + str(num_files) + " files..."
         for f in files:
             if f.endswith(".mat"):
+                print "Processing file " + f
                 path = folder + "/" + f
                 output = oc.load(path)
-                sync = output.data.sync
+                sync = output.data.sync[transient:]
                 duration = len(sync)
                 num_oscillators = sync[0].shape[0]
                 avg_syncs = []
@@ -90,8 +89,9 @@ class OscillatorDataImporter:
                 for i in range(num_oscillators):
                     sync_vars.append(np.var(syncs[i]))
                     skews.append(st.skew(syncs[i]))
-                    skw_factor = 1.0 - abs(skews[i])/2.0
-                    if skw_factor < 0: skw_factor = 0
+                    skw_factor = 1.0 - abs(skews[i]) / 2.0
+                    if skw_factor < 0:
+                        skw_factor = 0
                     sync_vars_skew.append(sync_vars[i] * skw_factor)
 
                 # Compute variance for chi.
@@ -114,22 +114,8 @@ class OscillatorDataImporter:
                     "chi": chi,
                     "num_oscillators": num_oscillators,
                     "duration": duration,
-                    "threshold": threshold,
-                    "is_surrogate": self.is_surrogate,
-                    "is_shuffled": self.is_shuffled,
-                    "is_sorted": self.is_sorted
+                    "threshold": threshold
                 }
-
-                # Shuffle if indicated.
-                if self.is_shuffled:
-                    np.random.shuffle(sync_discrete)
-
-                # Sort if indicated.
-                if self.is_sorted:
-                    sync_reduced = mu.reduce(self.base, sync_discrete)
-                    zipped = zip(sync_reduced, sync_discrete)
-                    zipped.sort(key=lambda k: k[0])
-                    sync_discrete = [v[1] for v in zipped]
 
                 # Storing in MongoDB if database has been defined.
                 db = self.db
@@ -146,45 +132,47 @@ class OscillatorDataImporter:
                         sync_objs.append(sync_obj)
 
                     # Insert to database.
-                    db.oscillator_simulation.insert_one(obj)
-                    db.oscillator_data.insert(sync_objs, {'ordered': True})
+                    db.kuramoto_simulation.insert_one(obj)
+                    db.kuramoto_data.insert(sync_objs, {'ordered': True})
 
                 # Progress bar.
                 file_count += 1
                 progress = (file_count / float(num_files - 1)) * 100
-                sys.stdout.write("Processing Oscillator Data: %d%% \r" % progress)
+                sys.stdout.write("Processing Kuramoto Data: %d%% \r" % progress)
                 sys.stdout.flush()
 
         return
 
 if __name__ == '__main__':
-    data_folder = "/Users/juancarlosfarah/Git/data/Data/part4"
+    data_folder = "/Users/juancarlosfarah/Git/data/Data/part#"
     default_db = "infotheoretic"
 
-    odi = OscillatorDataImporter()
-    odi.connect(default_db)
+    kdi = KuramotoDataImporter()
+    kdi.connect(default_db)
 
-    t1 = Thread(target=odi.load_folder, args=(data_folder, 0.9))
-    t2 = Thread(target=odi.load_folder, args=(data_folder, 0.8))
-    t3 = Thread(target=odi.load_folder, args=(data_folder, 0.7))
-    t4 = Thread(target=odi.load_folder, args=(data_folder, 0.6))
-    t5 = Thread(target=odi.load_folder, args=(data_folder, 0.5))
-    t1.start()
-    t2.start()
-    t3.start()
-    t4.start()
-    t5.start()
+    # Use multiple threads.
+    # ---------------------
+    # t1 = Thread(target=kdi.load_folder, args=(data_folder, 0.9))
+    # t2 = Thread(target=kdi.load_folder, args=(data_folder, 0.8))
+    # t3 = Thread(target=kdi.load_folder, args=(data_folder, 0.7))
+    # t4 = Thread(target=kdi.load_folder, args=(data_folder, 0.6))
+    # t5 = Thread(target=kdi.load_folder, args=(data_folder, 0.5))
+    # t1.start()
+    # t2.start()
+    # t3.start()
+    # t4.start()
+    # t5.start()
+    #
+    # t1.join()
+    # t2.join()
+    # t3.join()
+    # t4.join()
+    # t5.join()
 
-    t1.join()
-    t2.join()
-    t3.join()
-    t4.join()
-    t5.join()
-
-    # odi = OscillatorDataImporter(is_shuffled=True)
-    # odi.connect(default_db)
-    # odi.load_folder(data_folder, 0.9)
-    # odi.load_folder(data_folder, 0.8)
-    # odi.load_folder(data_folder, 0.7)
-    # odi.load_folder(data_folder, 0.6)
-    # odi.load_folder(data_folder, 0.5)
+    # Use single threads.
+    # ---------------------
+    kdi.load_folder(data_folder, 0.9)
+    kdi.load_folder(data_folder, 0.8)
+    kdi.load_folder(data_folder, 0.7)
+    kdi.load_folder(data_folder, 0.6)
+    kdi.load_folder(data_folder, 0.5)
