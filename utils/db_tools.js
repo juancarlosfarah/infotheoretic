@@ -7,6 +7,7 @@
 function createIndexes() {
     var db = db.getSiblingDB("infotheoretic");
     db.oscillator_data.ensureIndex({ "simulation_id": -1, "_id": 1 });
+    db.kuramoto_data.ensureIndex({ "simulation_id": -1, "_id": 1 });
     db.generator_data.ensureIndex({ "simulation_id": -1, "_id": 1 });
     db.snn_data.ensureIndex({ "simulation_id": -1, "_id": 1 });
     db.snn_simulation.ensureIndex({ "source": 1 });
