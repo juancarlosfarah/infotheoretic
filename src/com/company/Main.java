@@ -7,8 +7,14 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import infodynamics.measures.discrete.MutualInformationCalculatorDiscrete;
+import infodynamics.measures.discrete.EffectiveInformationCalculatorDiscrete;
+import infodynamics.measures.discrete
+                   .IntegratedInformationEmpiricalCalculatorDiscrete;
+import infodynamics.measures.discrete
+                   .IntegratedInformationEmpiricalTildeCalculatorDiscrete;
 import infodynamics.utils.MatrixUtils;
 import infodynamics.utils.RandomGenerator;
+import infodynamics.utils.Input;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -373,9 +379,9 @@ public class Main {
                                                .sort(ascending("_id"))
                                                .iterator();
             int num_communities;
-            if (type.equals("oscillator")) {
+            if (type.equals("oscillator") || type.equals("kuramoto")) {
                 num_communities = doc.getInteger("num_oscillators");
-            } else{
+            } else {
                 num_communities = doc.getInteger("num_communities");
             }
 
@@ -419,9 +425,13 @@ public class Main {
 
             // Store results in MongoDB.
             if (save) {
+
+                // Initialise documents.
                 Document setDoc = new Document();
                 Document update = new Document();
                 Document tauDoc = new Document();
+
+                // Populate fields.
                 update.put("phi_e", ii);
                 update.put("mib", mib);
                 update.put("mi", mi);
@@ -429,9 +439,9 @@ public class Main {
                 update.put("mib_tilde", mib_tilde);
                 update.put("tau", tau);
 
+                // Put update in embedded document.
                 tauDoc.put(tauKey, update);
                 setDoc.put("$set", tauDoc);
-
                 simulation.updateOne(eq("_id", _id), setDoc);
             }
 
@@ -460,8 +470,8 @@ public class Main {
         MongoDatabase db = mongoClient.getDatabase(database);
         MongoCollection<Document> simulation;
         MongoCollection<Document> data;
-        simulation = db.getCollection("oscillator_simulation");
-        data = db.getCollection("oscillator_data");
+        simulation = db.getCollection("kuramoto_simulation");
+        data = db.getCollection("kuramoto_data");
 
         Document query = new Document();
         Document ne = new Document("$exists", override);
@@ -826,7 +836,14 @@ public class Main {
         computePhiEForGeneratedData(false);
         computeNormalisedPhiEShuffled(false);
         computeCoalitionEntropy(false);
-        computeIntegratedInformation("snn", 5, false, false, false);
+
+        // Compute phi at various values of tau.
+        computeIntegratedInformation("kuramoto", 1, false, false, true);
+        computeIntegratedInformation("kuramoto", 5, false, false, true);
+        computeIntegratedInformation("kuramoto", 10, false, false, true);
+        computeIntegratedInformation("kuramoto", 15, false, false, true);
+        computeIntegratedInformation("kuramoto", 20, false, false, true);
+
         computeSortedSurrogateDataAnalysis(false);
         computeShuffledSurrogateDataAnalysis(false);
     }
