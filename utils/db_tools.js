@@ -122,12 +122,3 @@ db.oscillator_simulation.update({},
 db.oscillator_simulation.update({},
                                 { "$unset": { "phi_e_sorted": 1 } },
                                 { "multi": true });
-
-
-// Command to export data to CSV.
-"mongoexport -d infotheoretic" +
-"            -c oscillator_simulation" +
-"            --type=csv --fields " +
-"            beta,threshold,chi,global_sync,lambda,coalition_entropy," +
-"            tau_1.phi_e,tau_1.phi_e_tilde,tau_1.mi" +
-"            --out kuramoto_tau_1_gamma_5.csv -q '{ threshold: 0.5 }'";
