@@ -8,6 +8,15 @@ lambda_skew
 tau_1.phi_e
 tau_1.phi_e_tilde
 tau_1.mi
+tau_2.phi_e
+tau_2.phi_e_tilde
+tau_2.mi
+tau_3.phi_e
+tau_3.phi_e_tilde
+tau_3.mi
+tau_4.phi_e
+tau_4.phi_e_tilde
+tau_4.mi
 tau_5.phi_e
 tau_5.phi_e_tilde
 tau_5.mi
