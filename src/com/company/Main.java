@@ -376,6 +376,7 @@ public class Main {
 
             // Get data for this simulation.
             MongoCursor<Document> cursor = data.find(eq("simulation_id", _id))
+                                               .noCursorTimeout(true)
                                                .sort(ascending("_id"))
                                                .iterator();
             int num_communities;
@@ -839,7 +840,14 @@ public class Main {
 
         // Compute phi at various values of tau.
         computeIntegratedInformation("kuramoto", 1, false, false, true);
+        computeIntegratedInformation("kuramoto", 2, false, false, true);
+        computeIntegratedInformation("kuramoto", 3, false, false, true);
+        computeIntegratedInformation("kuramoto", 4, false, false, true);
         computeIntegratedInformation("kuramoto", 5, false, false, true);
+        computeIntegratedInformation("kuramoto", 6, false, false, true);
+        computeIntegratedInformation("kuramoto", 7, false, false, true);
+        computeIntegratedInformation("kuramoto", 8, false, false, true);
+        computeIntegratedInformation("kuramoto", 9, false, false, true);
         computeIntegratedInformation("kuramoto", 10, false, false, true);
         computeIntegratedInformation("kuramoto", 15, false, false, true);
         computeIntegratedInformation("kuramoto", 20, false, false, true);
