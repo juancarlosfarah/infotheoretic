@@ -57,7 +57,6 @@ class KuramotoDataImporter:
                 num_oscillators = sync[0].shape[0]
                 avg_syncs = []
                 beta = output.data.b
-                sync_discrete = []
                 syncs = np.zeros((num_oscillators, duration))
 
                 # Create ObjectId
@@ -73,13 +72,6 @@ class KuramotoDataImporter:
                     # Get diagonal and store for later calculations.
                     diagonal = sync_t.diagonal().copy()
                     syncs[:, t_step] = diagonal.T
-
-                    # Transform diagonal.
-                    diagonal[diagonal < threshold] = 0
-                    diagonal[diagonal >= threshold] = 1
-                    data = diagonal.tolist()
-
-                    sync_discrete.append(data)
                     t_step += 1
 
                 # Compute variance for lambda.
@@ -100,7 +92,7 @@ class KuramotoDataImporter:
                     chi_vars.append(np.var(syncs[:, i]))
 
                 lamda = np.average(sync_vars)
-                lamda_skew = np.average(sync_vars_skew)
+                lambda_skew = np.average(sync_vars_skew)
                 chi = np.average(chi_vars)
                 avg_sync = np.average(avg_syncs)
 
@@ -110,7 +102,7 @@ class KuramotoDataImporter:
                     "global_sync": avg_sync,
                     "beta": beta,
                     "lambda": lamda,
-                    "lambda_skew": lamda_skew,
+                    "lambda_skew": lambda_skew,
                     "chi": chi,
                     "num_oscillators": num_oscillators,
                     "duration": duration,
@@ -124,14 +116,12 @@ class KuramotoDataImporter:
                     # Create object container.
                     sync_objs = []
                     for i in range(duration):
-                        data_continuous = syncs[:, i].tolist()
-                        data_discrete = sync_discrete[i]
+                        data = syncs[:, i].tolist()
 
                         # Store information in object.
                         sync_obj = {
                             "simulation_id": _id,
-                            "discrete": data_discrete,
-                            "continuous": data_continuous
+                            "data": data
                         }
                         sync_objs.append(sync_obj)
 
