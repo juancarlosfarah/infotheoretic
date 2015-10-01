@@ -247,7 +247,8 @@ public class Main {
         iicd.addObservations(states0);
         iicd.computePossiblePartitions();
         System.out.println(iicd.compute());
-        System.out.println(Arrays.deepToString(iicd.minimumInformationPartition));
+        int[] mip1 = iicd.getMinimumInformationPartition();
+        System.out.println(Arrays.toString(mip1));
         System.out.println();
 
         // Shuffle data.
@@ -272,7 +273,8 @@ public class Main {
         iicd.addObservations(states0s);
         iicd.computePossiblePartitions();
         System.out.println(iicd.compute());
-        System.out.println(Arrays.deepToString(iicd.minimumInformationPartition));
+        int[] mip2 = iicd.getMinimumInformationPartition();
+        System.out.println(Arrays.toString(mip2));
 
 
         System.out.println("\n");
@@ -303,7 +305,8 @@ public class Main {
         iicd.computePossiblePartitions();
 
         System.out.println(iicd.compute());
-        System.out.println(Arrays.deepToString(iicd.minimumInformationPartition));
+        int[] mip3 = iicd.getMinimumInformationPartition();
+        System.out.println(Arrays.toString(mip3));
 
         System.out.println("\n");
         System.out.println("Second Integrated Information Test:");
@@ -314,7 +317,8 @@ public class Main {
         iicd.addObservations(states2);
         iicd.computePossiblePartitions();
         System.out.println(iicd.compute());
-        System.out.println(Arrays.deepToString(iicd.minimumInformationPartition));
+        int[] mip4 = iicd.getMinimumInformationPartition();
+        System.out.println(Arrays.toString(mip4));
 
     }
 
@@ -410,9 +414,8 @@ public class Main {
             iicd.computePossiblePartitions();
             double ii = iicd.compute();
             double mi = iicd.getMutualInformation();
-            ArrayList<List<Integer>> mib = new ArrayList<List<Integer>>();
-            mib.add(Ints.asList(iicd.minimumInformationPartition[0]));
-            mib.add(Ints.asList(iicd.minimumInformationPartition[1]));
+            int[] mip = iicd.getMinimumInformationPartition();
+            int mip_size = iicd.getMinimumInformationPartitionSize();
 
             // Compute Phi_E Tilde and Minimum Information Bipartition.
             iicdt = new IntegratedInformationEmpiricalTildeCalculatorDiscrete(2,
@@ -420,9 +423,8 @@ public class Main {
             iicdt.addObservations(obs);
             iicdt.computePossiblePartitions();
             double ii_tilde = iicdt.compute();
-            ArrayList<List<Integer>> mib_tilde = new ArrayList<List<Integer>>();
-            mib_tilde.add(Ints.asList(iicd.minimumInformationPartition[0]));
-            mib_tilde.add(Ints.asList(iicd.minimumInformationPartition[1]));
+            int[] mip_tilde = iicd.getMinimumInformationPartition();
+            int mip_tilde_size = iicd.getMinimumInformationPartitionSize();
 
             // Store results in MongoDB.
             if (save) {
@@ -434,10 +436,12 @@ public class Main {
 
                 // Populate fields.
                 update.put("phi_e", ii);
-                update.put("mib", mib);
+                update.put("mip", mip);
+                update.put("mip_size", mip_size);
                 update.put("mi", mi);
                 update.put("phi_e_tilde", ii_tilde);
-                update.put("mib_tilde", mib_tilde);
+                update.put("mip_tilde", mip_tilde);
+                update.put("mip_tilde_size", mip_tilde_size);
                 update.put("tau", tau);
 
                 // Put update in embedded document.
@@ -570,13 +574,14 @@ public class Main {
         double ii = iicd.compute();
         double mi = iicd.getMutualInformation();
         ArrayList<List<Integer>> mib = new ArrayList<List<Integer>>();
-        mib.add(Ints.asList(iicd.minimumInformationPartition[0]));
-        mib.add(Ints.asList(iicd.minimumInformationPartition[1]));
+        int[] mip = iicd.getMinimumInformationPartition();
+        int mip_size = iicd.getMinimumInformationPartitionSize();
 
         // Put values in return document.
         Document doc = new Document();
         doc.put("phi_e", ii);
-        doc.put("mib", mib);
+        doc.put("mip", mip);
+        doc.put("mip_size", mip_size);
         doc.put("tau", tau);
         doc.put("mi", mi);
 
@@ -834,26 +839,26 @@ public class Main {
         testCoalitionEntropy();
         System.out.println("Tests completed.");
 
-        computePhiEForGeneratedData(false);
-        computeNormalisedPhiEShuffled(false);
-        computeCoalitionEntropy(false);
+//        computePhiEForGeneratedData(false);
+//        computeNormalisedPhiEShuffled(false);
+//        computeCoalitionEntropy(false);
 
         // Compute phi at various values of tau.
-        computeIntegratedInformation("kuramoto", 1, false, false, true);
-        computeIntegratedInformation("kuramoto", 2, false, false, true);
-        computeIntegratedInformation("kuramoto", 3, false, false, true);
-        computeIntegratedInformation("kuramoto", 4, false, false, true);
-        computeIntegratedInformation("kuramoto", 5, false, false, true);
-        computeIntegratedInformation("kuramoto", 6, false, false, true);
-        computeIntegratedInformation("kuramoto", 7, false, false, true);
-        computeIntegratedInformation("kuramoto", 8, false, false, true);
-        computeIntegratedInformation("kuramoto", 9, false, false, true);
-        computeIntegratedInformation("kuramoto", 10, false, false, true);
-        computeIntegratedInformation("kuramoto", 15, false, false, true);
-        computeIntegratedInformation("kuramoto", 20, false, false, true);
+//        computeIntegratedInformation("kuramoto", 1, false, false, true);
+//        computeIntegratedInformation("kuramoto", 2, false, false, true);
+//        computeIntegratedInformation("kuramoto", 3, false, false, true);
+//        computeIntegratedInformation("kuramoto", 4, false, false, true);
+//        computeIntegratedInformation("kuramoto", 5, false, false, true);
+//        computeIntegratedInformation("kuramoto", 6, false, false, true);
+//        computeIntegratedInformation("kuramoto", 7, false, false, true);
+//        computeIntegratedInformation("kuramoto", 8, false, false, true);
+//        computeIntegratedInformation("kuramoto", 9, false, false, true);
+//        computeIntegratedInformation("kuramoto", 10, false, false, true);
+//        computeIntegratedInformation("kuramoto", 15, false, false, true);
+//        computeIntegratedInformation("kuramoto", 20, false, false, true);
 
-        computeSortedSurrogateDataAnalysis(false);
-        computeShuffledSurrogateDataAnalysis(false);
+//        computeSortedSurrogateDataAnalysis(false);
+//        computeShuffledSurrogateDataAnalysis(false);
     }
 
 }
