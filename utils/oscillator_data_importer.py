@@ -123,11 +123,15 @@ class KuramotoDataImporter:
 
                     # Create object container.
                     sync_objs = []
-                    for data_point in sync_discrete:
+                    for i in range(duration):
+                        data_continuous = syncs[:, i].tolist()
+                        data_discrete = sync_discrete[i]
+
                         # Store information in object.
                         sync_obj = {
                             "simulation_id": _id,
-                            "data": data_point
+                            "discrete": data_discrete,
+                            "continuous": data_continuous
                         }
                         sync_objs.append(sync_obj)
 
