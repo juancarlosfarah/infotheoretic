@@ -391,20 +391,34 @@ public class Main {
             }
 
             int duration = doc.getInteger("duration");
-            int[][] obs = new int[num_communities][duration * 10];
+            double[][] syncContinuous = new double[num_communities]
+                                                  [duration];
+            int[][] syncDiscrete = new int[num_communities][duration];
 
             // Transform data for use with Phi_E Calculator.
             int column = 0;
             while (cursor.hasNext()) {
                 Document d = cursor.next();
-                ArrayList<Integer> array = (ArrayList) (d.get("data"));
-                int[] vector = Ints.toArray(array);
-                MatrixUtils.insertVectorIntoMatrix(vector, obs, column);
-                for (int i = 1; i < 10; i++) {
-                    MatrixUtils.insertVectorIntoMatrix(vector,
-                                                       obs,
-                                                       column + i * duration);
+
+                // Get continuous data.
+                ArrayList<Double> array = (ArrayList) (d.get("data"));
+                double[] vecContinuous = Doubles.toArray(array);
+
+                // Discretise data.
+                int[] vecDiscrete = new int[num_communities];
+                for (int i = 0; i < num_communities; i++) {
+                    vecDiscrete[i] = (array.get(i) < gamma) ? 0 : 1;
                 }
+
+                // Discrete Matrix.
+                MatrixUtils.insertVectorIntoMatrix(vecDiscrete,
+                                                   syncDiscrete,
+                                                   column);
+
+                // Continuous Matrix.
+                MatrixUtils.insertVectorIntoMatrix(vecContinuous,
+                                                   syncContinuous,
+                                                   column);
                 column++;
             }
 
