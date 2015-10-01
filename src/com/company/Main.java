@@ -575,13 +575,13 @@ public class Main {
         double mi = iicd.getMutualInformation();
         ArrayList<List<Integer>> mib = new ArrayList<List<Integer>>();
         int[] mip = iicd.getMinimumInformationPartition();
-        int mip_size = iicd.getMinimumInformationPartitionSize();
+        int mipSize = iicd.getMinimumInformationPartitionSize();
 
         // Put values in return document.
         Document doc = new Document();
         doc.put("phi_e", ii);
         doc.put("mip", mip);
-        doc.put("mip_size", mip_size);
+        doc.put("mip_size", mipSize);
         doc.put("tau", tau);
         doc.put("mi", mi);
 
@@ -601,14 +601,14 @@ public class Main {
         iicd.addObservations(observations);
         iicd.computePossiblePartitions();
         double ii = iicd.compute();
-        ArrayList<List<Integer>> mib = new ArrayList<List<Integer>>();
-        mib.add(Ints.asList(iicd.minimumInformationPartition[0]));
-        mib.add(Ints.asList(iicd.minimumInformationPartition[1]));
+        int[] mip = iicd.getMinimumInformationPartition();
+        int mipSize = iicd.getMinimumInformationPartitionSize();
 
         // Put values in return document.
         Document doc = new Document();
         doc.put("phi_e_tilde", ii);
-        doc.put("mib_tilde", mib);
+        doc.put("mip_tilde", mip);
+        doc.put("mip_tilde_size", mipSize);
 
         return doc;
 
