@@ -1,17 +1,21 @@
 package com.company;
 
+import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+import infodynamics.measures.continuous.kraskov.IntegratedInformationCalculatorKraskov;
 import infodynamics.measures.discrete.MutualInformationCalculatorDiscrete;
 import infodynamics.measures.discrete.EffectiveInformationCalculatorDiscrete;
 import infodynamics.measures.discrete
                    .IntegratedInformationEmpiricalCalculatorDiscrete;
 import infodynamics.measures.discrete
                    .IntegratedInformationEmpiricalTildeCalculatorDiscrete;
+import infodynamics.measures.continuous.gaussian
+                   .IntegratedInformationCalculatorGaussian;
 import infodynamics.utils.MatrixUtils;
 import infodynamics.utils.RandomGenerator;
 import infodynamics.utils.Input;
@@ -345,14 +349,16 @@ public class Main {
 
     public static void computeIntegratedInformation(String type,
                                                     int tau,
+                                                    double gamma,
                                                     boolean override,
                                                     boolean shuffle,
                                                     boolean save) {
 
         IntegratedInformationEmpiricalCalculatorDiscrete iicd;
         IntegratedInformationEmpiricalTildeCalculatorDiscrete iicdt;
+        IntegratedInformationCalculatorGaussian iicg;
+        IntegratedInformationCalculatorKraskov iick;
 
-        // Test with data from Kuramoto Oscillator simulations.
         String host = "localhost";
         int port = 27017;
         String database = "infotheoretic";
@@ -422,23 +428,45 @@ public class Main {
                 column++;
             }
 
-            // Compute Phi_E and Minimum Information Bipartition.
+            // Compute Phi_E.
             iicd = new IntegratedInformationEmpiricalCalculatorDiscrete(2, tau);
-            iicd.addObservations(obs);
+            iicd.addObservations(syncDiscrete);
             iicd.computePossiblePartitions();
             double ii = iicd.compute();
             double mi = iicd.getMutualInformation();
-            int[] mip = iicd.getMinimumInformationPartition();
+            int[] min_p = iicd.getMinimumInformationPartition();
+            List<Integer> mip = Ints.asList(min_p);
             int mip_size = iicd.getMinimumInformationPartitionSize();
 
-            // Compute Phi_E Tilde and Minimum Information Bipartition.
+            // Compute Phi_E Tilde.
             iicdt = new IntegratedInformationEmpiricalTildeCalculatorDiscrete(2,
                     tau);
-            iicdt.addObservations(obs);
+            iicdt.addObservations(syncDiscrete);
             iicdt.computePossiblePartitions();
             double ii_tilde = iicdt.compute();
-            int[] mip_tilde = iicd.getMinimumInformationPartition();
+            int[] mipt = iicd.getMinimumInformationPartition();
+            List<Integer> mip_tilde = Ints.asList(mipt);
             int mip_tilde_size = iicd.getMinimumInformationPartitionSize();
+
+            // Compute Phi Gaussian.
+            iicg = new IntegratedInformationCalculatorGaussian(tau);
+            iicg.addObservations(syncContinuous);
+            iicg.computePossiblePartitions();
+            double iiGauss = iicg.compute();
+            double miGauss = iicg.getMutualInformation();
+            int[] mipg = iicg.getMinimumInformationPartition();
+            List<Integer> mipGauss = Ints.asList(mipg);
+            int mipGaussSize = iicg.getMinimumInformationPartitionSize();
+
+            // Compute Phi Kraskov.
+            iick = new IntegratedInformationCalculatorKraskov(tau);
+            iick.addObservations(syncContinuous);
+            iick.computePossiblePartitions();
+            double iiKraskov = iick.compute();
+            double miKraskov = iick.getMutualInformation();
+            int[] mipk = iick.getMinimumInformationPartition();
+            List<Integer> mipKraskov = Ints.asList(mipk);
+            int mipKraskovSize = iicg.getMinimumInformationPartitionSize();
 
             // Store results in MongoDB.
             if (save) {
@@ -456,7 +484,16 @@ public class Main {
                 update.put("phi_e_tilde", ii_tilde);
                 update.put("mip_tilde", mip_tilde);
                 update.put("mip_tilde_size", mip_tilde_size);
+                update.put("phi_gauss", iiGauss);
+                update.put("mip_gauss", mipGauss);
+                update.put("mip_gauss_size", mipGaussSize);
+                update.put("mi_gauss", miGauss);
+                update.put("phi_kraskov", iiKraskov);
+                update.put("mip_kraskov", mipKraskov);
+                update.put("mip_kraskov_size", mipKraskovSize);
+                update.put("mi_kraskov", miKraskov);
                 update.put("tau", tau);
+                update.put("gamma", gamma);
 
                 // Put update in embedded document.
                 tauDoc.put(tauKey, update);
@@ -588,7 +625,8 @@ public class Main {
         double ii = iicd.compute();
         double mi = iicd.getMutualInformation();
         ArrayList<List<Integer>> mib = new ArrayList<List<Integer>>();
-        int[] mip = iicd.getMinimumInformationPartition();
+        int[] min_p = iicd.getMinimumInformationPartition();
+        List<Integer> mip = Ints.asList(min_p);
         int mipSize = iicd.getMinimumInformationPartitionSize();
 
         // Put values in return document.
@@ -615,13 +653,14 @@ public class Main {
         iicd.addObservations(observations);
         iicd.computePossiblePartitions();
         double ii = iicd.compute();
-        int[] mip = iicd.getMinimumInformationPartition();
+        int[] mipt = iicd.getMinimumInformationPartition();
+        List<Integer> mip_tilde = Ints.asList(mipt);
         int mipSize = iicd.getMinimumInformationPartitionSize();
 
         // Put values in return document.
         Document doc = new Document();
         doc.put("phi_e_tilde", ii);
-        doc.put("mip_tilde", mip);
+        doc.put("mip_tilde", mip_tilde);
         doc.put("mip_tilde_size", mipSize);
 
         return doc;
@@ -845,20 +884,20 @@ public class Main {
 
     public static void main(String[] args) {
 
-        System.out.println("Start tests.");
-        testMutualInformation();
-        testMutualInformationTimeSeries();
-        testMutualInformationTimeSeriesPairs();
-        testIntegratedInformation();
-        testCoalitionEntropy();
-        System.out.println("Tests completed.");
+//        System.out.println("Start tests.");
+//        testMutualInformation();
+//        testMutualInformationTimeSeries();
+//        testMutualInformationTimeSeriesPairs();
+//        testIntegratedInformation();
+//        testCoalitionEntropy();
+//        System.out.println("Tests completed.");
 
 //        computePhiEForGeneratedData(false);
 //        computeNormalisedPhiEShuffled(false);
 //        computeCoalitionEntropy(false);
 
         // Compute phi at various values of tau.
-//        computeIntegratedInformation("kuramoto", 1, false, false, true);
+//        computeIntegratedInformation("kuramoto", 1, 0.5, true, false, true);
 //        computeIntegratedInformation("kuramoto", 2, false, false, true);
 //        computeIntegratedInformation("kuramoto", 3, false, false, true);
 //        computeIntegratedInformation("kuramoto", 4, false, false, true);
@@ -868,8 +907,6 @@ public class Main {
 //        computeIntegratedInformation("kuramoto", 8, false, false, true);
 //        computeIntegratedInformation("kuramoto", 9, false, false, true);
 //        computeIntegratedInformation("kuramoto", 10, false, false, true);
-//        computeIntegratedInformation("kuramoto", 15, false, false, true);
-//        computeIntegratedInformation("kuramoto", 20, false, false, true);
 
 //        computeSortedSurrogateDataAnalysis(false);
 //        computeShuffledSurrogateDataAnalysis(false);
