@@ -21,6 +21,7 @@ import infodynamics.utils.RandomGenerator;
 import infodynamics.utils.Input;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import com.mongodb.MongoCursorNotFoundException;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Sorts.ascending;
@@ -352,7 +353,8 @@ public class Main {
                                                     double gamma,
                                                     boolean override,
                                                     boolean shuffle,
-                                                    boolean save) {
+                                                    boolean save)
+                        throws MongoCursorNotFoundException {
 
         IntegratedInformationEmpiricalCalculatorDiscrete iicd;
         IntegratedInformationEmpiricalTildeCalculatorDiscrete iicdt;
@@ -513,7 +515,8 @@ public class Main {
 
     }
 
-    public static void computeCoalitionEntropy(boolean override) {
+    public static void computeCoalitionEntropy(double gamma,
+                                               boolean override) {
 
         int base = 2;
         CoalitionEntropyCalculatorDiscrete cecd;
@@ -526,12 +529,16 @@ public class Main {
         MongoDatabase db = mongoClient.getDatabase(database);
         MongoCollection<Document> simulation;
         MongoCollection<Document> data;
-        simulation = db.getCollection("kuramoto_simulation");
-        data = db.getCollection("kuramoto_data");
+        simulation = db.getCollection("k_simulation");
+        data = db.getCollection("k_data");
+
+        // Generate key.
+        String g = String.valueOf(gamma).split("\\.")[1];
+        String key = "hc_" + g;
 
         Document query = new Document();
         Document ne = new Document("$exists", override);
-        query.put("coalition_entropy", ne);
+        query.put(key, ne);
 
         // Counter to keep track of number of updated documents.
         int count = 0;
@@ -547,27 +554,42 @@ public class Main {
                                                .iterator();
             int num_oscillators = doc.getInteger("num_oscillators");
             int duration = doc.getInteger("duration");
-            int[][] obs = new int[num_oscillators][duration];
+            int[][] syncDiscrete = new int[num_oscillators][duration];
 
             // Transform data for use with H_c Calculator.
             int column = 0;
             while (cursor.hasNext()) {
                 Document d = cursor.next();
-                ArrayList<Integer> array = (ArrayList) (d.get("data"));
-                int[] vector = Ints.toArray(array);
-                MatrixUtils.insertVectorIntoMatrix(vector, obs, column);
+
+                // Get continuous data.
+                ArrayList<Double> array = (ArrayList) (d.get("data"));
+
+                // Discretise data.
+                int[] vecDiscrete = new int[num_oscillators];
+                for (int i = 0; i < num_oscillators; i++) {
+                    vecDiscrete[i] = (array.get(i) < gamma) ? 0 : 1;
+                }
+
+                // Discrete Matrix.
+                MatrixUtils.insertVectorIntoMatrix(vecDiscrete,
+                                                   syncDiscrete,
+                                                   column);
+
                 column++;
             }
 
             // Compute coalition entropy.
             cecd = new CoalitionEntropyCalculatorDiscrete(base);
-            cecd.addObservations(obs);
+            cecd.addObservations(syncDiscrete);
             double ce = cecd.compute();
 
             // Store results in MongoDB.
             Document setDoc = new Document();
             Document update = new Document();
-            update.put("coalition_entropy", ce);
+            Document hc = new Document();
+            hc.put("hc", ce);
+            hc.put("gamma", gamma);
+            update.put(key, hc);
             setDoc.put("$set", update);
 
             simulation.updateOne(eq("_id", _id), setDoc);
