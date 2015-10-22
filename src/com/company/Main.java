@@ -10,10 +10,8 @@ import com.mongodb.client.MongoDatabase;
 import infodynamics.measures.continuous.kraskov.IntegratedInformationCalculatorKraskov;
 import infodynamics.measures.discrete.MutualInformationCalculatorDiscrete;
 import infodynamics.measures.discrete.EffectiveInformationCalculatorDiscrete;
-import infodynamics.measures.discrete
-                   .IntegratedInformationEmpiricalCalculatorDiscrete;
-import infodynamics.measures.discrete
-                   .IntegratedInformationEmpiricalTildeCalculatorDiscrete;
+import infodynamics.measures.discrete.IntegratedInformationCalculatorDiscrete;
+import infodynamics.measures.discrete.IntegratedInteractionCalculatorDiscrete;
 import infodynamics.measures.continuous.gaussian
                    .IntegratedInformationCalculatorGaussian;
 import infodynamics.utils.MatrixUtils;
@@ -236,19 +234,19 @@ public class Main {
         eicd = new EffectiveInformationCalculatorDiscrete(2, tau);
         eicd.addObservations(states0);
         System.out.println("Computing EI for original generative model:");
-        double s = eicd.computeMutualInformationForSystem();
+        double s = eicd.computeForSystem();
         System.out.println("System:\t\t\t" + s);
         int[] p0 = {0};
-        double o0 = eicd.computeForBipartition(p0);
+        double o0 = eicd.computeForPartition(p0);
         System.out.println("Partition 1:\t" + o0);
         int[] p1 = {1};
-        double o1 = eicd.computeForBipartition(p1);
+        double o1 = eicd.computeForPartition(p1);
         System.out.println("Partition 2:\t" + o1);
 
         // Compute II for original generative model.
         System.out.println("Computing II for original generative model:");
-        IntegratedInformationEmpiricalCalculatorDiscrete iicd;
-        iicd = new IntegratedInformationEmpiricalCalculatorDiscrete(2, tau);
+        IntegratedInformationCalculatorDiscrete iicd;
+        iicd = new IntegratedInformationCalculatorDiscrete(2, tau);
         iicd.addObservations(states0);
         iicd.computePossiblePartitions();
         System.out.println(iicd.compute());
@@ -263,18 +261,18 @@ public class Main {
 
         // Compute EI for shuffled generative model.
         System.out.println("Computing EI for shuffled generative model:");
-        double ss = eicd.computeMutualInformationForSystem();
+        double ss = eicd.computeForSystem();
         System.out.println("System:\t\t\t" + ss);
         int[] p0s = {0};
-        double o0s = eicd.computeForBipartition(p0s);
+        double o0s = eicd.computeForPartition(p0s);
         System.out.println("Partition 1:\t" + o0s);
         int[] p1s = {1};
-        double o1s = eicd.computeForBipartition(p1s);
+        double o1s = eicd.computeForPartition(p1s);
         System.out.println("Partition 2:\t" + o1s);
 
         // Compute II for shuffled generative model.
         System.out.println("Computing II for shuffled generative model:");
-        iicd = new IntegratedInformationEmpiricalCalculatorDiscrete(2, tau);
+        iicd = new IntegratedInformationCalculatorDiscrete(2, tau);
         iicd.addObservations(states0s);
         iicd.computePossiblePartitions();
         System.out.println(iicd.compute());
@@ -299,13 +297,13 @@ public class Main {
         eicd.addObservations(states1);
 
         int[] p2 = {0, 1, 2};
-        double o2 = eicd.computeForBipartition(p2);
+        double o2 = eicd.computeForPartition(p2);
         System.out.println(o2);
 
         System.out.println("\n");
         System.out.println("First Integrated Information Test:");
 
-        iicd = new IntegratedInformationEmpiricalCalculatorDiscrete(2, tau);
+        iicd = new IntegratedInformationCalculatorDiscrete(2, tau);
         iicd.addObservations(states1);
         iicd.computePossiblePartitions();
 
@@ -318,12 +316,38 @@ public class Main {
 
         int[][] states2 = rg.generateRandomInts(8, 10000, 2);
 
-        iicd = new IntegratedInformationEmpiricalCalculatorDiscrete(2, tau);
+        iicd = new IntegratedInformationCalculatorDiscrete(2, tau);
         iicd.addObservations(states2);
         iicd.computePossiblePartitions();
         System.out.println(iicd.compute());
         int[] mip4 = iicd.getMinimumInformationPartition();
         System.out.println(Arrays.toString(mip4));
+
+        System.out.println("\n");
+        System.out.println("Gaussian Integrated Information Test:");
+
+        double[][] states3 = rg.generateRandomData(8, 5000);
+
+        IntegratedInformationCalculatorGaussian iicg;
+        iicg = new IntegratedInformationCalculatorGaussian(tau);
+        iicg.addObservations(states3);
+        iicg.computePossiblePartitions();
+        System.out.println(iicg.compute());
+        int[] mip5 = iicg.getMinimumInformationPartition();
+        System.out.println(Arrays.toString(mip5));
+
+        System.out.println("\n");
+        System.out.println("Kraskov Integrated Information Test:");
+
+        double[][] states4 = rg.generateRandomData(8, 5000);
+
+        IntegratedInformationCalculatorKraskov iick;
+        iick = new IntegratedInformationCalculatorKraskov(tau);
+        iick.addObservations(states4);
+        iick.computePossiblePartitions();
+        System.out.println(iick.compute());
+        int[] mip6 = iick.getMinimumInformationPartition();
+        System.out.println(Arrays.toString(mip6));
 
     }
 
@@ -356,8 +380,8 @@ public class Main {
                                                     boolean save)
                         throws MongoCursorNotFoundException {
 
-        IntegratedInformationEmpiricalCalculatorDiscrete iicd;
-        IntegratedInformationEmpiricalTildeCalculatorDiscrete iicdt;
+        IntegratedInformationCalculatorDiscrete iicd;
+        IntegratedInteractionCalculatorDiscrete iicdt;
         IntegratedInformationCalculatorGaussian iicg;
         IntegratedInformationCalculatorKraskov iick;
 
@@ -370,18 +394,24 @@ public class Main {
         MongoCollection<Document> data;
         simulation = db.getCollection(type + "_simulation");
         data = db.getCollection(type + "_data");
-        String tauKey = "tau_" + tau;
+        String g = String.valueOf(gamma).split("\\.")[1];
+        String key = "tau_" + tau + "_gamma_" + g;
 
         Document query = new Document();
         if (!override) {
             Document ne = new Document("$exists", false);
-            query.put(tauKey, ne);
+            query.put(key, ne);
         }
+
+        // Only calculate for interesting beta values.
+        query.put("beta", new Document("$lt", 1));
 
         // Counter to keep track of number of updated documents.
         int count = 0;
 
-        for (Document doc : simulation.find(query)) {
+        FindIterable<Document> sims = simulation.find(query);
+
+        for (Document doc : sims) {
 
             // Get ObjectId for simulation.
             ObjectId _id = doc.getObjectId("_id");
@@ -392,13 +422,17 @@ public class Main {
                                                .sort(ascending("_id"))
                                                .iterator();
             int num_communities;
-            if (type.equals("oscillator") || type.equals("kuramoto")) {
+            if (type.equals("oscillator") ||
+                type.equals("kuramoto") ||
+                type.equals("k")) {
                 num_communities = doc.getInteger("num_oscillators");
             } else {
                 num_communities = doc.getInteger("num_communities");
             }
 
             int duration = doc.getInteger("duration");
+
+            // Containers for continuous and discrete data.
             double[][] syncContinuous = new double[num_communities]
                                                   [duration];
             int[][] syncDiscrete = new int[num_communities][duration];
@@ -431,18 +465,19 @@ public class Main {
             }
 
             // Compute Phi_E.
-            iicd = new IntegratedInformationEmpiricalCalculatorDiscrete(2, tau);
+            // --------------
+            iicd = new IntegratedInformationCalculatorDiscrete(2, tau);
             iicd.addObservations(syncDiscrete);
             iicd.computePossiblePartitions();
             double ii = iicd.compute();
-            double mi = iicd.getMutualInformation();
+            double mi = iicd.getSystemInformation();
             int[] min_p = iicd.getMinimumInformationPartition();
             List<Integer> mip = Ints.asList(min_p);
             int mip_size = iicd.getMinimumInformationPartitionSize();
 
             // Compute Phi_E Tilde.
-            iicdt = new IntegratedInformationEmpiricalTildeCalculatorDiscrete(2,
-                    tau);
+            // --------------------
+            iicdt = new IntegratedInteractionCalculatorDiscrete(2, tau);
             iicdt.addObservations(syncDiscrete);
             iicdt.computePossiblePartitions();
             double ii_tilde = iicdt.compute();
@@ -451,6 +486,7 @@ public class Main {
             int mip_tilde_size = iicd.getMinimumInformationPartitionSize();
 
             // Compute Phi Gaussian.
+            // ---------------------
             iicg = new IntegratedInformationCalculatorGaussian(tau);
             iicg.addObservations(syncContinuous);
             iicg.computePossiblePartitions();
@@ -461,6 +497,7 @@ public class Main {
             int mipGaussSize = iicg.getMinimumInformationPartitionSize();
 
             // Compute Phi Kraskov.
+            // --------------------
             iick = new IntegratedInformationCalculatorKraskov(tau);
             iick.addObservations(syncContinuous);
             iick.computePossiblePartitions();
@@ -479,26 +516,37 @@ public class Main {
                 Document tauDoc = new Document();
 
                 // Populate fields.
+                // ----------------
+
+                // Empirical
                 update.put("phi_e", ii);
                 update.put("mip", mip);
                 update.put("mip_size", mip_size);
                 update.put("mi", mi);
+
+                // Empirical Tilde
                 update.put("phi_e_tilde", ii_tilde);
                 update.put("mip_tilde", mip_tilde);
                 update.put("mip_tilde_size", mip_tilde_size);
+
+                // Gaussian
                 update.put("phi_gauss", iiGauss);
                 update.put("mip_gauss", mipGauss);
                 update.put("mip_gauss_size", mipGaussSize);
                 update.put("mi_gauss", miGauss);
+
+                // Kraskov
                 update.put("phi_kraskov", iiKraskov);
                 update.put("mip_kraskov", mipKraskov);
                 update.put("mip_kraskov_size", mipKraskovSize);
                 update.put("mi_kraskov", miKraskov);
+
+                // Params
                 update.put("tau", tau);
                 update.put("gamma", gamma);
 
                 // Put update in embedded document.
-                tauDoc.put(tauKey, update);
+                tauDoc.put(key, update);
                 setDoc.put("$set", tauDoc);
                 simulation.updateOne(eq("_id", _id), setDoc);
             }
@@ -638,14 +686,14 @@ public class Main {
 
         // Use tau = 1;
         int tau = 1;
-        IntegratedInformationEmpiricalCalculatorDiscrete iicd;
+        IntegratedInformationCalculatorDiscrete iicd;
 
         // Compute Phi_E and Minimium Information Partition.
-        iicd = new IntegratedInformationEmpiricalCalculatorDiscrete(2, tau);
+        iicd = new IntegratedInformationCalculatorDiscrete(2, tau);
         iicd.addObservations(observations);
         iicd.computePossiblePartitions();
         double ii = iicd.compute();
-        double mi = iicd.getMutualInformation();
+        double mi = iicd.getSystemInformation();
         ArrayList<List<Integer>> mib = new ArrayList<List<Integer>>();
         int[] min_p = iicd.getMinimumInformationPartition();
         List<Integer> mip = Ints.asList(min_p);
@@ -667,11 +715,10 @@ public class Main {
 
         // Use tau = 1;
         int tau = 1;
-        IntegratedInformationEmpiricalTildeCalculatorDiscrete iicd;
+        IntegratedInteractionCalculatorDiscrete iicd;
 
         // Compute Phi_E and Minimium Information Partition.
-        iicd = new IntegratedInformationEmpiricalTildeCalculatorDiscrete(2,
-                                                                         tau);
+        iicd = new IntegratedInteractionCalculatorDiscrete(2, tau);
         iicd.addObservations(observations);
         iicd.computePossiblePartitions();
         double ii = iicd.compute();
@@ -906,29 +953,35 @@ public class Main {
 
     public static void main(String[] args) {
 
-//        System.out.println("Start tests.");
-//        testMutualInformation();
-//        testMutualInformationTimeSeries();
-//        testMutualInformationTimeSeriesPairs();
-//        testIntegratedInformation();
-//        testCoalitionEntropy();
-//        System.out.println("Tests completed.");
+        System.out.println("Start tests.");
+        testMutualInformation();
+        testMutualInformationTimeSeries();
+        testMutualInformationTimeSeriesPairs();
+        testIntegratedInformation();
+        testCoalitionEntropy();
+        System.out.println("Tests completed.");
 
 //        computePhiEForGeneratedData(false);
 //        computeNormalisedPhiEShuffled(false);
-//        computeCoalitionEntropy(false);
 
-        // Compute phi at various values of tau.
-//        computeIntegratedInformation("kuramoto", 1, 0.5, true, false, true);
-//        computeIntegratedInformation("kuramoto", 2, false, false, true);
-//        computeIntegratedInformation("kuramoto", 3, false, false, true);
-//        computeIntegratedInformation("kuramoto", 4, false, false, true);
-//        computeIntegratedInformation("kuramoto", 5, false, false, true);
-//        computeIntegratedInformation("kuramoto", 6, false, false, true);
-//        computeIntegratedInformation("kuramoto", 7, false, false, true);
-//        computeIntegratedInformation("kuramoto", 8, false, false, true);
-//        computeIntegratedInformation("kuramoto", 9, false, false, true);
-//        computeIntegratedInformation("kuramoto", 10, false, false, true);
+//        double[] gammas = {0.5, 0.6, 0.7, 0.8, 0.9};
+//        for (double gamma : gammas) {
+//            computeCoalitionEntropy(gamma, false);
+//        }
+
+        // Compute phi at various values of tau and gamma.
+//        double[] gammas = {0.5, 0.6, 0.7, 0.8, 0.9};
+//        for (double gamma : gammas)  {
+//            try {
+//                computeIntegratedInformation("k", 10, gamma, false, false,
+//                        true);
+//            } catch (MongoCursorNotFoundException e) {
+//                e.printStackTrace();
+//                computeIntegratedInformation("k", 10, gamma, false, false,
+//                        true);
+//            }
+//        }
+
 
 //        computeSortedSurrogateDataAnalysis(false);
 //        computeShuffledSurrogateDataAnalysis(false);
