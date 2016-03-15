@@ -48,7 +48,7 @@ class DataPlotter:
              ext="svg",
              query=None,
              tau=1,
-             thresholds=None,
+             gamma=0.5,
              is_sorted=False,
              is_shuffled=False):
 
@@ -56,8 +56,8 @@ class DataPlotter:
             query = dict()
 
         duration = "Various"
-        tau_key = "tau_" + str(tau)
-        query[tau_key] = {"$exists": True}
+        key = "tau_" + str(tau) + "_gamma_" + str(gamma).split(".")[1]
+        query[key] = {"$exists": True}
 
         if "duration" in query:
             duration = query['duration']
@@ -119,7 +119,7 @@ class DataPlotter:
             mi[key] = []
 
             for doc in cursors[key]:
-                subdoc = doc[tau_key]
+                subdoc = doc[key]
                 if is_sorted:
                     subdoc = doc['sorted']
                 elif is_shuffled:

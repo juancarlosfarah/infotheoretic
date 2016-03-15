@@ -7,7 +7,6 @@ import numpy as np
 import scipy.stats as st
 import sys
 from bson.objectid import ObjectId
-from threading import Thread
 
 
 class KuramotoDataImporter:
@@ -29,7 +28,7 @@ class KuramotoDataImporter:
         return self.db
 
     # noinspection PyUnresolvedReferences
-    def load_folder(self, folder, threshold):
+    def load_folder(self, folder):
         print "Loading folder..."
 
         if not os.path.isdir(folder):
@@ -105,8 +104,7 @@ class KuramotoDataImporter:
                     "lambda_skew": lambda_skew,
                     "chi": chi,
                     "num_oscillators": num_oscillators,
-                    "duration": duration,
-                    "threshold": threshold
+                    "duration": duration
                 }
 
                 # Storing in MongoDB if database has been defined.
@@ -126,8 +124,8 @@ class KuramotoDataImporter:
                         sync_objs.append(sync_obj)
 
                     # Insert to database.
-                    db.kuramoto_simulation.insert_one(obj)
-                    db.kuramoto_data.insert(sync_objs, {'ordered': True})
+                    db.k_simulation.insert_one(obj)
+                    db.k_data.insert(sync_objs, {'ordered': True})
 
                 # Progress bar.
                 file_count += 1
@@ -138,35 +136,14 @@ class KuramotoDataImporter:
         return
 
 if __name__ == '__main__':
-    data_folder = "/Users/juancarlosfarah/Git/data/Data/part#"
+
     default_db = "infotheoretic"
 
     kdi = KuramotoDataImporter()
     kdi.connect(default_db)
 
-    # Use multiple threads.
-    # ---------------------
-    # t1 = Thread(target=kdi.load_folder, args=(data_folder, 0.9))
-    # t2 = Thread(target=kdi.load_folder, args=(data_folder, 0.8))
-    # t3 = Thread(target=kdi.load_folder, args=(data_folder, 0.7))
-    # t4 = Thread(target=kdi.load_folder, args=(data_folder, 0.6))
-    # t5 = Thread(target=kdi.load_folder, args=(data_folder, 0.5))
-    # t1.start()
-    # t2.start()
-    # t3.start()
-    # t4.start()
-    # t5.start()
-    #
-    # t1.join()
-    # t2.join()
-    # t3.join()
-    # t4.join()
-    # t5.join()
-
-    # Use single threads.
-    # ---------------------
-    kdi.load_folder(data_folder, 0.9)
-    kdi.load_folder(data_folder, 0.8)
-    kdi.load_folder(data_folder, 0.7)
-    kdi.load_folder(data_folder, 0.6)
-    kdi.load_folder(data_folder, 0.5)
+    # Import data.
+    # ------------
+    for i in range(1, 7):
+        data_folder = "/Users/juancarlosfarah/Git/data/Data/part" + str(i)
+        kdi.load_folder(data_folder)
